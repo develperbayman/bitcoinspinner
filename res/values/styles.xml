@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="QRAddressStyle">
+    	<item name="android:background">@drawable/qr_address</item>
+    </style>
+    
+    <style name="BitCoinActivity">
+        <item name="android:background">@color/DarkOrange</item>
+    </style>
+    
+    <style name="SendMoneyButton" parent="@android:style/Widget.Button">
+    	<item name="android:gravity">center</item>
+    	<item name="android:textSize">25dp</item>
+    	<item name="android:padding">0dp</item>
+    </style>
+    
+    <style name="BitCoinTextView" parent="@android:style/Widget.TextView">
+    	<item name="android:textColor">@color/Black</item>
+    </style>
+    
+</resources>

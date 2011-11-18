@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/rl_address"
+    android:layout_width="fill_parent"
+    android:layout_height="90dp"
+    android:background="@drawable/infobox" >
+
+    <TextView
+        android:id="@+id/tv_addresstext"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:text="Your bitcoin address:"
+        android:textColor="@color/DarkSlateGray" />
+
+    <TextView
+        android:id="@+id/tv_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/tv_addresstext"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/textview"
+        android:maxWidth="135dp"
+        android:paddingLeft="5dp"
+        android:paddingRight="5dp"
+        android:text="ADDRESS"
+        android:textColor="@color/Black"
+        android:textSize="16dp"
+        android:typeface="monospace" />
+
+    <ImageView
+        android:id="@+id/iv_address"
+        style="@style/QRAddressStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="fill_parent"
+        android:layout_alignParentRight="true"
+        android:layout_centerVertical="true"
+        android:layout_marginBottom="5dp"
+        android:layout_marginRight="5dp"
+        android:layout_marginTop="5dp"
+        android:padding="5dp" />
+
+</RelativeLayout>

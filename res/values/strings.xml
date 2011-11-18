@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="app_name">BitCoinSpinner</string>
+    <string name="shake_dialog_text">Please shake your device...</string>
+    <string name="initialize">Initializing Random Seed</string>
+    <string name="startup_dialog_text">Please wait...</string>
+    <string name="startup_dialog_title">Connecting</string>
+    <string name="about_text">This app is ment to be used as a wallet holding change, or to be used as an introduction to the currency "Bitcoin".</string>
+    <string name="about_menu">About BS</string>
+    <string name="about_title">About BitCoinSpinner</string>
+    <string name="clipboard_copy">Address copied to clipboard</string>
+    <string name="send_bitcoins">Send Bitcoins</string>
+    <string name="settings">Settings</string>
+    <string name="pref_network_fee">Network fee</string>
+    <string name="prefs_backup_title">Backup wallet</string>
+    <string name="backup_dialog_text">You are about to display a QR code which can be used to restore your wallet on a different device.\n\n
+Take a picture of it and/or print it out on Paper.\n\n
+Warning, this QR code enables anyone who scans it to take possession of the funds controlled by this device.\n\n
+Do you want to proceed?</string>
+    <string name="restore_dialog_no_coins">You are about to restore your wallet from a backup.\n\n
+This is done by scanning a previously generated backup QR code.\n\n
+Do you want to continue?</string>
+    <string name="restore_dialog_coins">You cannot restore a backup as your wallet contains funds.\n\n
+Please send your funds elsewhere before proceeding.</string>
+    <string name="prefs_restore_title">Restore wallet</string>
+    <string name="prefs_category_backupandrestore">Backup and Restore</string>
+    <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner preferences</string>
+    <string name="no">No</string>
+    <string name="yes">Yes</string>
+    <string name="ok">Ok</string>
+    <string name="restore_invalid_qr_code">Invalid QR-code!</string>
+    <string name="restore_complete_dialog_text">Restore complete</string>
+    <string name="network_fee_heading">Network fee:</string>
+    <string name="sending_bitcoins">Sending Bitcoins</string>
+    <string name="sending_bitcoins_wait">Please wait while sending bitcoins</string>
+</resources>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory android:title="@string/prefs_category_bitcoinwalletprefs" >
+
+        <EditTextPreference
+            android:defaultValue=""
+            android:key="networkFeeSizePref"
+            android:summary="0.0005 BTC"
+            android:title="@string/pref_network_fee" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/prefs_category_backupandrestore" >
+
+        <Preference
+            android:key="backupSeed"
+            android:title="@string/prefs_backup_title" />
+
+        <Preference
+            android:key="restoreSeed"
+            android:title="@string/prefs_restore_title" />
+    </PreferenceCategory>
+
+</PreferenceScreen>
