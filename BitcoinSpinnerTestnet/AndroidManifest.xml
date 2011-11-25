@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manifest android:versionCode="1" android:versionName="0.2.16"
+<manifest android:versionCode="4" android:versionName="0.2.19b"
     package="com.miracleas.bitcoin_spinner_testnet" xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-sdk android:minSdkVersion="8"/>
     <uses-permission android:name="android.permission.INTERNET"/>

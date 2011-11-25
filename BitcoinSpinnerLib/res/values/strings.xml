@@ -6,7 +6,7 @@
     <string name="startup_dialog_title">Connecting</string>
     <string name="about_text">BitcoinSpinner is a leight-weight, secure, and user friendly Bitcoin client for Android, which is built on top of the BCCAPI.\nBitcpoinSpinner is not a Bitcoin bank. All your funds are secured by private keys in app-private storage on your Android device.\n\nPlease note that this is a beta release, and that you should only use it for small change.\n</string>
     <string name="about_menu">About BS</string>
-    <string name="about_title">About BitCoinSpinner v.: 0.2.16b</string>
+    <string name="about_title">About BitCoinSpinner v.: 0.2.19b</string>
     <string name="clipboard_copy">Address copied to clipboard</string>
     <string name="send_bitcoins">Send Bitcoins</string>
     <string name="settings">Settings</string>

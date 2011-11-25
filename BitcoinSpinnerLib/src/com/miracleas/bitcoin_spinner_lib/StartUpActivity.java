@@ -40,11 +40,7 @@ public class StartUpActivity extends Activity {
 	private static final int SETUP_MESSAGE = 100;
 	private static final int SAVE_SEED_MESSAGE = 101;
 	private static final int STARTUP_MESSAGE = 102;
-	private static final int KEY_MANAGER_MESSAGE = 103;
-	private static final int BIT_COIN_CLIENT_API_INSTANCE_MESSAGE = 104;
-	private static final int ACCOUNT_MESSAGE = 105;
-	private static final int LOGIN_MESSAGE = 106;
-	private static final int GET_ACCOUNT_INFO_MESSAGE = 107;
+	private static final int GET_ACCOUNT_INFO_MESSAGE = 103;
 
 	private static final int STARTUP_DIALOG = 1;
 
@@ -219,28 +215,15 @@ public class StartUpActivity extends Activity {
 					e.printStackTrace();
 				}
 				showDialog(STARTUP_DIALOG);
-				break;
-			case KEY_MANAGER_MESSAGE:
+
 				keyManager = new DeterministicECKeyManager(seed);
-				message = handler.obtainMessage();
-				message.arg1 = BIT_COIN_CLIENT_API_INSTANCE_MESSAGE;
-				handler.sendMessage(message);
-				break;
-			case BIT_COIN_CLIENT_API_INSTANCE_MESSAGE:
+				
 				api = new BitcoinClientApiImpl(Consts.url, Consts.network);
+				
 				Consts.account = new Account(keyManager, api);
-				message = handler.obtainMessage();
-				message.arg1 = LOGIN_MESSAGE;
-				handler.sendMessage(message);
-				break;
-			case ACCOUNT_MESSAGE:
-				Consts.account = new Account(keyManager, api);
-				message = handler.obtainMessage();
-				message.arg1 = LOGIN_MESSAGE;
-				handler.sendMessage(message);
-				break;
-			case LOGIN_MESSAGE:
+				
 				new AsyncLogin().execute(Consts.account);
+				
 				break;
 			case GET_ACCOUNT_INFO_MESSAGE:
 				try {
@@ -277,11 +260,6 @@ public class StartUpActivity extends Activity {
 
 			editor.putBoolean(Consts.FIRSTTIME_PREFS, false);
 			editor.commit();
-
-			Message msg = handler.obtainMessage();
-			msg.arg1 = KEY_MANAGER_MESSAGE;
-			handler.sendMessage(msg);
-
 			break;
 		}
 		return dialog;
@@ -305,6 +283,8 @@ public class StartUpActivity extends Activity {
 		@Override
 		protected Long doInBackground(Account... params) {
 			try {
+				//TODO in a later API
+				//Consts.info = Consts.account.login();
 				Consts.account.login();
 				Consts.lastLogin = new Date();
 			} catch (IOException e) {

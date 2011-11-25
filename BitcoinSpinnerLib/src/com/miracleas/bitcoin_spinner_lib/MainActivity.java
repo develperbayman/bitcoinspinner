@@ -1,7 +1,5 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
@@ -34,11 +32,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bccapi.api.APIException;
-import com.bccapi.core.Account;
-import com.bccapi.core.BitcoinClientApiImpl;
 import com.bccapi.core.CoinUtils;
-import com.bccapi.core.DeterministicECKeyManager;
-import com.bccapi.core.ECKeyManager;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -82,12 +76,11 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mContext = this;
 		setContentView(R.layout.main);
 
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		editor = preferences.edit();
-
-		mContext = this;
 
 		detector = new SimpleGestureFilter(this, this);
 

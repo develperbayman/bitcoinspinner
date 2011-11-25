@@ -59,7 +59,7 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.connect();
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
          return StreamReader.readAllBytes(connection.getInputStream());
       } catch (IOException e) {
@@ -78,7 +78,7 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.connect();
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
          String sessionId = new String(StreamReader.readAllBytes(connection.getInputStream()));
          return sessionId;
@@ -95,16 +95,17 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.connect();
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
          return AccountInfo.fromStream(new DataInputStream(connection.getInputStream()));
       } catch (IOException e) {
          throw e;
       }
    }
-   
+
    @Override
-   public AccountStatement getAccountStatement(String sessionId, int startIndex, int count) throws IOException, APIException {
+   public AccountStatement getAccountStatement(String sessionId, int startIndex, int count) throws IOException,
+         APIException {
       try {
          StringBuilder sb = new StringBuilder();
          sb.append("?index=").append(startIndex);
@@ -114,7 +115,7 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.connect();
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
          return AccountStatement.fromStream(new DataInputStream(connection.getInputStream()));
       } catch (IOException e) {
@@ -133,7 +134,7 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.getOutputStream().write(keyString.getBytes());
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
       } catch (IOException e) {
          throw e;
@@ -158,7 +159,7 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.getOutputStream().write(toSend.toByteArray());
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
          return SendCoinForm.fromStream(new DataInputStream(connection.getInputStream()));
       } catch (IOException e) {
@@ -178,7 +179,7 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
          connection.getOutputStream().write(toSend.toByteArray());
          int status = connection.getResponseCode();
          if (status != 200) {
-            throw new APIException(StreamReader.readFully(connection.getErrorStream()));
+            throw generateException(connection);
          }
       } catch (IOException e) {
          throw e;
@@ -196,6 +197,13 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
       }
       connection.setReadTimeout(60000);
       return connection;
+   }
+
+   private APIException generateException(HttpURLConnection connection) throws IOException {
+      if (connection.getErrorStream() == null) {
+         return new APIException("No server response");
+      }
+      return new APIException(StreamReader.readFully(connection.getErrorStream()));
    }
 
 }

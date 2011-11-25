@@ -75,10 +75,11 @@ public class Account {
    /**
     * Login to the BCCAPI server using the account public key
     * 
+    * @return The {@link AccountInfo} for this account.
     * @throws IOException
     * @throws APIException
     */
-   public synchronized void login() throws IOException, APIException {
+   public synchronized AccountInfo login() throws IOException, APIException {
       PublicECKey publicKey = getAccountPublicKey();
       // Get challenge
       byte[] challenge = _api.getLoginChallenge(publicKey.getPubKeyBytes());
@@ -92,6 +93,7 @@ public class Account {
       if (info.getKeys() > 0) {
          getWalletPublicKey(info.getKeys() - 1);
       }
+      return info;
    }
 
    /**
