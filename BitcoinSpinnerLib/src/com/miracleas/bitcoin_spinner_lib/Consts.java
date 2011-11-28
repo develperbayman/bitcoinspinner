@@ -21,6 +21,7 @@ public final class Consts {
 	public static final String FIRSTTIME_PREFS = "FistTimeStart";
 	public static final String SEEDSTRING = "SeedString";
 	public static final String LASTKNOWNBALANCE = "LastKnownBalance";
+	public static final String LASTLOGIN = "LastLogin";  
 	public static final String NETWORKFEESIZE = "NetworkFeeSize";
 	public static final String AVAIABLE_BITCOINS = "AvailableBitcoins";
 	public static final String BITCOINS_ON_THE_WAY = "BitcoinsOnTheWay";
@@ -51,8 +52,6 @@ public final class Consts {
 	public static AccountInfo info;
 	public static SendCoinForm form;
 
-	public static Date lastLogin;
-	
 	public static final String PACKAGE_NAME_ZXING = "com.google.zxing.client.android";
 	public static final String MARKET_APP_URL = "market://details?id=%s";
 	public static final String WEBMARKET_APP_URL = "https://market.android.com/details?id=%s";

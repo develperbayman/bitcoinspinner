@@ -40,7 +40,6 @@ public class StartUpActivity extends Activity {
 	private static final int SETUP_MESSAGE = 100;
 	private static final int SAVE_SEED_MESSAGE = 101;
 	private static final int STARTUP_MESSAGE = 102;
-	private static final int GET_ACCOUNT_INFO_MESSAGE = 103;
 
 	private static final int STARTUP_DIALOG = 1;
 
@@ -135,7 +134,6 @@ public class StartUpActivity extends Activity {
 	final Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
 			int total;
-			Intent intent = new Intent();
 			Message message;
 			switch (msg.arg1) {
 			case STARTUP_PROGRESS_MESSAGE:
@@ -158,9 +156,9 @@ public class StartUpActivity extends Activity {
 					AlertDialog.Builder builder = new AlertDialog.Builder(
 							context);
 					builder.setMessage(
-							"You need to be connected to the internet.")
+							R.string.need_connection)
 							.setCancelable(false)
-							.setPositiveButton("Try again?",
+							.setPositiveButton(R.string.try_again,
 									new DialogInterface.OnClickListener() {
 										public void onClick(
 												DialogInterface dialog, int id) {
@@ -225,23 +223,6 @@ public class StartUpActivity extends Activity {
 				new AsyncLogin().execute(Consts.account);
 				
 				break;
-			case GET_ACCOUNT_INFO_MESSAGE:
-				try {
-					Consts.info = Consts.account.getInfo();
-					if (Consts.info.getKeys() == 0) {
-						// upload first wallet public key
-						Consts.account.addKey();
-					}
-				} catch (APIException e) {
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				progressThread.mState = ProgressThread.STOP;
-				intent.setClass(context, MainActivity.class);
-				startActivity(intent);
-				finish();
-				break;
 			}
 		}
 	};
@@ -283,10 +264,15 @@ public class StartUpActivity extends Activity {
 		@Override
 		protected Long doInBackground(Account... params) {
 			try {
-				//TODO in a later API
-				//Consts.info = Consts.account.login();
-				Consts.account.login();
-				Consts.lastLogin = new Date();
+				Consts.info = Consts.account.login();
+				if (Consts.info.getKeys() == 0) {
+					// upload first wallet public key
+					Consts.account.addKey();
+				}
+//				Consts.account.login();
+				editor.putLong(Consts.LASTLOGIN, new Date().getTime());
+				editor.commit();
+
 			} catch (IOException e) {
 				e.printStackTrace();
 			} catch (APIException e) {
@@ -301,9 +287,14 @@ public class StartUpActivity extends Activity {
 
 		protected void onPostExecute(Long result) {
 			progressThread.mState = ProgressThread.STOP;
-			Message message = handler.obtainMessage();
-			message.arg1 = GET_ACCOUNT_INFO_MESSAGE;
-			handler.sendMessage(message);
+			Intent intent = new Intent();
+			intent.setClass(context, MainActivity.class);
+			startActivity(intent);
+			finish();
+//			progressThread.mState = ProgressThread.STOP;
+//			Message message = handler.obtainMessage();
+//			message.arg1 = GET_ACCOUNT_INFO_MESSAGE;
+//			handler.sendMessage(message);
 		}
 	}
 

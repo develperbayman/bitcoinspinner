@@ -211,7 +211,7 @@ public class SettingsActivity extends PreferenceActivity {
 																		showMarketPage(Consts.PACKAGE_NAME_ZXING);
 																		Toast.makeText(
 																				mContext,
-																				"Please install ZXing QR-code scanner or Goggles!",
+																				R.string.install_qr_scanner,
 																				Toast.LENGTH_LONG)
 																				.show();
 																	}
@@ -260,7 +260,7 @@ public class SettingsActivity extends PreferenceActivity {
 												showMarketPage(Consts.PACKAGE_NAME_ZXING);
 												Toast.makeText(
 														mContext,
-														"Please install ZXing QR-code scanner or Goggles!",
+														R.string.install_qr_scanner,
 														Toast.LENGTH_LONG)
 														.show();
 											}
@@ -277,7 +277,7 @@ public class SettingsActivity extends PreferenceActivity {
 					alertDialog.show();
 				}
 			} else {
-				Toast.makeText(mContext, "You need to be connected", Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, R.string.need_connection, Toast.LENGTH_LONG).show();
 			}
 			return true;
 		}
@@ -354,7 +354,9 @@ public class SettingsActivity extends PreferenceActivity {
 		@Override
 		protected Long doInBackground(Account... params) {
 			try {
-				Consts.lastLogin = new Date();
+				editor.putLong(Consts.LASTLOGIN, new Date().getTime());
+				editor.commit();
+
 				Consts.account.login();
 				Consts.info = Consts.account.getInfo();
 				for (String address : Consts.account.getAddresses()) {

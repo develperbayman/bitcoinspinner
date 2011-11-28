@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <string name="app_name">BitCoinSpinner</string>
+    <string name="initialize">Initialisation du générateur de nombres peuso-aléatoire</string>
+    <string name="startup_dialog_text">Veuillez patienter...</string>
+    <string name="startup_dialog_title">En cours de connection</string>
+    <string name="about_text">BitcoinSpinner est un client Bitcoin léger, sécurisé et facile à utiliser pour Android, basé sur BCCAPI.\nBitcoinSpinner n\'est pas une banque Bitcoin. Tous vos fonds sont sécurisés par une clé privée résidant dans l\'espace de stockage des applications de votre appareil Android.\n\nMerci de prendre note que ce logiciel est encore en beta, et que vous devriez l\'utiliser uniquement pour des petites sommes.\n</string>
+    <string name="about_menu">À propos de BS</string>
+    <string name="about_title">À propos de BitCoinSpinner v.: 0.2.19b</string>
+    <string name="clipboard_copy">Adresse copiée dans le presse papier</string>
+    <string name="send_bitcoins">Envoyer des Bitcoins</string>
+    <string name="settings">Paramètres</string>
+    <string name="pref_network_fee">Frais de transaction</string>
+    <string name="prefs_backup_title">Sauvegarder votre porte-monnaie</string>
+    <string name="backup_dialog_text">Ceci va afficher un QR code qui pourra être utilisé pour récupérer votre porte-monnaie sur un appareil différent.\n\nPrenez une photo et/ou imprimez le sur papier.\n\nAttention, le QR code permet à quiconque qui le scanne de prendre possession des fonds stockés sur l\'appareil.\n\nVoulez-vous continuer?</string>
+    <string name="restore_dialog_no_coins">Vous êtes sur le point de restaurer votre porte-monnaie depuis une sauvegarde.\n\nCela requière de scanner un QR généré précédement à cet effet.\n\nVoulez-vous continer ?</string>
+    <string name="restore_dialog_coins">Vous ne pouvez pas restaurer une sauvegarde tant que votre porte-monnaie actuel contient des fonds. Merci d\'envoyer vos fonds ailleurs avant de continuer.</string>
+    <string name="prefs_restore_title">Restorer votre porte-monnaie</string>
+    <string name="prefs_category_backupandrestore">Sauvegarder et restaurer</string>
+    <string name="prefs_category_bitcoinwalletprefs">Preferences de BitcoinSpinner</string>
+    <string name="no">Non</string>
+    <string name="yes">Oui</string>
+    <string name="ok">Ok</string>
+    <string name="restore_invalid_qr_code"> QR-code invalide !</string>
+    <string name="restore_complete_dialog_text">Restauration complète</string>
+    <string name="sending_bitcoins">Envoie des Bitcoins en cours</string>
+    <string name="sending_bitcoins_wait">Merci de patienter pendant l\'envoie des Bitcoins</string>
+    <string name="restore_dialog_title">Restauration en cours</string>
+    <string name="please_wait">Veuillez patienter...</string>
+    <string name="calculating_fee">Calcul des frais de transaction en cours</string>
+    <string name="calculating_fee_wait">Merci de patienter pendant le calcul des frais de transaction...</string>
+    <string name="calculating_fee_done">Les frais de transaction calculés sont de %s BTC.\n\nContinuer ?</string>
+    <string name="your_balance">Votre solde :</string>
+    <string name="network_fee_text">Des frais de transaction de 0.0005 BTC sont automatiquement ajoutés à votre transaction.%1$sinfo...%2$s</string>
+    <string name="network_fee_text_info">En ajoutant des frais de transactions minimalistes, votre transfert est garanti d\'être propagé à travers le réseau et accepté par les mineurs de Bitcoins. Ces frais sont généralement de 0.0005 BTC, ou parfois plus si votre transfert fait plus de 1000 octets. Si votre transfert requière des frais supérieurs à 0.0005 BTC, une confirmation vous sera demander avant l\'envoi.</string>
+</resources>

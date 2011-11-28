@@ -10,6 +10,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -249,7 +250,7 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 			intent.setType("text/plain");
 			intent.putExtra(Intent.EXTRA_TEXT, "bitcoin:" + mAddress);
 			startActivity(Intent.createChooser(intent,
-					"Share your bitcoin address..."));
+					getString(R.string.share_bitcoin_address)));
 		}
 	};
 
@@ -351,7 +352,17 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		case ABOUT_DIALOG:
 			dialog = new Dialog(mContext);
 			dialog.setTitle(R.string.about_title);
+
 			dialog.setContentView(R.layout.dialog_about);
+
+			try {
+				String VersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+				TextView tvAboutText = (TextView)dialog.findViewById(R.id.tv_about_text);
+				tvAboutText.setText(String.format(getString(R.string.about_text), VersionName));
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+
 			dialog.findViewById(R.id.btn_about_ok).setOnClickListener(
 					new OnClickListener() {
 
@@ -371,8 +382,8 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		pbBalanceUpdateProgress.setVisibility(View.VISIBLE);
 		vBalanceUpdateView.setVisibility(View.VISIBLE);
 
-		Date thisLogin = new Date();
-		long loginDiff = thisLogin.getTime() - Consts.lastLogin.getTime();
+		long loginDiff = new Date().getTime() - preferences.getLong(Consts.LASTLOGIN, new Date().getTime());
+
 		if (loginDiff > 1140000)
 			logInAndUpdate(true);
 		else {
@@ -409,11 +420,12 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		pbBalanceUpdateProgress.setVisibility(View.VISIBLE);
 		vBalanceUpdateView.setVisibility(View.VISIBLE);
 
-		Date thisLogin = new Date();
-		long loginDiff = thisLogin.getTime() - Consts.lastLogin.getTime();
+		long loginDiff = new Date().getTime() - preferences.getLong(Consts.LASTLOGIN, new Date().getTime());
 
 		if (force || loginDiff > 1140000) {
-			Consts.lastLogin = new Date();
+			editor.putLong(Consts.LASTLOGIN, new Date().getTime());
+			editor.commit();
+
 			new Thread(new Runnable() {
 
 				@Override

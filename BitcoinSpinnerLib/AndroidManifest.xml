@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<manifest android:versionCode="2" android:versionName="0.2.17b"
-    package="com.miracleas.bitcoin_spinner_lib" xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest package="com.miracleas.bitcoin_spinner_lib" xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-sdk android:minSdkVersion="8"/>
     <uses-permission android:name="android.permission.INTERNET"/>
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>

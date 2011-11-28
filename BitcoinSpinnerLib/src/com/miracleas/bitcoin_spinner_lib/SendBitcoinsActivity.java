@@ -15,6 +15,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -72,8 +73,6 @@ public class SendBitcoinsActivity extends Activity implements
 
 	private SimpleGestureFilter detector;
 
-	private SharedPreferences preferences;
-
 	private static final int ABOUT_DIALOG = 1001;
 
 	private static final int UPDATE_AVAILABLE_SPEND_MESSAGE = 101;
@@ -92,6 +91,9 @@ public class SendBitcoinsActivity extends Activity implements
 	private BigDecimal amount;
 	private Long toSend, fee;
 	
+	private SharedPreferences preferences;
+	private SharedPreferences.Editor editor;
+	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
@@ -107,6 +109,7 @@ public class SendBitcoinsActivity extends Activity implements
 		new Thread(ConnectionWatcher).start();
 
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
+		editor = preferences.edit();
 
 		pbAvailableSpendUpdateProgress = (ProgressBar) findViewById(R.id.pb_available_spend_update);
 		rlAvailableSpend = (RelativeLayout) findViewById(R.id.rl_available_spend_update);
@@ -252,12 +255,9 @@ public class SendBitcoinsActivity extends Activity implements
 		@Override
 		public void afterTextChanged(Editable e) {
 			String tempString = e.toString();
-
-			if (tempString.matches(".*\\s.*")) {
-				tempString = tempString.replace(" ", "");
-				tempString = tempString.replace("\t", "");
-				tempString = tempString.replace("\n", "");
-				tempString = tempString.replace("\r", "");
+		
+			if (tempString.matches("\\W")) {
+				tempString = tempString.replaceAll("[\\W]", "");
 				etAddress.setText("");
 				etAddress.append(tempString);
 			} else {
@@ -267,9 +267,9 @@ public class SendBitcoinsActivity extends Activity implements
 						Consts.network)) {
 					if (Consts.network == Network.testNetwork)
 						tvValidAdress
-								.setText("Invalid address for testnetwork");
+								.setText(R.string.invalid_address_for_testnet);
 					else if (Consts.network == Network.productionNetwork)
-						tvValidAdress.setText("Invalid address");
+						tvValidAdress.setText(R.string.invalid_address_for_prodnet);
 					mValidAdress = false;
 				} else {
 					tvValidAdress.setText("");
@@ -365,7 +365,7 @@ public class SendBitcoinsActivity extends Activity implements
 			} else {
 				showMarketPage(Consts.PACKAGE_NAME_ZXING);
 				Toast.makeText(mContext,
-						"Please install ZXing QR-code scanner or Goggles!",
+						getString(R.string.install_qr_scanner),
 						Toast.LENGTH_LONG).show();
 			}
 		}
@@ -545,19 +545,6 @@ public class SendBitcoinsActivity extends Activity implements
 			amount = amount.multiply(new BigDecimal(Consts.BTC_IN_SATOSHI));
 			toSend = amount.longValue();
 
-//            try {
-//                form = Consts.account.getSendCoinForm(address, toSend, fee);
-//	        } catch (Exception e) {
-//               try {
-//	   	        	Consts.account.login();
-//					form = Consts.account.getSendCoinForm(address, toSend, fee);
-//				} catch (APIException e1) {
-//					e1.printStackTrace();
-//				} catch (IOException e1) {
-//					e1.printStackTrace();
-//				}
-//	        }
-
 			if (!SendCoinFormValidator.validate(Consts.form, Consts.account, toSend,
 					fee, address))
 				return 0L;
@@ -621,6 +608,15 @@ public class SendBitcoinsActivity extends Activity implements
 			dialog = new Dialog(mContext);
 			dialog.setTitle(R.string.about_title);
 			dialog.setContentView(R.layout.dialog_about);
+
+			try {
+				String VersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
+				TextView tvAboutText = (TextView)dialog.findViewById(R.id.tv_about_text);
+				tvAboutText.setText(String.format(getString(R.string.about_text), VersionName));
+			} catch (NameNotFoundException e) {
+				e.printStackTrace();
+			}
+
 			dialog.findViewById(R.id.btn_about_ok).setOnClickListener(
 					new OnClickListener() {
 
@@ -637,14 +633,15 @@ public class SendBitcoinsActivity extends Activity implements
 	}
 
 	private void readyAvailableSpend(final boolean updateAvailableSpend) {
-		Date thisLogin = new Date();
-		long loginDiff = thisLogin.getTime() - Consts.lastLogin.getTime();
+		long loginDiff = new Date().getTime() - preferences.getLong(Consts.LASTLOGIN, new Date().getTime());
 
 		pbAvailableSpendUpdateProgress.setVisibility(View.VISIBLE);
 		rlAvailableSpend.setVisibility(View.VISIBLE);
 
 		if (loginDiff > 1140000) {
-			Consts.lastLogin = new Date();
+			editor.putLong(Consts.LASTLOGIN, new Date().getTime());
+			editor.commit();
+
 			Thread t = new Thread(new Runnable() {
 
 				@Override
