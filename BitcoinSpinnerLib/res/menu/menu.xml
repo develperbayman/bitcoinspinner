@@ -9,6 +9,11 @@
     <item
         android:id="@+id/settings"
         android:icon="@drawable/tab_info_dark"
-        android:title="@string/settings"/>
+        android:title="@string/settings_menu"/>
+
+    <item
+        android:id="@+id/credits"
+        android:icon="@drawable/tab_info_dark"
+        android:title="@string/credits_menu"/>
 
 </menu>

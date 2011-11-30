@@ -1,42 +1,55 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
+    <!-- Name, about, credits and versioning -->
     <string name="app_name">BitCoinSpinner</string>
+    <string name="about_title">About BitcoinSpinner</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner is a light-weight, secure, and user friendly Bitcoin client for Android, which is built on top of the BCCAPI.\nBitcoinSpinner is not a Bitcoin bank. All your funds are secured by private keys in app-private storage on your Android device.\n\nPlease note that this is a beta release, and that you should only use it for small change.\n</string>
+    <string name="credits_text">Thanks  to:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\nMats(Sv. trans.)</string>
+    <!-- Menu -->
+    <string name="about_menu">About BS</string>
+    <string name="credits_menu">Credits</string>
+    <string name="settings_menu">Settings</string>
+    <!-- Startup -->
     <string name="initialize">Initializing Random Seed</string>
     <string name="startup_dialog_text">Please wait...</string>
     <string name="startup_dialog_title">Connecting</string>
-    <string name="about_text">V.: %1$s\nBitcoinSpinner is a light-weight, secure, and user friendly Bitcoin client for Android, which is built on top of the BCCAPI.\nBitcoinSpinner is not a Bitcoin bank. All your funds are secured by private keys in app-private storage on your Android device.\n\nPlease note that this is a beta release, and that you should only use it for small change.\n</string>
-    <string name="about_menu">About BS</string>
-    <string name="about_title">About BitcoinSpinner</string>
-    <string name="clipboard_copy">Address copied to clipboard</string>
-    <string name="send_bitcoins">Send Bitcoins</string>
-    <string name="settings">Settings</string>
+    <!-- Backup and Restore -->
+    <string name="backup_dialog_text">You are about to display a QR code which can be used to restore your wallet on a different device.\n\nTake a picture of it and/or print it out on Paper.\n\nWarning, this QR code enables anyone who scans it to take possession of the funds controlled by this device.\n\nDo you want to proceed?</string>
+    <string name="restore_complete_dialog_text">Restore complete</string>
+    <string name="restore_dialog_coins">You cannot restore a backup as your wallet contains funds.\n\nPlease send your funds elsewhere before proceeding.</string>
+    <string name="restore_dialog_no_coins">You are about to restore your wallet from a backup.\n\nThis is done by scanning a previously generated backup QR code.\n\nDo you want to continue?</string>
+    <string name="restore_dialog_title">Restoring</string>
+    <!-- Preferences -->
     <string name="pref_network_fee">Network fee</string>
     <string name="prefs_backup_title">Backup wallet</string>
-    <string name="backup_dialog_text">You are about to display a QR code which can be used to restore your wallet on a different device.\n\nTake a picture of it and/or print it out on Paper.\n\nWarning, this QR code enables anyone who scans it to take possession of the funds controlled by this device.\n\nDo you want to proceed?</string>
-    <string name="restore_dialog_no_coins">You are about to restore your wallet from a backup.\n\nThis is done by scanning a previously generated backup QR code.\n\nDo you want to continue?</string>
-    <string name="restore_dialog_coins">You cannot restore a backup as your wallet contains funds.\n\nPlease send your funds elsewhere before proceeding.</string>
-    <string name="prefs_restore_title">Restore wallet</string>
     <string name="prefs_category_backupandrestore">Backup and Restore</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner preferences</string>
+    <string name="prefs_restore_title">Restore wallet</string>
+    <!-- Common -->
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="ok">Ok</string>
-    <string name="restore_invalid_qr_code">Invalid QR-code!</string>
-    <string name="restore_complete_dialog_text">Restore complete</string>
-    <string name="sending_bitcoins">Sending Bitcoins</string>
-    <string name="sending_bitcoins_wait">Please wait while sending bitcoins</string>
-    <string name="restore_dialog_title">Restoring</string>
     <string name="please_wait">Please wait...</string>
+    <string name="try_again">Try again?</string>
+    <!-- Calculation and sending of bitcoins -->
     <string name="calculating_fee">Calculating network fee</string>
     <string name="calculating_fee_wait">Please wait while network fee is being calculated...</string>
     <string name="calculating_fee_done">Network fee have been calculated to %s BTC.\n\nProceed?</string>
-    <string name="your_balance">Your balance:</string>
+    <string name="send_bitcoins">Send Bitcoins</string>
+    <string name="sending_bitcoins">Sending Bitcoins</string>
+    <string name="sending_bitcoins_wait">Please wait while sending bitcoins</string>
+    <!-- Sharing -->
+    <string name="clipboard_copy">Address copied to clipboard</string>
+    <string name="share_bitcoin_address">Share your bitcoin address...</string>
+    <!-- Info -->
     <string name="network_fee_text">A Bitcoin network fee of 0.0005 BTC is automatically added to your transaction.%1$sinfo...%2$s</string>
     <string name="network_fee_text_info">By adding a small network fee your transaction is guaranteed to be propagated through the network and accepted by Bitcoin miners. The size of the network fee is typically 0.0005 BTC, but may be larger if your transaction is larger than 1000 bytes. If your transaction requires a fee larger than 0.0005 BTC you will get prompted to confirm whether you would like to send it.</string>
+    <string name="your_balance">Your balance:</string>
+    <!-- Warnings -->
     <string name="install_qr_scanner">Please install ZXing QR-code scanner or Goggles!</string>
-    <string name="share_bitcoin_address">Share your bitcoin address...</string>
+    <string name="need_connection">You need to be connected to the internet.</string>
+    <!-- Errors -->
     <string name="invalid_address_for_testnet">Invalid address for testnetwork</string>
     <string name="invalid_address_for_prodnet">Invalid address</string>
-    <string name="need_connection">You need to be connected to the internet.</string>
-    <string name="try_again">Try again?</string>
+    <string name="restore_invalid_qr_code">Invalid QR-code!</string>
 </resources>

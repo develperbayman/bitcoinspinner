@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <!-- Name, about, credits and versioning -->
+    <string name="app_name">BitcoinSpinner</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner är en lättviktig, säker och användarvänlig Bitcoin-klient för Android, byggd med hjälp av BCCAPI.\nBitcoinSpinner är inte en Bitcoin bank. Alla dina Bitcoin är skyddade av privata krypteringsnycklar som sparas i app-privat utrymme på din Android.\n\nLägg märke till att detta är en beta-release, och att du bara bör använda den för växelpengar.\n</string>
+    <string name="about_title">Om BitcoinSpinner</string>
+    <string name="credits_text">Tack till:\n - Jan(bccapi)\n - Kevin(Fr. övers.)\n - Mats(Sv. övers.)</string>
+    <!-- Menu -->
+    <string name="about_menu">Om BS</string>
+    <string name="credits_menu">Tack</string>
+    <string name="settings_menu">Inställningar</string>
+    <!-- Startup -->
+    <string name="initialize">Skapar frö för slumptal</string>
+    <string name="startup_dialog_text">Var vänlig vänta...</string>
+    <string name="startup_dialog_title">Ansluter</string>
+    <!-- Backup and Restore -->
+    <string name="backup_dialog_text">Du får snart se en QR-kod som kan användas för att återställa din plånbok på en annan enhet.\n\nTag ett foto av den och/eller skriv ut den på papper.\n\nVarning, den som scannar denna QR-kod kan ta kontroll över alla de Bitcoins som finns på denna enhet.\n\nVill du fortsätta?</string>
+    <string name="restore_complete_dialog_text">Återställningen färdig</string>
+    <string name="restore_dialog_coins">Du kan inte återställa från en säkerhetskopia eftersom din existerande plånbok fortfarande har Bitcoins.\n\nFörst måste du skicka dessa Bitcoins till någon annan plånbok innan du kan fortsätta.</string>
+    <string name="restore_dialog_no_coins">Du håller på att återställa din plånbok från en säkerhetskopia.\n\nDetta sker genom att scanna en tidigare genererad säkerhetskopia som QR-kod.\n\nVill du fortsätta?</string>
+    <string name="restore_dialog_title">Återställer</string>
+    <!-- Preferences -->
+    <string name="pref_network_fee">Transaktionsavgift</string>
+    <string name="prefs_backup_title">Säkerhetskopia av plånbok</string>
+    <string name="prefs_category_backupandrestore">Säkerhetskopiera och återställa</string>
+    <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner inställningar</string>
+    <string name="prefs_restore_title">Återställ plånbok</string>
+    <!-- Common -->
+    <string name="no">Nej</string>
+    <string name="yes">Ja</string>
+    <string name="ok">Ok</string>
+    <string name="please_wait">Vänligen vänta...</string>
+    <string name="try_again">Prova igen?</string>
+    <!-- Calculation and sending of bitcoins -->
+    <string name="calculating_fee">Beräknar transaktionskostnad</string>
+    <string name="calculating_fee_wait">Vänligen vänta medan transaktionsavgiften beräknas...</string>
+    <string name="calculating_fee_done">Transaktionsavgiften har beräknats till %s BTC.\n\nFortsätta?</string>
+    <string name="send_bitcoins">Skickade Bitcoins</string>
+    <string name="sending_bitcoins">Skickar Bitcoins</string>
+    <string name="sending_bitcoins_wait">Vänligen vänta medan bitcoins skickas</string>
+    <!-- Sharing -->
+    <string name="clipboard_copy">Adressen kopierades till urklipp</string>
+    <string name="share_bitcoin_address">Dela din Bitcoin adress...</string>
+    <!-- Info -->
+    <string name="network_fee_text">En transaktionsavgift på 0.0005 BTC läggs automatiskt till.%1$sinfo...%2$s</string>
+    <string name="network_fee_text_info">Genom att lägga till en liten transaktionsavgift så överförs dina Bitcoins snabbare. Storleken på transaktionsavgiften är vanligen 0.0005 BTC, men kan vara större om din transaktion är större än 1000 bytes. Om din transaktion behöver en större avgift än 0.0005 BTC så kommer du att bli tillfrågad om du vill skicka den.</string>
+    <string name="your_balance">Ditt saldo:</string>
+    <!-- Warnings -->
+    <string name="install_qr_scanner">Vänligen installera ZXing QR-kods scanner eller Goggles!</string>
+    <string name="need_connection">Du måste vara ansluten till internet.</string>
+    <!-- Errors -->
+    <string name="invalid_address_for_testnet">Ogiltig adress för testnätverket</string>
+    <string name="invalid_address_for_prodnet">Ogiltig adress</string>
+    <string name="restore_invalid_qr_code">Ogiltig QR-kod!</string>
+</resources>

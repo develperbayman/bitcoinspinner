@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 	private static final int REQUEST_CODE_SETTINGS = 10002;
 
 	private static final int ABOUT_DIALOG = 1001;
+	private static final int THANKS_DIALOG = 1002;
 
 	private static final int UPDATE_BALANCES_MESSAGE = 101;
 	private static final int NO_CONNECTION_MESSAGE = 102;
@@ -340,6 +341,9 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 			startActivityForResult(new Intent(this, SettingsActivity.class),
 					REQUEST_CODE_SETTINGS);
 			return true;
+		} else if (item.getItemId() == R.id.credits) {
+			showDialog(THANKS_DIALOG);
+			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
 		}
@@ -362,6 +366,24 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 			} catch (NameNotFoundException e) {
 				e.printStackTrace();
 			}
+
+			dialog.findViewById(R.id.btn_about_ok).setOnClickListener(
+					new OnClickListener() {
+
+						@Override
+						public void onClick(View v) {
+							dialog.dismiss();
+						}
+					});
+			break;
+		case THANKS_DIALOG:
+			dialog = new Dialog(mContext);
+			dialog.setTitle(R.string.about_title);
+
+			dialog.setContentView(R.layout.dialog_about);
+
+			TextView tvAboutText = (TextView)dialog.findViewById(R.id.tv_about_text);
+			tvAboutText.setText(R.string.credits_text);
 
 			dialog.findViewById(R.id.btn_about_ok).setOnClickListener(
 					new OnClickListener() {
