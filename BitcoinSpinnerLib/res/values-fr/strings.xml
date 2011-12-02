@@ -40,8 +40,8 @@
     <string name="clipboard_copy">Adresse copiée dans le presse papier</string>
     <string name="share_bitcoin_address">Partager votre adresse Bitcoin...</string>
     <!-- Info -->
-    <string name="network_fee_text">Des frais de transaction de 0.0005 BTC sont automatiquement ajoutés à votre transaction.%1$sinfo...%2$s</string>
-    <string name="network_fee_text_info">En ajoutant des frais de transactions minimalistes, votre transfert est garanti d\'être propagé à travers le réseau et accepté par les mineurs de Bitcoins. Ces frais sont généralement de 0.0005 BTC, ou parfois plus si votre transfert fait plus de 1000 octets. Si votre transfert requière des frais supérieurs à 0.0005 BTC, une confirmation vous sera demander avant l\'envoi.</string>
+    <string name="transaction_fee_text">Des frais de transaction de 0.0005 BTC sont automatiquement ajoutés à votre transaction.%1$sinfo...%2$s</string>
+    <string name="transaction_fee_text_info">En ajoutant des frais de transactions minimalistes, votre transfert est garanti d\'être propagé à travers le réseau et accepté par les mineurs de Bitcoins. Ces frais sont généralement de 0.0005 BTC, ou parfois plus si votre transfert fait plus de 1000 octets. Si votre transfert requière des frais supérieurs à 0.0005 BTC, une confirmation vous sera demander avant l\'envoi.</string>
     <string name="your_balance">Votre solde :</string>
     <!-- Warnings -->
     <string name="install_qr_scanner">Merci d\'installer ZXing QR-code scanner ou Goggles!</string>
@@ -51,5 +51,5 @@
     <string name="invalid_address_for_prodnet">Adresse invalide</string>
     <string name="restore_invalid_qr_code">QR-code invalide !</string>
     <string name="credits_menu">Crédits</string>
-    <string name="credits_text">Merci à:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\nMats(Sv. trans.)</string>
+    <string name="credits_text">Merci à:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats(Sv. trans.)\n - Gerhard(De. trans.)</string>
 </resources>

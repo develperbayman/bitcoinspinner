@@ -44,7 +44,6 @@ import android.widget.Toast;
 
 import com.bccapi.api.APIException;
 import com.bccapi.api.Network;
-import com.bccapi.api.SendCoinForm;
 import com.bccapi.core.AddressUtil;
 import com.bccapi.core.CoinUtils;
 import com.bccapi.core.SendCoinFormValidator;
@@ -120,13 +119,13 @@ public class SendBitcoinsActivity extends Activity implements
 		tvAvailSpend = (TextView) findViewById(R.id.tv_available_spend_balance);
 		
 		tvFeeInfo = (TextView) findViewById(R.id.tv_fee_info);
-		tvFeeInfo.setText(Html.fromHtml(String.format(getString(R.string.network_fee_text), "<br /><a href=''>", "</a>")));
+		tvFeeInfo.setText(Html.fromHtml(String.format(getString(R.string.transaction_fee_text), "<br /><a href=''>", "</a>")));
 		tvFeeInfo.setOnClickListener(new OnClickListener() {
 			
 			@Override
 			public void onClick(View v) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				builder.setMessage(R.string.network_fee_text_info)
+				builder.setMessage(R.string.transaction_fee_text_info)
 				       .setCancelable(false)
 				       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
 				           public void onClick(DialogInterface dialog, int id) {
@@ -425,8 +424,8 @@ public class SendBitcoinsActivity extends Activity implements
 				if (amountStr != null) {
 					final Matcher m = P_AMOUNT.matcher(amountStr);
 					if (m.matches()) {
-						etSpend.setText(CoinUtils.valueString(Long.parseLong(m
-								.group(1))));
+						etSpend.setText(CoinUtils.valueString(new BigDecimal(m
+								.group(1)).movePointRight(8).toBigIntegerExact()));
 						if (m.group(2) != null)
 							;
 						// amount.multiply(BigInteger.valueOf(10).pow(Integer.parseInt(m.group(2))
@@ -647,8 +646,7 @@ public class SendBitcoinsActivity extends Activity implements
 				@Override
 				public void run() {
 					try {
-						Consts.account.login();
-						Consts.info = Consts.account.getInfo();
+						Consts.info = Consts.account.login();
 						if (updateAvailableSpend) {
 							Message message = handler.obtainMessage();
 							message.arg1 = UPDATE_AVAILABLE_SPEND_MESSAGE;

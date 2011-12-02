@@ -8,7 +8,7 @@
         android:id="@+id/tv_fee_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/network_fee_text"
+        android:text="@string/transaction_fee_text"
         android:textColor="@color/Black" />
 
 </RelativeLayout>
