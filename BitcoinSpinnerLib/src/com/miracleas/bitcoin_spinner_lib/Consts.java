@@ -1,7 +1,6 @@
 package com.miracleas.bitcoin_spinner_lib;
 
 import java.net.URL;
-import java.util.Date;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,7 +11,6 @@ import com.bccapi.api.AccountInfo;
 import com.bccapi.api.Network;
 import com.bccapi.api.SendCoinForm;
 import com.bccapi.core.Account;
-import com.miracleas.bitcoin_spinner_lib.R;
 
 public final class Consts {
 	public static final String TAG = "Bitcoin Spinner";
@@ -21,6 +19,7 @@ public final class Consts {
 	public static final String FIRSTTIME_PREFS = "FistTimeStart";
 	public static final String SEEDSTRING = "SeedString";
 	public static final String LASTKNOWNBALANCE = "LastKnownBalance";
+	public static final String LASTKNOWNONTHEWAY = "LastKnownOnTheWay";
 	public static final String LASTLOGIN = "LastLogin";  
 	public static final String NETWORKFEESIZE = "NetworkFeeSize";
 	public static final String AVAIABLE_BITCOINS = "AvailableBitcoins";

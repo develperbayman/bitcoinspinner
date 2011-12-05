@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <!-- Name, about, credits and versioning -->
+    <string name="app_name">BitCoinSpinner</string>
+    <string name="about_title">Acerca de BitcoinSpinner</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner es un cliente de Bitcoin para Android ligero, seguro y amigable, el cual ha sido desarrollado sobre BCCAPI.\nBitcoinSpinner no es un banco de Bitcoins. Todos su sfondos son asegurados mediente claves privadas dentro del almacenamiento privado de la aplicación en su dispositivo Android.\n\nPor favor tenga en cuenta que esta es una versión beta, y que ustéd debería sólamente usarla para pequeños intercambios.\n</string>
+    <string name="credits_text">Gracias a:\n
+- Jan(bccapi)\n
+- Kevin(Trad. Fr.)\n
+- Mats(Trad. Sv.)\n
+- Gerhard(Trad. De.)\n
+- Manuel Polo(Trad. Es.)</string>
+    <!-- Menu -->
+    <string name="about_menu">Acerca de BS</string>
+    <string name="credits_menu">Créditos</string>
+    <string name="settings_menu">Ajustes</string>
+    <!-- Startup -->
+    <string name="initialize">Inicializando semilla aleatoria</string>
+    <string name="startup_dialog_text">Espere por favor...</string>
+    <string name="startup_dialog_title">Conectando</string>
+    <!-- Backup and Restore -->
+    <string name="backup_dialog_text">Se va a mostrar un código QR que puede ser usado para restarurar su billetera en otro dispositivo.\n\nTome una foto de el o imprímalo en papel.\n\nAviso, este código QR permite a cualquiera que lo adquiera tomar posesión de los fondos controlados por este dispositivo.\n\n¿Desea continuar?</string>
+    <string name="restore_complete_dialog_text">Respaldo completado.</string>
+    <string name="restore_dialog_coins">No puede restaurar una copia de seguridad dado que su billetero contiene fondos.\n\nPor favod, envie sus fondos a otra cuenta antes de continuar.</string>
+    <string name="restore_dialog_no_coins">Va a restaurar tu monedero desde una copia de seguridad.\n\nEsto se hace mediante escaneo de un código QR de respaldo hecho anteriormente.\n\n¿Deseas continuar?</string>
+    <string name="restore_dialog_title">Restaurando</string>
+    <!-- Preferences -->
+    <string name="pref_network_fee">Tasa de transacción</string>
+    <string name="prefs_backup_title">Copia de seguridad</string>
+    <string name="prefs_category_backupandrestore">Copia de seguridad y restauración</string>
+    <string name="prefs_category_bitcoinwalletprefs">Preferencias de BitcoinSpinner</string>
+    <string name="prefs_restore_title">Restaurar billetero</string>
+    <!-- Common -->
+    <string name="no">No</string>
+    <string name="yes">Si</string>
+    <string name="ok">Acptar</string>
+    <string name="please_wait">Espere por favor...</string>
+    <string name="try_again">¿Volver a intentar?</string>
+    <!-- Calculation and sending of bitcoins -->
+    <string name="calculating_fee">Calculando tasa de la red</string>
+    <string name="calculating_fee_wait">Por favor espere mientras la tasa de la red está siendo calculada...</string>
+    <string name="calculating_fee_done">La tasa de la red ha siendo calculada en %s BTC.\n\n¿Proceder?</string>
+    <string name="send_bitcoins">Enviar Bitcoins</string>
+    <string name="sending_bitcoins">Enviando Bitcoins</string>
+    <string name="sending_bitcoins_wait">Por favor espere mientras envio bitcoins</string>
+    <!-- Sharing -->
+    <string name="clipboard_copy">Dirección copiada al portapapeles</string>
+    <string name="share_bitcoin_address">Compartir su dirección bitcoin...</string>
+    <!-- Info -->
+    <string name="transaction_fee_text">Una tasa de transacción de 0.0005 BTC es automáticamente añadida a su transacción.%1$sinformación...%2$s</string>
+    <string name="transaction_fee_text_info">Al añadir una pequeña tasa de transación, su transacción está garantizada para ser propagada a través de la red y aceptada por los mineros de Bitcoin. El monto de la tasa de transacción es típicamente de 0.0005 BTC, aunque puede ser más si su transacción es mayor de 1000 bytes. Si su transacción requiere una tasa mayor de 0.0005 BTC se le pedirá que confirme que usted desearía enviarla.</string>
+    <string name="your_balance">Su balance:</string>
+    <!-- Warnings -->
+    <string name="install_qr_scanner">Por favor, ¡instale el escanner QR ZXing o Goggles!</string>
+    <string name="need_connection">Se necesita estar conectado a interner.</string>
+    <!-- Errors -->
+    <string name="invalid_address_for_testnet">Dirección inválida para la red de pruebas</string>
+    <string name="invalid_address_for_prodnet">Dirección inválida</string>
+    <string name="restore_invalid_qr_code">¡Código QR inválido!</string>
+</resources>

@@ -129,7 +129,6 @@ public class SendBitcoinsActivity extends Activity implements
 				       .setCancelable(false)
 				       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
 				           public void onClick(DialogInterface dialog, int id) {
-				                // put your code here
 				           }
 				       });
 				AlertDialog alertDialog = builder.create();
@@ -155,6 +154,7 @@ public class SendBitcoinsActivity extends Activity implements
 		btnSpend.setOnClickListener(spendMoneyClickListener);
 		btnCancel.setOnClickListener(cancelClickListener);
 
+		mAvailableBitcoins = preferences.getString(Consts.LASTKNOWNBALANCE, "0");
 	}
 
 	@Override
@@ -178,7 +178,6 @@ public class SendBitcoinsActivity extends Activity implements
 		@Override
 		public void run() {
 			while (true) {
-				Consts.isConnected(mContext);
 				Message message = handler.obtainMessage();
 				message.arg1 = CONNECTION_MESSAGE;
 				handler.sendMessage(message);
@@ -637,7 +636,7 @@ public class SendBitcoinsActivity extends Activity implements
 		pbAvailableSpendUpdateProgress.setVisibility(View.VISIBLE);
 		rlAvailableSpend.setVisibility(View.VISIBLE);
 
-		if (loginDiff > 1140000) {
+		if (loginDiff > 1140000 && isConnected()) {
 			editor.putLong(Consts.LASTLOGIN, new Date().getTime());
 			editor.commit();
 
@@ -664,10 +663,13 @@ public class SendBitcoinsActivity extends Activity implements
 				}
 			});
 			t.start();
-		} else {
+		} else if (isConnected()) {
 			Message message = handler.obtainMessage();
 			message.arg1 = UPDATE_AVAILABLE_SPEND_MESSAGE;
 			handler.sendMessage(message);
+		} else {
+			mAvailableBitcoins = preferences.getString(Consts.LASTKNOWNBALANCE, "0");
+			tvAvailSpend.setText(mAvailableBitcoins + " BTC");
 		}
 	}
 

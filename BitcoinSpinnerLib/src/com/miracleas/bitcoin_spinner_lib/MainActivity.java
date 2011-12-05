@@ -108,12 +108,6 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		ivAddress.setOnClickListener(qrClickListener);
 
 		rlBalance = (RelativeLayout) findViewById(R.id.rl_balance_ref);
-		mBalance = CoinUtils.valueString(Consts.info.getAvailableBalance());
-		tvBalance.setText(mBalance + " BTC");
-		mEstimatedOnTheWay = CoinUtils.valueString(Consts.info
-				.getEstimatedBalance() - Consts.info.getAvailableBalance());
-		tvEstimatedOnTheWay.setText(mEstimatedOnTheWay + " BTC");
-
 		btnSendMoney.setOnClickListener(sendMoneyClickListener);
 		rlBalance.setOnClickListener(refreshMoneyClickListener);
 		rlBalance.setOnLongClickListener(balanceOnLongClickListener);
@@ -131,6 +125,11 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		}
 		if (isConnected()) {
 			UpdateInfo();
+		} else {
+			mBalance = preferences.getString(Consts.LASTKNOWNBALANCE, "0");
+			tvBalance.setText(mBalance + " BTC");
+			mEstimatedOnTheWay = preferences.getString(Consts.LASTKNOWNONTHEWAY, "0");;
+			tvEstimatedOnTheWay.setText(mEstimatedOnTheWay + " BTC");
 		}
 		updateAddress();
 	}
@@ -140,6 +139,8 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		super.onPause();
 		if (null != qrCodeDialog) {
 			editor.putBoolean("ShowQrCode", qrCodeDialog.isShowing());
+			editor.putString(Consts.LASTKNOWNBALANCE, mBalance);
+			editor.putString(Consts.LASTKNOWNONTHEWAY, mEstimatedOnTheWay);
 			editor.commit();
 			qrCodeDialog.dismiss();
 		} else {
@@ -152,7 +153,6 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		@Override
 		public void run() {
 			while (true) {
-				Consts.isConnected(mContext);
 				if (isConnected()) {
 					Message message = handler.obtainMessage();
 					message.arg1 = CONNECTION_MESSAGE;
