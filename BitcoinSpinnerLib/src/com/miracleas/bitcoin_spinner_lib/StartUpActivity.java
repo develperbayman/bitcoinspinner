@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.security.SecureRandom;
 import java.util.Date;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,6 +16,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -74,6 +76,15 @@ public class StartUpActivity extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
+		editor.commit();
+		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+			Locale.setDefault(locale);
+			Configuration config = new Configuration();
+			config.locale = locale;
+			getBaseContext().getResources().updateConfiguration(config,
+			      getBaseContext().getResources().getDisplayMetrics());
+		}
 
 		if (preferences.getBoolean("ShowQrCode", false) && null != noConnDialog) {
 			noConnDialog.show();

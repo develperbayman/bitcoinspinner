@@ -15,5 +15,6 @@
         </activity>
         <activity android:name=".SendBitcoinsActivity" android:screenOrientation="portrait"/>
         <activity android:name="com.miracleas.bitcoin_spinner_lib.SettingsActivity"/>
+        <activity android:name=".TransactionHistoryActivity"/>
     </application>
 </manifest>

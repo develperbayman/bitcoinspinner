@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.miracleas.bitcoin_spinner"
-    android:versionCode="10"
-    android:versionName="0.2.25b" >
+    android:versionCode="12"
+    android:versionName="0.3.0b" >
 
     <uses-sdk android:minSdkVersion="8" />
 
@@ -39,6 +39,7 @@
             android:name="com.miracleas.bitcoin_spinner_lib.SettingsActivity"
             android:screenOrientation="portrait" >
         </activity>
+        <activity android:screenOrientation="portrait" android:name="com.miracleas.bitcoin_spinner_lib.TransactionHistoryActivity"></activity>
     </application>
 
 </manifest>

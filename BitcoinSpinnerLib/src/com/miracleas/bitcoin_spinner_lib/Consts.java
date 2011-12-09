@@ -26,6 +26,7 @@ public final class Consts {
 	public static final String BITCOINS_ON_THE_WAY = "BitcoinsOnTheWay";
 	public static final String BITCOIN_ADDRESS = "BitcoinAddress";
 	public static final String NETWORK = "BitcoinNetwork";
+	public static final String LOCALE = "Locale";
 
 	public static final String PACKAGE_NAME_PROD = "com.miracleas.bitcoin_spinner";
 	public static final String PACKAGE_NAME_TEST = "com.miracleas.bitcoin_spinner" + '_' + "test";

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/et_available_spend"
         android:layout_below="@+id/et_available_spend"
-        android:text="Amount to pay:"
+        android:text="@string/amount_to_pay"
         android:textColor="@color/Black" />
 
     <EditText

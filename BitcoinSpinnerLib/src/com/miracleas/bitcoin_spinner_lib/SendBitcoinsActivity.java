@@ -3,6 +3,7 @@ package com.miracleas.bitcoin_spinner_lib;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -16,6 +17,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -54,8 +56,6 @@ public class SendBitcoinsActivity extends Activity implements
 
 	private Context mContext;
 
-	private int currentapiVersion;
-
 	private TextView tvValidAdress, tvAvailSpend, tvFeeInfo;
 	private EditText etAddress, etSpend;
 	private Button btnQRScan, btnSpend, btnCancel;
@@ -93,6 +93,8 @@ public class SendBitcoinsActivity extends Activity implements
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
 	
+	private Network mNetwork;
+	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
@@ -101,9 +103,9 @@ public class SendBitcoinsActivity extends Activity implements
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.send_money);
 
-		currentapiVersion = android.os.Build.VERSION.SDK_INT;
-
 		mContext = this;
+		
+		mNetwork = Consts.network;
 
 		new Thread(ConnectionWatcher).start();
 
@@ -160,6 +162,16 @@ public class SendBitcoinsActivity extends Activity implements
 	@Override
 	protected void onResume() {
 		super.onResume();
+
+		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+			Locale.setDefault(locale);
+			Configuration config = new Configuration();
+			config.locale = locale;
+			getBaseContext().getResources().updateConfiguration(config,
+			      getBaseContext().getResources().getDisplayMetrics());
+		}
+
 		if (isConnected())
 			readyAvailableSpend(true);
 		else {
@@ -224,27 +236,29 @@ public class SendBitcoinsActivity extends Activity implements
 
 		@Override
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
-			if (keyCode == KeyEvent.KEYCODE_ENTER
-					&& !(event.getAction() == KeyEvent.ACTION_UP)) {
-				if (null != v && v == etSpend) {
-					imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(etSpend.getWindowToken(), 0);
-					v.clearFocus();
-					return true;
+			if (event.getAction() == KeyEvent.ACTION_DOWN) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER
+						&& !(event.getAction() == KeyEvent.ACTION_UP)) {
+					if (null != v && v == etSpend) {
+						imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(etSpend.getWindowToken(), 0);
+						v.clearFocus();
+						return true;
+					}
 				}
 			}
+			return false;
 			// Handle all other keys in the default way
-			if (currentapiVersion <= android.os.Build.VERSION_CODES.FROYO) {
-				if (event.getAction() == KeyEvent.ACTION_UP) {
-					return v.onKeyDown(keyCode, event);
-				} else if (keyCode == KeyEvent.KEYCODE_BACK) {
-					return v.onKeyDown(keyCode, event);
-				}
-			} else {
-				return v.onKeyDown(keyCode, event);
-			}
-			;
-			return true;
+//			if (currentapiVersion <= android.os.Build.VERSION_CODES.FROYO) {
+//				if (event.getAction() == KeyEvent.ACTION_UP) {
+//					return v.onKeyDown(keyCode, event);
+//				} else if (keyCode == KeyEvent.KEYCODE_BACK) {
+//					return v.onKeyDown(keyCode, event);
+//				}
+//			} else {
+//				return v.onKeyDown(keyCode, event);
+//			}
+//			return true;
 		}
 	};
 
@@ -262,11 +276,11 @@ public class SendBitcoinsActivity extends Activity implements
 				if (tempString.matches(""))
 					tvValidAdress.setText("");
 				else if (!AddressUtil.validateAddress(tempString,
-						Consts.network)) {
-					if (Consts.network == Network.testNetwork)
+						mNetwork)) {
+					if (mNetwork == Network.testNetwork)
 						tvValidAdress
 								.setText(R.string.invalid_address_for_testnet);
-					else if (Consts.network == Network.productionNetwork)
+					else if (mNetwork == Network.productionNetwork)
 						tvValidAdress.setText(R.string.invalid_address_for_prodnet);
 					mValidAdress = false;
 				} else {

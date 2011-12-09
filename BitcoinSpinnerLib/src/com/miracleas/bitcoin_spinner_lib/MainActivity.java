@@ -3,6 +3,7 @@ package com.miracleas.bitcoin_spinner_lib;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager.NameNotFoundException;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -50,7 +52,7 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 
 	private TextView tvAddress, tvBalance, tvEstimatedOnTheWay;
 	private ImageView ivAddress;
-	private Button btnSendMoney;
+	private Button btnSendMoney, btnTransactionHistory;
 	private RelativeLayout rlBalance;
 	private ProgressBar pbBalanceUpdateProgress;
 	private View vBalanceUpdateView;
@@ -79,10 +81,24 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
-		setContentView(R.layout.main);
 
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		editor = preferences.edit();
+	}
+
+	@Override
+	protected void onResume() {
+		super.onResume();
+		setContentView(R.layout.main);
+
+		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+			Locale.setDefault(locale);
+			Configuration config = new Configuration();
+			config.locale = locale;
+			getBaseContext().getResources().updateConfiguration(config,
+			      getBaseContext().getResources().getDisplayMetrics());
+		}
 
 		detector = new SimpleGestureFilter(this, this);
 
@@ -101,6 +117,7 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		tvBalance = (TextView) findViewById(R.id.tv_balance);
 		tvEstimatedOnTheWay = (TextView) findViewById(R.id.tv_estimated_on_the_way);
 		btnSendMoney = (Button) findViewById(R.id.btn_send_money);
+		btnTransactionHistory = (Button) findViewById(R.id.btn_transaction_history);
 
 		tvAddress.setOnClickListener(addressClickListener);
 //		tvAddress.setOnLongClickListener(addressOnLongClickListener);
@@ -109,17 +126,14 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 
 		rlBalance = (RelativeLayout) findViewById(R.id.rl_balance_ref);
 		btnSendMoney.setOnClickListener(sendMoneyClickListener);
+		btnTransactionHistory.setOnClickListener(transactionHistoryClickListener);
 		rlBalance.setOnClickListener(refreshMoneyClickListener);
 		rlBalance.setOnLongClickListener(balanceOnLongClickListener);
 
 		pbBalanceUpdateProgress = (ProgressBar) findViewById(R.id.pb_balance_update);
 		vBalanceUpdateView = findViewById(R.id.v_balance_update);
 		vBalanceNoConnView = findViewById(R.id.v_balance_no_conn);
-	}
 
-	@Override
-	protected void onResume() {
-		super.onResume();
 		if (preferences.getBoolean("ShowQrCode", false)) {
 			ivAddress.performClick();
 		}
@@ -266,6 +280,16 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 		}
 	};
 
+	private final OnClickListener transactionHistoryClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(MainActivity.this, TransactionHistoryActivity.class);
+			startActivity(intent);
+		}
+	};
+
 	private final OnClickListener refreshMoneyClickListener = new OnClickListener() {
 
 		@Override
@@ -297,6 +321,11 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 			startActivity(intent);
 			break;
 
+		case SimpleGestureFilter.SWIPE_RIGHT:
+			intent.setClass(this, TransactionHistoryActivity.class);
+			startActivity(intent);
+			break;
+
 		}
 	}
 
@@ -305,14 +334,14 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 
 	}
 
-	private final OnLongClickListener addressOnLongClickListener = new OnLongClickListener() {
-
-		@Override
-		public boolean onLongClick(View v) {
-			return true;
-		}
-	};
-
+//	private final OnLongClickListener addressOnLongClickListener = new OnLongClickListener() {
+//
+//		@Override
+//		public boolean onLongClick(View v) {
+//			return true;
+//		}
+//	};
+//
 	private final OnLongClickListener balanceOnLongClickListener = new OnLongClickListener() {
 
 		@Override

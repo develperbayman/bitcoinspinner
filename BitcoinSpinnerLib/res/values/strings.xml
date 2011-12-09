@@ -4,12 +4,7 @@
     <string name="app_name">BitCoinSpinner</string>
     <string name="about_title">About BitcoinSpinner</string>
     <string name="about_text">V.: %1$s\nBitcoinSpinner is a light-weight, secure, and user friendly Bitcoin client for Android, which is built on top of the BCCAPI.\nBitcoinSpinner is not a Bitcoin bank. All your funds are secured by private keys in app-private storage on your Android device.\n\nPlease note that this is a beta release, and that you should only use it for small change.\n</string>
-    <string name="credits_text">Thanks  to:\n
-- Jan(bccapi)\n
-- Kevin(Fr. trans.)\n
-- Mats(Sv. trans.)\n
-- Gerhard(De. trans.)
-- Manuel Polo(Es. trans.)</string>
+    <string name="credits_text">Thanks  to:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
     <!-- Menu -->
     <string name="about_menu">About BS</string>
     <string name="credits_menu">Credits</string>
@@ -30,6 +25,12 @@
     <string name="prefs_category_backupandrestore">Backup and Restore</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner preferences</string>
     <string name="prefs_restore_title">Restore wallet</string>
+    <!-- Transaction -->
+    <string name="no_transactions">No transactions</string>
+    <string name="received_from">Received from:</string>
+    <string name="sent_to">Sent to:</string>
+    <string name="sent_to_yourself">Sent to yourself:</string>
+    <string name="transaction_history">Transaction history</string>
     <!-- Common -->
     <string name="no">No</string>
     <string name="yes">Yes</string>
@@ -50,6 +51,7 @@
     <string name="transaction_fee_text">A Bitcoin transaction fee of 0.0005 BTC is automatically added to your transaction.%1$sinfo...%2$s</string>
     <string name="transaction_fee_text_info">By adding a small transaction fee your transaction is guaranteed to be propagated through the network and accepted by Bitcoin miners. The size of the transaction fee is typically 0.0005 BTC, but may be larger if your transaction is larger than 1000 bytes. If your transaction requires a fee larger than 0.0005 BTC you will get prompted to confirm whether you would like to send it.</string>
     <string name="your_balance">Your balance:</string>
+    <string name="your_bitcoin_address">Your Bitcoin address:</string>
     <!-- Warnings -->
     <string name="install_qr_scanner">Please install ZXing QR-code scanner or Goggles!</string>
     <string name="need_connection">You need to be connected to the internet.</string>
@@ -57,4 +59,9 @@
     <string name="invalid_address_for_testnet">Invalid address for testnetwork</string>
     <string name="invalid_address_for_prodnet">Invalid address</string>
     <string name="restore_invalid_qr_code">Invalid QR-code!</string>
+    <!-- NEW STRINGS -->
+    <string name="prefs_choose_default_locale">Choose default language</string>
+    <string name="pay_to">Pay to:</string>
+    <string name="address">Address</string>
+    <string name="amount_to_pay">Amount to pay:</string>
 </resources>

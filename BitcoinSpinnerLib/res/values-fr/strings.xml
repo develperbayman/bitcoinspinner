@@ -4,8 +4,10 @@
     <string name="about_text">V.: %1$s\nBitcoinSpinner est un client Bitcoin léger, sécurisé et facile à utiliser pour Android, basé sur BCCAPI.\nBitcoinSpinner n\'est pas une banque Bitcoin. Tous vos fonds sont sécurisés par une clé privée résidant dans l\'espace de stockage des applications de votre appareil Android.\n\nMerci de prendre note que ce logiciel est encore en beta, et que vous devriez l\'utiliser uniquement pour des petites sommes.\n</string>
     <string name="about_title">À propos de BitCoinSpinner</string>
     <string name="app_name">BitCoinSpinner</string>
+    <string name="credits_text">Merci à:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
     <!-- Menu -->
     <string name="about_menu">À propos de BS</string>
+    <string name="credits_menu">Crédits</string>
     <string name="settings_menu">Paramètres</string>
     <!-- Startup -->
     <string name="initialize">Initialisation du générateur de nombres peuso-aléatoire</string>
@@ -23,6 +25,12 @@
     <string name="prefs_category_backupandrestore">Sauvegarder et restaurer</string>
     <string name="prefs_category_bitcoinwalletprefs">Preferences de BitcoinSpinner</string>
     <string name="prefs_restore_title">Restorer votre porte-monnaie</string>
+    <!-- Transaction -->
+    <string name="no_transactions">Aucune transaction</string>
+    <string name="received_from">Reçu de:</string>
+    <string name="sent_to">Envoyé à:</string>
+    <string name="sent_to_yourself">Envoyé à vous-même:</string>
+    <string name="transaction_history">Historique des transactions</string>
     <!-- Common -->
     <string name="no">Non</string>
     <string name="yes">Oui</string>
@@ -43,6 +51,7 @@
     <string name="transaction_fee_text">Des frais de transaction de 0.0005 BTC sont automatiquement ajoutés à votre transaction.%1$sinfo...%2$s</string>
     <string name="transaction_fee_text_info">En ajoutant des frais de transactions minimalistes, votre transfert est garanti d\'être propagé à travers le réseau et accepté par les mineurs de Bitcoins. Ces frais sont généralement de 0.0005 BTC, ou parfois plus si votre transfert fait plus de 1000 octets. Si votre transfert requière des frais supérieurs à 0.0005 BTC, une confirmation vous sera demander avant l\'envoi.</string>
     <string name="your_balance">Votre solde :</string>
+    <string name="your_bitcoin_address">Votre adresse Bitcoin:</string>
     <!-- Warnings -->
     <string name="install_qr_scanner">Merci d\'installer ZXing QR-code scanner ou Goggles!</string>
     <string name="need_connection">Vous devez être connecté à Internet.</string>
@@ -50,11 +59,4 @@
     <string name="invalid_address_for_testnet">Adresse invalide pour testnetwork</string>
     <string name="invalid_address_for_prodnet">Adresse invalide</string>
     <string name="restore_invalid_qr_code">QR-code invalide !</string>
-    <string name="credits_menu">Crédits</string>
-    <string name="credits_text">Merci à:\n
-- Jan(bccapi)\n
-- Kevin(Fr. trans.)\n
-- Mats(Sv. trans.)\n
-- Gerhard(De. trans.)\n
-- Manuel Polo(Es. trans.)</string>
 </resources>

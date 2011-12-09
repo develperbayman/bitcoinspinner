@@ -3,13 +3,8 @@
     <!-- Name, about, credits and versioning -->
     <string name="app_name">BitCoinSpinner</string>
     <string name="about_title">Über BitcoinSpinner</string>
-    <string name="about_text">V.: %1$s\nBitcoinSpinner ist ein schlanker, sicherer, und benutzerfreundlicher Bitcoin Client für Android, aufbauend auf der BCCAPI.\nBitcoinSpinner ist keine Bitcoin Bank. Ihr Guthaben ist durch ihre privaten Schlüssel gesichert, auf die nur diese App auf ihren Android Smartphone Zugriff hat. \n\nBitte beachten sie, dass dies eine Beta Version ist. Bitte verwenden sie sie nur für kleinere Beträge.\n</string>
-    <string name="credits_text">Dank an:\n
-- Jan(bccapi)\n
-- Kevin(Fr. trans.)\n
-- Mats(Sv. trans.)\n
-- Gerhard(De. trans.)\n
-- Manuel Polo(Es. trans.)</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner ist ein schlanker, sicherer, und benutzerfreundlicher Bitcoin Client für Android, aufbauend auf der BCCAPI.\nBitcoinSpinner ist keine Bitcoin Bank. Ihr Guthaben ist durch ihre privaten Schlüssel gesichert, auf die nur diese App auf ihren Android Smartphone Zugriff hat. \n\nBitte beachten Sie, dass dies eine Beta Version ist. Bitte verwenden Sie sie nur für kleinere Beträge.\n</string>
+    <string name="credits_text">Dank an:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
     <!-- Menu -->
     <string name="about_menu">Über BS</string>
     <string name="credits_menu">Credits</string>
@@ -19,10 +14,10 @@
     <string name="startup_dialog_text">Bitte warten...</string>
     <string name="startup_dialog_title">Verbinde</string>
     <!-- Backup and Restore -->
-    <string name="backup_dialog_text">Sie sind dabei, einen QR-Code anzuzeigen, mit dem ihr Wallet auf einem anderen Gerät wiederhergestellt werden kann.\n\nPhotographieren sie es und/oder drucken sie es aus.\n\nAchtung, mithilfe dieses QR-Codes kann jeder, der ihn einscannt, sich das Guthaben auf diesem Gerät aneignen.\n\nMöchten sie fortfahren?</string>
+    <string name="backup_dialog_text">Sie sind dabei, einen QR-Code anzuzeigen, mit dem ihr Wallet auf einem anderen Gerät wiederhergestellt werden kann.\n\nPhotographieren Sie es und/oder drucken Sie es aus.\n\nAchtung, mithilfe dieses QR-Codes kann jeder, der ihn einscannt, sich das Guthaben auf diesem Gerät aneignen.\n\nMöchten Sie fortfahren?</string>
     <string name="restore_complete_dialog_text">Wiederherstellung abgeschlossen</string>
-    <string name="restore_dialog_coins">Sie können kein Backup wiederherstellen, weil ihr derzeitiges Wallet noch Bitcoins enthält.\n\nBitte überweisen sie ihre Bitcoins auf ein anderes Wallet bevor sie fortfahren.</string>
-    <string name="restore_dialog_no_coins">Sie sind dabei eine Sicherungskopie ihres Wallets wiederherzustellen.\n\nDas geschieht durch das Einscannen einer vorher erzeugten Sicherung in Form eines QR-Codes.\n\nMöchten sie fortfahren?</string>
+    <string name="restore_dialog_coins">Sie können kein Backup wiederherstellen, weil ihr derzeitiges Wallet noch Bitcoins enthält.\n\nBitte überweisen Sie ihre Bitcoins auf ein anderes Wallet bevor Sie fortfahren.</string>
+    <string name="restore_dialog_no_coins">Sie sind dabei eine Sicherungskopie ihres Wallets wiederherzustellen.\n\nDas geschieht durch das Einscannen einer vorher erzeugten Sicherung in Form eines QR-Codes.\n\nMöchten Sie fortfahren?</string>
     <string name="restore_dialog_title">Wiederherstellen</string>
     <!-- Preferences -->
     <string name="pref_network_fee">Überweisungsgebühr</string>
@@ -30,6 +25,12 @@
     <string name="prefs_category_backupandrestore">Sichern und Wiederherstellen</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner Einstellungen</string>
     <string name="prefs_restore_title">Wallet wiederherstellen</string>
+	<!-- Transaction -->
+	<string name="no_transactions">Keine Überweisungen</string>
+    <string name="received_from">Empfangen von:</string>
+    <string name="sent_to">Überwiesen an:</string>
+    <string name="sent_to_yourself">An Sie selbst überwiesen:</string>
+    <string name="transaction_history">Überweisungsgshistorie</string>
     <!-- Common -->
     <string name="no">Nein</string>
     <string name="yes">Ja</string>
@@ -38,7 +39,7 @@
     <string name="try_again">Nochmal versuchen?</string>
     <!-- Calculation and sending of bitcoins -->
     <string name="calculating_fee">ÜBerweisungsgebühr berechnen</string>
-    <string name="calculating_fee_wait">Bitte warten sie während die Überweisungsgebühr berechnet wird...</string>
+    <string name="calculating_fee_wait">Bitte warten Sie während die Überweisungsgebühr berechnet wird...</string>
     <string name="calculating_fee_done">Die Überweisungsgebühr beträgt %s BTC.\n\nFortfahren?</string>
     <string name="send_bitcoins">Bitcoins überweisen</string>
     <string name="sending_bitcoins">Überweise Bitcoins</string>
@@ -48,13 +49,15 @@
     <string name="share_bitcoin_address">Bitcoin Adresse weitergeben...</string>
     <!-- Info -->
     <string name="transaction_fee_text">Eine Überweisungsgebühr 0.0005 BTC wird der Überweisung automatisch hinzugefügt.%1$sinfo...%2$s</string>
-    <string name="transaction_fee_text_info">Das Hinzufügen einer kleinen Überweisungsgebühr garantiert, dass ihre Überweisung durch das Bitcoin Netzwerk schnell bearbeitet wird. Die Überweisungsgebühr beträgt üblicherweise 0.0005 BTC, kann aber höher sein, wenn die Transaktionsdaten mehr als 1000 bytes groß ist. Sollten die Überweisungsgebühr mehr als 0.0005 BTC betragen, werden sie gefragt, ob sie die Überweisung ausführen trotzdem möchten. </string>
+    <string name="transaction_fee_text_info">Das Hinzufügen einer kleinen Überweisungsgebühr garantiert, dass ihre Überweisung durch das Bitcoin Netzwerk schnell bearbeitet wird. Die Überweisungsgebühr beträgt üblicherweise 0.0005 BTC, kann aber höher sein, wenn die Transaktionsdaten mehr als 1000 bytes groß ist. Sollten die Überweisungsgebühr mehr als 0.0005 BTC betragen, werden Sie gefragt, ob Sie die Überweisung ausführen trotzdem möchten. </string>
     <string name="your_balance">Ihr Guthaben:</string>
+    <string name="your_bitcoin_address">Ihre Bitcoin Adresse:</string>
     <!-- Warnings -->
-    <string name="install_qr_scanner">Bitte installieren sie ZXing QR-code Scanner oder Goggles!</string>
+    <string name="install_qr_scanner">Bitte installieren Sie ZXing QR-code Scanner oder Goggles!</string>
     <string name="need_connection">Sie müssen mit dem Internet verbunden sein.</string>
     <!-- Errors -->
     <string name="invalid_address_for_testnet">Ungültige Adresse für Testnet</string>
     <string name="invalid_address_for_prodnet">Ungültige Adresse</string>
     <string name="restore_invalid_qr_code">Ungültiger QR-code!</string>
+    <!-- NEW STRINGS -->
 </resources>

@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
-        android:text="Pay to:"
+        android:text="@string/pay_to"
         android:textColor="@color/Black" />
 
     <EditText
@@ -21,7 +21,7 @@
         android:layout_below="@+id/tv_pay_to"
         android:layout_marginRight="70dp"
         android:gravity="top"
-        android:hint="Address"
+        android:hint="@string/address"
         android:lines="3"
         android:textColor="@color/Black" >
 

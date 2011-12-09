@@ -4,12 +4,7 @@
     <string name="app_name">BitcoinSpinner</string>
     <string name="about_text">V.: %1$s\nBitcoinSpinner är en lättviktig, säker och användarvänlig Bitcoin-klient för Android, byggd med hjälp av BCCAPI.\nBitcoinSpinner är inte en Bitcoin bank. Alla dina Bitcoin är skyddade av privata krypteringsnycklar som sparas i app-privat utrymme på din Android.\n\nLägg märke till att detta är en beta-release, och att du bara bör använda den för växelpengar.\n</string>
     <string name="about_title">Om BitcoinSpinner</string>
-    <string name="credits_text">Tack till:\n
-- Jan(bccapi)\n
-- Kevin(Fr. övers.)\n
-- Mats(Sv. övers.)\n
-- Gerhard(De. övers.)
-- Manuel Polo(Es. övers.)</string>
+    <string name="credits_text">Tack till:\n - Jan(bccapi)\n - Kevin(Fr. övers.)\n - Mats Henricson(Sv. övers.)\n - Gerhard(De. övers.)\n - Manuel Polo(Es. övers.)\n - Troels(Da.  övers.)</string>
     <!-- Menu -->
     <string name="about_menu">Om BS</string>
     <string name="credits_menu">Tack</string>
@@ -30,6 +25,12 @@
     <string name="prefs_category_backupandrestore">Säkerhetskopiera och återställa</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner inställningar</string>
     <string name="prefs_restore_title">Återställ plånbok</string>
+	<!-- Transaction -->
+	<string name="no_transactions">Inga transaktioner</string>
+	<string name="received_from">Mottagna från:</string>
+    <string name="sent_to">Skicka till:</string>
+	<string name="sent_to_yourself">Skickade till dig själv:</string>
+	<string name="transaction_history">Transaktionshistoria</string>
     <!-- Common -->
     <string name="no">Nej</string>
     <string name="yes">Ja</string>
@@ -50,6 +51,7 @@
     <string name="transaction_fee_text">En transaktionsavgift på 0.0005 BTC läggs automatiskt till.%1$sinfo...%2$s</string>
     <string name="transaction_fee_text_info">Genom att lägga till en liten transaktionsavgift så överförs dina Bitcoins snabbare. Storleken på transaktionsavgiften är vanligen 0.0005 BTC, men kan vara större om din transaktion är större än 1000 bytes. Om din transaktion behöver en större avgift än 0.0005 BTC så kommer du att bli tillfrågad om du vill skicka den.</string>
     <string name="your_balance">Ditt saldo:</string>
+    <string name="your_bitcoin_address">Din Bitcoin adress:</string>
     <!-- Warnings -->
     <string name="install_qr_scanner">Vänligen installera ZXing QR-kods scanner eller Goggles!</string>
     <string name="need_connection">Du måste vara ansluten till internet.</string>

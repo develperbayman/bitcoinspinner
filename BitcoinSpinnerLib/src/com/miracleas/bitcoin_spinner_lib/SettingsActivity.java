@@ -6,6 +6,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -15,12 +16,15 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.ListPreference;
 import android.preference.Preference;
+import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
 import android.text.ClipboardManager;
@@ -58,6 +62,8 @@ public class SettingsActivity extends PreferenceActivity {
 
 	private Context mContext;
 
+	ListPreference useLocalePref;
+	
 	ProgressDialog restoreDialog;
 
 	/**
@@ -75,6 +81,10 @@ public class SettingsActivity extends PreferenceActivity {
 
 		addPreferencesFromResource(R.xml.preferences);
 
+		useLocalePref = (ListPreference) findPreference("useLocale");
+		useLocalePref.setTitle(R.string.prefs_choose_default_locale);
+		useLocalePref.setOnPreferenceChangeListener(useLocalChangeListener);
+		
 		Preference backupWalletPref = (Preference) findPreference("backupSeed");
 		backupWalletPref
 				.setOnPreferenceClickListener(backupWalletClickListener);
@@ -85,6 +95,30 @@ public class SettingsActivity extends PreferenceActivity {
 
 	}
 
+	@Override
+	public void onResume() {
+		super.onResume();
+		
+		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+			Locale.setDefault(locale);
+			Configuration config = new Configuration();
+			config.locale = locale;
+			getBaseContext().getResources().updateConfiguration(config,
+			      getBaseContext().getResources().getDisplayMetrics());
+		}
+	}
+	
+	private final OnPreferenceChangeListener useLocalChangeListener = new OnPreferenceChangeListener() {
+		
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			editor.putString(Consts.LOCALE, (String)newValue);
+			editor.commit();
+			return true;
+		}
+	};
+	
 	private final OnPreferenceClickListener backupWalletClickListener = new OnPreferenceClickListener() {
 
 		public boolean onPreferenceClick(Preference preference) {
@@ -99,10 +133,8 @@ public class SettingsActivity extends PreferenceActivity {
 									dialog.cancel();
 
 									LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-									View layout = inflater
-											.inflate(
-													R.layout.dialog_qr_address,
-													null);
+									View layout = inflater.inflate(
+											R.layout.dialog_qr_address, null);
 									AlertDialog.Builder builder = new AlertDialog.Builder(
 											mContext).setView(layout);
 									backupWalletDialog = builder.create();
@@ -111,10 +143,11 @@ public class SettingsActivity extends PreferenceActivity {
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
 
-									qrString = "bsb:"
-											+ getSeedAsBase58() + "?net=";
-									
-									qrString += preferences.getInt(Consts.NETWORK, Consts.PRODNET);
+									qrString = "bsb:" + getSeedAsBase58()
+											+ "?net=";
+
+									qrString += preferences.getInt(
+											Consts.NETWORK, Consts.PRODNET);
 
 									qrAdress.setImageBitmap(getQRCodeBitmap(
 											qrString, 320));
@@ -126,14 +159,16 @@ public class SettingsActivity extends PreferenceActivity {
 										}
 									});
 
-									Button copy = (Button) layout.findViewById(R.id.btn_copy_to_clip);
+									Button copy = (Button) layout
+											.findViewById(R.id.btn_copy_to_clip);
 									copy.setOnClickListener(new OnClickListener() {
 
 										@Override
 										public void onClick(View v) {
 											ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
 											clipboard.setText(qrString);
-											Toast.makeText(mContext, R.string.clipboard_copy,
+											Toast.makeText(mContext,
+													R.string.clipboard_copy,
 													Toast.LENGTH_SHORT).show();
 										}
 									});
@@ -191,21 +226,27 @@ public class SettingsActivity extends PreferenceActivity {
 											dialog.cancel();
 											AlertDialog.Builder builder = new AlertDialog.Builder(
 													mContext);
-											builder.setMessage(R.string.restore_dialog_no_coins)
+											builder.setMessage(
+													R.string.restore_dialog_no_coins)
 													.setCancelable(false)
-													.setPositiveButton(R.string.yes,
+													.setPositiveButton(
+															R.string.yes,
 															new DialogInterface.OnClickListener() {
 																public void onClick(
-																		DialogInterface dialog, int id) {
+																		DialogInterface dialog,
+																		int id) {
 
 																	final PackageManager pm = getPackageManager();
 																	if (pm.resolveActivity(
-																			Consts.zxingIntent, 0) != null) {
+																			Consts.zxingIntent,
+																			0) != null) {
 																		startActivityForResult(
 																				Consts.zxingIntent,
 																				REQUEST_CODE_SCAN);
-																	} else if (pm.resolveActivity(
-																			Consts.gogglesIntent, 0) != null) {
+																	} else if (pm
+																			.resolveActivity(
+																					Consts.gogglesIntent,
+																					0) != null) {
 																		startActivity(Consts.gogglesIntent);
 																	} else {
 																		showMarketPage(Consts.PACKAGE_NAME_ZXING);
@@ -217,24 +258,30 @@ public class SettingsActivity extends PreferenceActivity {
 																	}
 																}
 															})
-													.setNegativeButton(R.string.no,
+													.setNegativeButton(
+															R.string.no,
 															new DialogInterface.OnClickListener() {
 																public void onClick(
-																		DialogInterface dialog, int id) {
+																		DialogInterface dialog,
+																		int id) {
 																	dialog.cancel();
 																}
 															});
-											AlertDialog alertDialog = builder.create();
+											AlertDialog alertDialog = builder
+													.create();
 											alertDialog.show();
 										}
 									})
-							.setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-								
-								@Override
-								public void onClick(DialogInterface dialog, int which) {
-									dialog.cancel();
-								}
-							});
+							.setNegativeButton(R.string.no,
+									new DialogInterface.OnClickListener() {
+
+										@Override
+										public void onClick(
+												DialogInterface dialog,
+												int which) {
+											dialog.cancel();
+										}
+									});
 					AlertDialog alertDialog = builder.create();
 					alertDialog.show();
 				} else {
@@ -277,7 +324,8 @@ public class SettingsActivity extends PreferenceActivity {
 					alertDialog.show();
 				}
 			} else {
-				Toast.makeText(mContext, R.string.need_connection, Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, R.string.need_connection,
+						Toast.LENGTH_LONG).show();
 			}
 			return true;
 		}
@@ -306,11 +354,10 @@ public class SettingsActivity extends PreferenceActivity {
 				alertDialog.show();
 			} else {
 				Uri uri = Uri.parse(contents);
-				final Uri u = Uri.parse("bsb://"
-						+ uri.getSchemeSpecificPart());
+				final Uri u = Uri.parse("bsb://" + uri.getSchemeSpecificPart());
 
-				final int network = Integer.parseInt(u
-						.getQueryParameter("net"));
+				final int network = Integer
+						.parseInt(u.getQueryParameter("net"));
 
 				String seedFile = null;
 				switch (network) {
@@ -342,7 +389,8 @@ public class SettingsActivity extends PreferenceActivity {
 				BitcoinClientApiImpl api = new BitcoinClientApiImpl(Consts.url,
 						Consts.network);
 				Consts.account = new Account(keyManager, api);
-				restoreDialog = ProgressDialog.show(this, getString(R.string.restore_dialog_title),
+				restoreDialog = ProgressDialog.show(this,
+						getString(R.string.restore_dialog_title),
 						getString(R.string.please_wait), true);
 				new AsyncLogin().execute(Consts.account);
 			}
@@ -369,7 +417,7 @@ public class SettingsActivity extends PreferenceActivity {
 			} catch (APIException e) {
 				e.printStackTrace();
 			}
-			
+
 			return null;
 		}
 
@@ -423,9 +471,11 @@ public class SettingsActivity extends PreferenceActivity {
 		String seedFile;
 		byte[] seed = new byte[Consts.SEED_SIZE];
 
-		if (Consts.TESTNET == preferences.getInt(Consts.NETWORK, Consts.PRODNET)) {
+		if (Consts.TESTNET == preferences
+				.getInt(Consts.NETWORK, Consts.PRODNET)) {
 			seedFile = Consts.TESTNET_FILE;
-		} else if (Consts.CLOSEDTESTNET == preferences.getInt(Consts.NETWORK, Consts.PRODNET)) {
+		} else if (Consts.CLOSEDTESTNET == preferences.getInt(Consts.NETWORK,
+				Consts.PRODNET)) {
 			seedFile = Consts.CLOSED_TESTNET_FILE;
 		} else {
 			seedFile = Consts.PRODNET_FILE;
@@ -454,7 +504,7 @@ public class SettingsActivity extends PreferenceActivity {
 			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String
 					.format(Consts.WEBMARKET_APP_URL, packageName))));
 	}
-	
+
 	private boolean isConnected() {
 		return Consts.isConnected(mContext);
 	}
