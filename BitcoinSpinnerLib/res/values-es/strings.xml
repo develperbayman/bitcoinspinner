@@ -3,8 +3,8 @@
     <!-- Name, about, credits and versioning -->
     <string name="app_name">BitCoinSpinner</string>
     <string name="about_title">Acerca de BitcoinSpinner</string>
-    <string name="about_text">V.: %1$s\nBitcoinSpinner es un cliente de Bitcoin para Android ligero, seguro y amigable, el cual ha sido desarrollado sobre BCCAPI.\nBitcoinSpinner no es un banco de Bitcoins. Todos su fondos están asegurados mediente claves privadas dentro del almacenamiento privado de la aplicación en su dispositivo Android.\n\nPor favor tenga en cuenta que esta es una versión beta, y que usted debería sólamente usarla para pequeños intercambios.\n</string>
-    <string name="credits_text">Gracias a:\n - Jan(bccapi)\n - Kevin(Trad. Fr.)\n - Mats Henricson(Trad. Sv.)\n - Gerhard(Trad. De.)\n - Manuel Polo(Trad. Es.)\n - Troels((Trad. Da.)</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner es un cliente de Bitcoin para Android ligero, seguro y amigable, el cual ha sido desarrollado sobre BCCAPI.\nBitcoinSpinner no es un banco de Bitcoins. Todos su fondos están asegurados mediante claves privadas dentro del almacenamiento privado de la aplicación en su dispositivo Android.\n\nPor favor tenga en cuenta que esta es una versión beta, y que usted debería sólamente usarla para pequeños intercambios.\n</string>
+    <string name="credits_text">Gracias a:\n - Jan(bccapi)\n - Kevin(Trad. Fr.)\n - Mats(Trad. Sv.)\n - Gerhard(Trad. De.)\n - Manuel Polo(Trad. Es.)\n - Troels(Trad. Da.)</string>
     <!-- Menu -->
     <string name="about_menu">Acerca de BS</string>
     <string name="credits_menu">Créditos</string>
@@ -25,12 +25,6 @@
     <string name="prefs_category_backupandrestore">Copia de seguridad y restauración</string>
     <string name="prefs_category_bitcoinwalletprefs">Preferencias de BitcoinSpinner</string>
     <string name="prefs_restore_title">Restaurar billetero</string>
-	<!-- Transaction -->
-    <string name="no_transactions">No hay transacciones</string>
-    <string name="received_from">Recivido desde:</string>
-    <string name="sent_to">Enviado a:</string>
-    <string name="sent_to_yourself">Enviado a mi mismo:</string>
-    <string name="transaction_history">Historial de transacciones</string>
     <!-- Common -->
     <string name="no">No</string>
     <string name="yes">Si</string>
@@ -48,10 +42,9 @@
     <string name="clipboard_copy">Dirección copiada al portapapeles</string>
     <string name="share_bitcoin_address">Compartir su dirección bitcoin...</string>
     <!-- Info -->
-    <string name="transaction_fee_text">Una tasa de transacción de 0.0005 BTC es automáticamente añadida a su transacción.%1$sinformación...%2$s</string>
+    <string name="transaction_fee_text">Una tasa de transacción de 0.0005 BTC se añade automáticamente a su transacción.%1$sinformación...%2$s</string>
     <string name="transaction_fee_text_info">Al añadir una pequeña tasa de transación, su transacción está garantizada para ser propagada a través de la red y aceptada por los mineros de Bitcoin. El monto de la tasa de transacción es típicamente de 0.0005 BTC, aunque puede ser más si su transacción es mayor de 1000 bytes. Si su transacción requiere una tasa mayor de 0.0005 BTC se le pedirá que confirme que usted desea enviarla.</string>
     <string name="your_balance">Su balance:</string>
-    <string name="your_bitcoin_address">Su dirección de Bitcoin:</string>
     <!-- Warnings -->
     <string name="install_qr_scanner">Por favor, ¡instale el escanner QR ZXing o Goggles!</string>
     <string name="need_connection">Se necesita estar conectado a interner.</string>
@@ -59,4 +52,15 @@
     <string name="invalid_address_for_testnet">Dirección inválida para la red de pruebas</string>
     <string name="invalid_address_for_prodnet">Dirección inválida</string>
     <string name="restore_invalid_qr_code">¡Código QR inválido!</string>
+    <!-- NEW STRINGS -->
+    <string name="sent_to">Enviado a:</string>
+    <string name="received_from">Recibido desde:</string>
+    <string name="sent_to_yourself">Enviado a mi mismo:</string>
+    <string name="transaction_history">Historial de transacciones</string>
+    <string name="no_transactions">No hay transacciones</string>
+    <!-- NEW STRINGS -->
+    <string name="prefs_choose_default_locale">Elegir idioma por defecto</string>
+    <string name="pay_to">Pagar a:</string>
+    <string name="address">Dirección</string>
+    <string name="amount_to_pay">Cantidad a pagar:</string>
 </resources>

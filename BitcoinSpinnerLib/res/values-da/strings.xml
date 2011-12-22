@@ -64,4 +64,8 @@
     <string name="pay_to">Betal til:</string>
     <string name="address">Adresse</string>
     <string name="amount_to_pay">Beløb:</string>
+    <string name="prefs_category_advanced">Avanceret</string>
+    <string name="prefs_transaction_history_size">Tansaktionshistoriens størrelse</string>
+    <string name="pref_export_private_key_title">Eksporter den private nøgle</string>
+    <string name="export_private_key_dialog_text">Advarsel. Du skal til at eksportere din private nøgle der holder alle bitcoins i BitcoinSpinner.\n\nAlle der får adgang til denne nøgle kan overtage alle bitcoins den holder.</string>
 </resources>

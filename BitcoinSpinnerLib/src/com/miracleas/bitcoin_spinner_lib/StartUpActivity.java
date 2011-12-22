@@ -282,6 +282,13 @@ public class StartUpActivity extends Activity {
 				}
 //				Consts.account.login();
 				editor.putLong(Consts.LASTLOGIN, new Date().getTime());
+				
+				String mAddress = null;
+				for (String address : Consts.account.getAddresses()) {
+					mAddress = address;
+					break;
+				}
+				editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
 				editor.commit();
 
 			} catch (IOException e) {

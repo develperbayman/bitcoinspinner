@@ -124,6 +124,24 @@ public class BitcoinClientApiImpl implements BitcoinClientAPI {
    }
 
    @Override
+   public AccountStatement getRecentTransactionSummary(String sessionId, int count) throws IOException, APIException {
+      try {
+         StringBuilder sb = new StringBuilder();
+         sb.append("?count=").append(count);
+         HttpURLConnection connection = getHttpConnection("getRecentTransactionSummary", sb.toString(), sessionId);
+         connection.setRequestMethod("GET");
+         connection.connect();
+         int status = connection.getResponseCode();
+         if (status != 200) {
+            throw generateException(connection);
+         }
+         return AccountStatement.fromStream(new DataInputStream(connection.getInputStream()));
+      } catch (IOException e) {
+         throw e;
+      }
+   }
+   
+   @Override
    public void addKeyToWallet(String sessionId, byte[] publicKey) throws APIException, IOException {
       try {
          String keyString = HexUtils.toHex(publicKey);

@@ -104,13 +104,13 @@ public class MainActivity extends Activity implements SimpleGestureListener {
 
 		new Thread(ConnectionWatcher).start();
 
-		for (String address : Consts.account.getAddresses()) {
-			mAddress = address;
-			break;
-		}
+//		for (String address : Consts.account.getAddresses()) {
+//			mAddress = address;
+//			break;
+//		}
 
-		editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
-		editor.commit();
+//		editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
+//		editor.commit();
 
 		tvAddress = (TextView) findViewById(R.id.tv_address);
 		ivAddress = (ImageView) findViewById(R.id.iv_address);

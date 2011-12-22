@@ -25,8 +25,8 @@
     <string name="prefs_category_backupandrestore">Sichern und Wiederherstellen</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner Einstellungen</string>
     <string name="prefs_restore_title">Wallet wiederherstellen</string>
-	<!-- Transaction -->
-	<string name="no_transactions">Keine Überweisungen</string>
+    <!-- Transaction -->
+    <string name="no_transactions">Keine Überweisungen</string>
     <string name="received_from">Empfangen von:</string>
     <string name="sent_to">Überwiesen an:</string>
     <string name="sent_to_yourself">An Sie selbst überwiesen:</string>

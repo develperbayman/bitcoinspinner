@@ -4,6 +4,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
@@ -22,6 +23,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.EditTextPreference;
 import android.preference.ListPreference;
 import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
@@ -37,9 +39,11 @@ import android.widget.Toast;
 
 import com.bccapi.api.APIException;
 import com.bccapi.api.AccountInfo;
+import com.bccapi.api.Network;
 import com.bccapi.core.Account;
 import com.bccapi.core.Base58;
 import com.bccapi.core.BitcoinClientApiImpl;
+import com.bccapi.core.DeterministicECKeyExporter;
 import com.bccapi.core.DeterministicECKeyManager;
 import com.bccapi.core.ECKeyManager;
 import com.google.zxing.BarcodeFormat;
@@ -54,17 +58,22 @@ public class SettingsActivity extends PreferenceActivity {
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
 
-	private AlertDialog backupWalletDialog;
+	private AlertDialog backupWalletDialog, exportKeyDialog;
 	private static final QRCodeWriter QR_CODE_WRITER = new QRCodeWriter();
-	private String qrString;
+	private String qrString, keyString;
 
 	private static final int REQUEST_CODE_SCAN = 0;
 
 	private Context mContext;
 
-	ListPreference useLocalePref;
+	private Preference backupWalletPref, restoreWalletPref,
+			ExportPrivateKeyPref;
+	private EditTextPreference transactionHistorySizePref;
+	private ListPreference useLocalePref;
+
+	private ProgressDialog restoreDialog;
 	
-	ProgressDialog restoreDialog;
+	private Account account;
 
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
@@ -77,6 +86,8 @@ public class SettingsActivity extends PreferenceActivity {
 				Activity.MODE_PRIVATE);
 		editor = preferences.edit();
 
+		account = Consts.account;
+		
 		mContext = this;
 
 		addPreferencesFromResource(R.xml.preferences);
@@ -84,41 +95,64 @@ public class SettingsActivity extends PreferenceActivity {
 		useLocalePref = (ListPreference) findPreference("useLocale");
 		useLocalePref.setTitle(R.string.prefs_choose_default_locale);
 		useLocalePref.setOnPreferenceChangeListener(useLocalChangeListener);
-		
-		Preference backupWalletPref = (Preference) findPreference("backupSeed");
+
+		transactionHistorySizePref = (EditTextPreference) findPreference("transactionHistorySize");
+		transactionHistorySizePref
+				.setOnPreferenceChangeListener(TransactionHistorySizeChangeListener);
+
+		backupWalletPref = (Preference) findPreference("backupSeed");
 		backupWalletPref
 				.setOnPreferenceClickListener(backupWalletClickListener);
 
-		Preference restoreWalletPref = (Preference) findPreference("restoreSeed");
+		restoreWalletPref = (Preference) findPreference("restoreSeed");
 		restoreWalletPref
 				.setOnPreferenceClickListener(restoreWalletClickListener);
+
+		ExportPrivateKeyPref = (Preference) findPreference("exportPrivateKey");
+		ExportPrivateKeyPref
+				.setOnPreferenceClickListener(exportPrivateKeyClickListener);
 
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		
-		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
-			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+
+		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE,
+					"en"));
 			Locale.setDefault(locale);
 			Configuration config = new Configuration();
 			config.locale = locale;
 			getBaseContext().getResources().updateConfiguration(config,
-			      getBaseContext().getResources().getDisplayMetrics());
+					getBaseContext().getResources().getDisplayMetrics());
 		}
 	}
-	
+
 	private final OnPreferenceChangeListener useLocalChangeListener = new OnPreferenceChangeListener() {
-		
+
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			editor.putString(Consts.LOCALE, (String)newValue);
+			editor.putString(Consts.LOCALE, (String) newValue);
 			editor.commit();
 			return true;
 		}
 	};
-	
+
+	private final OnPreferenceChangeListener TransactionHistorySizeChangeListener = new OnPreferenceChangeListener() {
+
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			String value = ((String) newValue).replaceAll("\\D", "");
+			if (value != "") {
+				editor.putInt(Consts.TRANSACTION_HISTORY_SIZE,
+						Integer.parseInt(value));
+				editor.commit();
+			}
+			return true;
+		}
+	};
+
 	private final OnPreferenceClickListener backupWalletClickListener = new OnPreferenceClickListener() {
 
 		public boolean onPreferenceClick(Preference preference) {
@@ -327,6 +361,108 @@ public class SettingsActivity extends PreferenceActivity {
 				Toast.makeText(mContext, R.string.need_connection,
 						Toast.LENGTH_LONG).show();
 			}
+			return true;
+		}
+	};
+
+	private final OnPreferenceClickListener exportPrivateKeyClickListener = new OnPreferenceClickListener() {
+
+		public boolean onPreferenceClick(Preference preference) {
+
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setMessage(R.string.export_private_key_dialog_text)
+					.setCancelable(false)
+					.setPositiveButton(R.string.yes,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+
+									LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+									View layout = inflater.inflate(
+											R.layout.dialog_qr_address, null);
+									AlertDialog.Builder builder = new AlertDialog.Builder(
+											mContext).setView(layout);
+									exportKeyDialog = builder.create();
+									exportKeyDialog
+											.setCanceledOnTouchOutside(true);
+									
+									byte[] seed = new byte[Consts.SEED_SIZE];
+									String seedFile = null;
+									switch (preferences.getInt(Consts.NETWORK, 0)) {
+									case Consts.PRODNET:
+										seedFile = Consts.PRODNET_FILE;
+										break;
+							
+									case Consts.TESTNET:
+										seedFile = Consts.TESTNET_FILE;
+										break;
+										
+									case Consts.CLOSEDTESTNET:
+										seedFile = Consts.CLOSED_TESTNET_FILE;
+										break;
+									}
+
+									FileInputStream fis;
+									try {
+										fis = openFileInput(seedFile);
+										fis.read(seed);
+										fis.close();
+									} catch (FileNotFoundException e1) {
+										e1.printStackTrace();
+									} catch (IOException e) {
+										e.printStackTrace();
+									}
+
+									ImageView qrAdress = (ImageView) layout
+											.findViewById(R.id.iv_qr_Address);
+									
+									int keys = account.getAddresses().size();
+									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(
+											seed);
+									for (int i = 0; i < keys; i++) {
+										keyString = exporter
+												.getPrivateKeyExporter(i + 1)
+												.getBase58EncodedKey(
+														account.getNetwork());
+									}
+									
+									qrAdress.setImageBitmap(getQRCodeBitmap(
+											keyString, 320));
+									qrAdress.setOnClickListener(new OnClickListener() {
+
+										@Override
+										public void onClick(View v) {
+											exportKeyDialog.dismiss();
+										}
+									});
+
+									Button copy = (Button) layout
+											.findViewById(R.id.btn_copy_to_clip);
+									copy.setOnClickListener(new OnClickListener() {
+
+										@Override
+										public void onClick(View v) {
+											ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
+											clipboard.setText(keyString);
+											Toast.makeText(mContext,
+													R.string.clipboard_copy,
+													Toast.LENGTH_SHORT).show();
+										}
+									});
+
+									exportKeyDialog.show();
+								}
+							})
+					.setNegativeButton(R.string.no,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									// put your code here
+								}
+							});
+			AlertDialog alertDialog = builder.create();
+			alertDialog.show();
 			return true;
 		}
 	};

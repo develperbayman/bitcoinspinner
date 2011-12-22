@@ -91,6 +91,28 @@ public interface BitcoinClientAPI {
          APIException;
 
    /**
+    * Get an {@link AccountStatement} for this account containing a specified number of recent entries.
+    * <p>
+    * Call this function to get the {@link AccountStatement} for an account,
+    * which includes recent transaction records. The function allows the caller to
+    * specify how many recent records should be obtained.
+    * 
+    * @param sessionID
+    *           The session ID.
+    * @param count
+    *           The number of records to retrieve. If the number supplied is
+    *           larger than what is available, only the available records are
+    *           returned.
+    * @return {@link AccountStatement} for this account.
+    * @throws IOException
+    *            If communication with server fails
+    * @throws APIException
+    *            If the server responds with an error
+    */
+   public AccountStatement getRecentTransactionSummary(String sessionID, int count) throws IOException,
+         APIException;
+   
+   /**
     * Add a new public key to the wallet. Any future blocks containing
     * transaction outputs for this key are included in the wallet.
     * 

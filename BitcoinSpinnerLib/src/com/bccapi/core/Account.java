@@ -133,6 +133,27 @@ public class Account {
    }
 
    /**
+    * Get an {@link AccountStatement} for this account containing a specified
+    * number of recent entries.
+    * <p>
+    * Call this function to get the {@link AccountStatement} for an account,
+    * which includes recent transaction records. The function allows the caller
+    * to specify how many recent records should be obtained.
+    * 
+    * @param count
+    *           The number of records to retrieve. If the number supplied is
+    *           larger than what is available, only the available records are
+    *           returned.
+    * @return The {@link AccountStatement} for this account.
+    * @throws APIException
+    * @throws IOException
+    */
+   public synchronized AccountStatement getRecentTransactionSummary(int count) throws APIException, IOException {
+      AccountStatement statement = _api.getRecentTransactionSummary(_sessionId, count);
+      return statement;
+   }
+   
+   /**
     * Add a new public key to the BCCAPI server. From the time the server
     * receives the public key it will track new transaction outputs to it and
     * associate it with the wallet of this account.

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" ><ListPreference android:key="useLocale" android:entryValues="@array/laguagesValues" android:entries="@array/languages"/><PreferenceCategory android:title="@string/prefs_category_backupandrestore" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" ><ListPreference android:key="useLocale" android:entryValues="@array/laguagesValues" android:entries="@array/languages"/><EditTextPreference android:key="transactionHistorySize" android:title="@string/prefs_transaction_history_size"/><PreferenceCategory android:title="@string/prefs_category_backupandrestore" >
 
         <Preference
             android:key="backupSeed"
@@ -9,6 +9,11 @@
             android:key="restoreSeed"
             android:title="@string/prefs_restore_title" />
     </PreferenceCategory>
+<PreferenceScreen android:title="@string/prefs_category_advanced"><PreferenceCategory android:title="@string/prefs_category_advanced">
+    <Preference android:title="@string/pref_export_private_key_title" android:key="exportPrivateKey" />
+</PreferenceCategory></PreferenceScreen>
+
+
 
     
 

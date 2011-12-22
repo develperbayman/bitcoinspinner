@@ -25,12 +25,12 @@
     <string name="prefs_category_backupandrestore">Säkerhetskopiera och återställa</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner inställningar</string>
     <string name="prefs_restore_title">Återställ plånbok</string>
-	<!-- Transaction -->
-	<string name="no_transactions">Inga transaktioner</string>
-	<string name="received_from">Mottagna från:</string>
+    <!-- Transaction -->
+    <string name="no_transactions">Inga transaktioner</string>
+    <string name="received_from">Mottagna från:</string>
     <string name="sent_to">Skicka till:</string>
-	<string name="sent_to_yourself">Skickade till dig själv:</string>
-	<string name="transaction_history">Transaktionshistoria</string>
+    <string name="sent_to_yourself">Skickade till dig själv:</string>
+    <string name="transaction_history">Transaktionshistoria</string>
     <!-- Common -->
     <string name="no">Nej</string>
     <string name="yes">Ja</string>
@@ -59,4 +59,5 @@
     <string name="invalid_address_for_testnet">Ogiltig adress för testnätverket</string>
     <string name="invalid_address_for_prodnet">Ogiltig adress</string>
     <string name="restore_invalid_qr_code">Ogiltig QR-kod!</string>
+    <!-- NEW STRINGS -->
 </resources>

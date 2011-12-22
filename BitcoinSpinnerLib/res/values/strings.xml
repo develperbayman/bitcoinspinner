@@ -64,4 +64,8 @@
     <string name="pay_to">Pay to:</string>
     <string name="address">Address</string>
     <string name="amount_to_pay">Amount to pay:</string>
+    <string name="prefs_category_advanced">Advanced</string>
+    <string name="prefs_transaction_history_size">Transaction history size</string>
+    <string name="pref_export_private_key_title">Export private key</string>
+    <string name="export_private_key_dialog_text">Warning. You are about to export the private key that controls all the bitcoins managed by BitcoinSpinner.\n\nAnyone who gains access to this key can take possession of the bitcoins it controls.</string>
 </resources>

@@ -55,12 +55,8 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 		detector = new SimpleGestureFilter(this, this);
 
 		try {
-			AccountStatement statement = account.getStatement(0, 0);
-			int totalRecords = statement.getTotalRecordCount();
-			if (totalRecords != 0) {
-				statement = account.getStatement(
-						Math.max(0, totalRecords - 15), 15);
-			}
+			int size = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, 15);
+			AccountStatement statement = account.getRecentTransactionSummary(size);
 			if (!statement.getRecords().isEmpty()) {
 				records = statement.getRecords();
 				setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, records));
