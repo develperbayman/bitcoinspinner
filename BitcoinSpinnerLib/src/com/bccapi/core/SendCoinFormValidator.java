@@ -17,8 +17,10 @@
 package com.bccapi.core;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
+import com.bccapi.api.Network;
 import com.bccapi.api.SendCoinForm;
 import com.bccapi.api.TxOutput;
 import com.bccapi.core.BccScript.BccScriptException;
@@ -36,8 +38,10 @@ public class SendCoinFormValidator {
     * 
     * @param form
     *           The {@link SendCoinForm} to validate
-    * @param myAccount
-    *           The account that is sending coins
+    * @param myAddresses
+    *           The list of addresses sending coins
+    * @param network
+    *           The Bitcoin network used
     * @param amount
     *           The amount that should be sent
     * @param fee
@@ -46,9 +50,10 @@ public class SendCoinFormValidator {
     *           The receiving address
     * @return true is the form is valid, false otherwise.
     */
-   public static boolean validate(SendCoinForm form, Account myAccount, long amount, long fee, String receiver) {
+   public static boolean validate(SendCoinForm form, List<String> myAddresses, Network network, long amount, long fee,
+         String receiver) {
       // Build the list of addresses controlled by this account
-      Set<String> myAddresses = new HashSet<String>(myAccount.getAddresses());
+      Set<String> addressSet = new HashSet<String>(myAddresses);
 
       try {
          /**
@@ -68,8 +73,8 @@ public class SendCoinFormValidator {
          // Go through all the outputs of this transaction.
          for (TxOutput out : form.getTransaction().getOutputs()) {
             BccScriptOutput script = new BccScriptOutput(out.getScript());
-            String address = AddressUtil.byteAddressToStringAddress(myAccount.getNetwork(), script.getAddress());
-            if (myAddresses.contains(address)) {
+            String address = AddressUtil.byteAddressToStringAddress(network, script.getAddress());
+            if (addressSet.contains(address)) {
                // Money for me. Either change going back to me or I am sending
                // to myself
                sentToMe += out.getValue();
@@ -91,7 +96,7 @@ public class SendCoinFormValidator {
             return false;
          }
 
-         boolean sendingToMyself = myAddresses.contains(receiver);
+         boolean sendingToMyself = addressSet.contains(receiver);
          if (sendingToMyself) {
             // Validate that everything is accounted for
             return inCoins == sentToMe + fee;

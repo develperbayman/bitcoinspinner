@@ -1,34 +1,28 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.io.IOException;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Message;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
@@ -39,28 +33,30 @@ import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bccapi.api.APIException;
 import com.bccapi.api.Network;
+import com.bccapi.api.SendCoinForm;
+import com.bccapi.api.Tx;
 import com.bccapi.core.AddressUtil;
 import com.bccapi.core.CoinUtils;
 import com.bccapi.core.SendCoinFormValidator;
+import com.bccapi.core.Asynchronous.AccountTask;
+import com.bccapi.core.Asynchronous.AsynchronousAccount;
+import com.bccapi.core.Asynchronous.GetSendCoinFormCallbackHandler;
+import com.bccapi.core.Asynchronous.TransactionSubmissionCallbackHandler;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
 public class SendBitcoinsActivity extends Activity implements
-		SimpleGestureListener {
+		SimpleGestureListener, GetSendCoinFormCallbackHandler, TransactionSubmissionCallbackHandler {
 
+	private final int STANDARD_FEE = 50000;
 	private Context mContext;
 
 	private TextView tvValidAdress, tvAvailSpend, tvFeeInfo;
 	private EditText etAddress, etSpend;
 	private Button btnQRScan, btnSpend, btnCancel;
-
-	private String mAvailableBitcoins = "";
 
 	private static final int REQUEST_CODE_SCAN = 0;
 
@@ -74,26 +70,15 @@ public class SendBitcoinsActivity extends Activity implements
 
 	private static final int ABOUT_DIALOG = 1001;
 
-	private static final int UPDATE_AVAILABLE_SPEND_MESSAGE = 101;
-	private static final int CONNECTION_MESSAGE = 102;
-
-	private static final int REQUEST_CODE_SETTINGS = 10002;
-
 	private boolean mValidAdress = false;
 	private boolean mValidAmount = false;
 
 	private InputMethodManager imm;
 
-	ProgressBar pbAvailableSpendUpdateProgress;
-	RelativeLayout rlAvailableSpend;
-
-	private BigDecimal amount;
-	private Long toSend, fee;
-	
 	private SharedPreferences preferences;
-	private SharedPreferences.Editor editor;
-	
-	private Network mNetwork;
+	private AccountTask mGetFormTask;
+	private AccountTask mSubmitTask;
+	private SendCoinForm mFormToSend;
 	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
@@ -104,16 +89,8 @@ public class SendBitcoinsActivity extends Activity implements
 		setContentView(R.layout.send_money);
 
 		mContext = this;
-		
-		mNetwork = Consts.network;
-
-		new Thread(ConnectionWatcher).start();
 
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
-		editor = preferences.edit();
-
-		pbAvailableSpendUpdateProgress = (ProgressBar) findViewById(R.id.pb_available_spend_update);
-		rlAvailableSpend = (RelativeLayout) findViewById(R.id.rl_available_spend_update);
 
 		detector = new SimpleGestureFilter(this, this);
 
@@ -148,15 +125,13 @@ public class SendBitcoinsActivity extends Activity implements
 		etSpend.setOnKeyListener(handleReturn);
 
 		etAddress.addTextChangedListener(btcAddressValidatorOnTextChanged);
-		etSpend.addTextChangedListener(btcBitCoinValidatorOnTextChanged);
+		etSpend.addTextChangedListener(btcBitcoinValidatorOnTextChanged);
 
 		etSpend.setOnFocusChangeListener(btcFocusChangeListenerAddExtend);
 
 		btnQRScan.setOnClickListener(qrScanClickListener);
 		btnSpend.setOnClickListener(spendMoneyClickListener);
 		btnCancel.setOnClickListener(cancelClickListener);
-
-		mAvailableBitcoins = preferences.getString(Consts.LASTKNOWNBALANCE, "0");
 	}
 
 	@Override
@@ -172,11 +147,11 @@ public class SendBitcoinsActivity extends Activity implements
 			      getBaseContext().getResources().getDisplayMetrics());
 		}
 
-		if (isConnected())
-			readyAvailableSpend(true);
-		else {
-			tvAvailSpend.setText(preferences.getString(
-					Consts.AVAIABLE_BITCOINS, "0.00000") + " BTC");
+		long balance = Consts.account.getCachedBalance();
+		if (balance == -1) {
+			tvAvailSpend.setText(R.string.unknown);
+		} else {
+			tvAvailSpend.setText(CoinUtils.valueString(balance) + " BTC");
 		}
 	}
 
@@ -185,23 +160,17 @@ public class SendBitcoinsActivity extends Activity implements
 		super.onPause();
 	}
 
-	private Runnable ConnectionWatcher = new Runnable() {
-
-		@Override
-		public void run() {
-			while (true) {
-				Message message = handler.obtainMessage();
-				message.arg1 = CONNECTION_MESSAGE;
-				handler.sendMessage(message);
-				try {
-					Thread.sleep(1000);
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
-			}
+	@Override
+	protected void onDestroy() {
+		if (mGetFormTask != null) {
+			mGetFormTask.cancel();
 		}
+		if (mSubmitTask != null) {
+			mSubmitTask.cancel();
+		}
+		super.onDestroy();
 	};
-
+	
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent me) {
 		this.detector.onTouchEvent(me);
@@ -211,8 +180,6 @@ public class SendBitcoinsActivity extends Activity implements
 	/** Called when menu button is pressed. */
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
-		MenuInflater inflater = getMenuInflater();
-		inflater.inflate(R.menu.menu, menu);
 		return true;
 	}
 
@@ -222,10 +189,6 @@ public class SendBitcoinsActivity extends Activity implements
 		// Handle item selection
 		if (item.getItemId() == R.id.about) {
 			showDialog(ABOUT_DIALOG);
-			return true;
-		} else if (item.getItemId() == R.id.settings) {
-			startActivityForResult(new Intent(this, SettingsActivity.class),
-					REQUEST_CODE_SETTINGS);
 			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
@@ -275,12 +238,10 @@ public class SendBitcoinsActivity extends Activity implements
 			} else {
 				if (tempString.matches(""))
 					tvValidAdress.setText("");
-				else if (!AddressUtil.validateAddress(tempString,
-						mNetwork)) {
-					if (mNetwork == Network.testNetwork)
-						tvValidAdress
-								.setText(R.string.invalid_address_for_testnet);
-					else if (mNetwork == Network.productionNetwork)
+				else if (!AddressUtil.validateAddress(tempString, Consts.account.getNetwork())) {
+					if (Consts.account.getNetwork() == Network.testNetwork)
+						tvValidAdress.setText(R.string.invalid_address_for_testnet);
+					else if (Consts.account.getNetwork() == Network.productionNetwork)
 						tvValidAdress.setText(R.string.invalid_address_for_prodnet);
 					mValidAdress = false;
 				} else {
@@ -304,11 +265,10 @@ public class SendBitcoinsActivity extends Activity implements
 
 	};
 
-	private final TextWatcher btcBitCoinValidatorOnTextChanged = new TextWatcher() {
+	private final TextWatcher btcBitcoinValidatorOnTextChanged = new TextWatcher() {
 
 		@Override
 		public void afterTextChanged(Editable e) {
-			double spend = -1;
 			String spendText = etSpend.getText().toString();
 
 			if (spendText.contains(" BTC"))
@@ -320,10 +280,9 @@ public class SendBitcoinsActivity extends Activity implements
 			if (spendText.matches(""))
 				mValidAmount = false;
 			else {
-				spend = Double.parseDouble(spendText);
-				if (spend > 0
-						&& (spend + 0.0005 <= Double
-								.parseDouble(mAvailableBitcoins))) {
+				long spend = (long) Double.parseDouble(spendText) * Consts.SATOSHIS_PER_BITCOIN;
+				long available = Consts.account.getCachedBalance();
+				if (spend > 0 && (spend + STANDARD_FEE <= available)) {
 					mValidAmount = true;
 				} else
 					mValidAmount = false;
@@ -387,7 +346,7 @@ public class SendBitcoinsActivity extends Activity implements
 
 		@Override
 		public void onClick(View v) {
-			new CalculateFeeTask().execute((Void[]) null);
+			requestSendCoinForm();
 		}
 	};
 
@@ -400,10 +359,7 @@ public class SendBitcoinsActivity extends Activity implements
 	};
 
 	private void enableSendButton() {
-		if (mValidAdress && mValidAmount && isConnected())
-			btnSpend.setEnabled(true);
-		else
-			btnSpend.setEnabled(false);
+		btnSpend.setEnabled(mValidAdress && mValidAmount);
 	}
 
 	private void showMarketPage(final String packageName) {
@@ -446,156 +402,100 @@ public class SendBitcoinsActivity extends Activity implements
 					}
 				}
 			}
-		} else if (requestCode == REQUEST_CODE_SETTINGS) {
-			if (isConnected())
-				readyAvailableSpend(true);
 		}
 	}
 
-	private class CalculateFeeTask extends AsyncTask<Void, Void, Long> {
-		String address;
+	private void requestSendCoinForm() {
+		mCalcFeeProgressDialog = ProgressDialog.show(mContext, getString(R.string.calculating_fee),
+				getString(R.string.calculating_fee_wait), true);
 
-		protected Long doInBackground(Void... voids) {
-			address = etAddress.getText().toString();
-
-			if (etSpend.getText().toString().matches(".* BTC"))
-				amount = new BigDecimal(
-						etSpend.getText()
-								.toString()
-								.substring(
-										0,
-										etSpend.getText().toString().length() - 4));
-			else
-				amount = new BigDecimal(etSpend.getText().toString());
-
-			amount = amount.multiply(new BigDecimal(Consts.BTC_IN_SATOSHI));
-			toSend = amount.longValue();
-
-			try {
-				Consts.form = Consts.account.getSendCoinForm(address, toSend, -1);
-			} catch (Exception e) {
-				try {
-					Consts.account.login();
-					Consts.form = Consts.account.getSendCoinForm(address, toSend, -1);
-				} catch (IOException e1) {
-					e1.printStackTrace();
-				} catch (APIException e1) {
-					e1.printStackTrace();
-				}
-			}
-
-			fee = SendCoinFormValidator.calculateFee(Consts.form);
-
-			return 1L;
+		String address = getReceivingAddress();
+		Long satoshisToSend = getSatoshisToSend();
+		mGetFormTask = Consts.account.requestSendCoinForm(address, satoshisToSend, -1, this);
+	}
+	
+	@Override
+	public void handleGetSendCoinFormCallback(SendCoinForm form, String errorMessage) {
+		mFormToSend = form;
+		mGetFormTask = null;
+		mCalcFeeProgressDialog.dismiss();
+		if(form == null) {
+			Utils.showConnectionAlert(this);
+			return;
+		}
+		
+		long fee = SendCoinFormValidator.calculateFee(mFormToSend);
+		
+		String address = getReceivingAddress();
+		Long satoshisToSend = getSatoshisToSend();
+		
+		// Validate that the server is not cheating us
+		List<String> addresses = new ArrayList<String>();
+		addresses.add(Consts.account.getPrimaryBitcoinAddress());
+		if (!SendCoinFormValidator.validate(mFormToSend, addresses, Consts.account.getNetwork(), satoshisToSend,
+				fee, address)){
+			Utils.showAlert(this,R.string.unexpected_error);
+			return;
 		}
 
-		protected void onPreExecute() {
-			mCalcFeeProgressDialog = ProgressDialog.show(mContext,
-					getString(R.string.calculating_fee),
-					getString(R.string.calculating_fee_wait), true);
-		}
-
-		protected void onPostExecute(Long result) {
-			mCalcFeeProgressDialog.dismiss();
-			if (result == 1L) {
-				if (fee != 50000) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-					builder.setMessage(String.format(getString(R.string.calculating_fee_done), CoinUtils.valueString(fee)))
-							.setCancelable(false)
-							.setPositiveButton(R.string.yes,
-									new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog,
-												int id) {
-											new SpendMoneyTask()
-													.execute((Void[]) null);
-										}
-									})
-							.setNegativeButton(R.string.no,
-									new DialogInterface.OnClickListener() {
-										public void onClick(DialogInterface dialog,
-												int id) {
-										}
-									});
-					AlertDialog alertDialog = builder.create();
-					alertDialog.show();
-				} else {
-					new SpendMoneyTask()
-					.execute((Void[]) null);
-				}
-			} else {
-				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				builder.setMessage("Something went wrong! Try again!")
-						.setCancelable(false)
-						.setNeutralButton("Ok",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-									}
-								});
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-			}
+		if (fee != STANDARD_FEE) {
+			// If the fee is not 0.0005 we ask the user for confirmation
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setMessage(String.format(getString(R.string.calculating_fee_done), CoinUtils.valueString(fee)))
+					.setCancelable(false)
+					.setPositiveButton(R.string.yes,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									sendCoins();
+								}
+							})
+					.setNegativeButton(R.string.no,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+								}
+							});
+			AlertDialog alertDialog = builder.create();
+			alertDialog.show();
+		} else {
+			sendCoins();
 		}
 	}
-
-	private class SpendMoneyTask extends AsyncTask<Void, Void, Long> {
-		String address;
-
-		protected Long doInBackground(Void... voids) {
-			address = etAddress.getText().toString();
-
-			if (etSpend.getText().toString().matches(".* BTC"))
-				amount = new BigDecimal(
-						etSpend.getText()
-								.toString()
-								.substring(
-										0,
-										etSpend.getText().toString().length() - 4));
-			else
-				amount = new BigDecimal(etSpend.getText().toString());
-
-			amount = amount.multiply(new BigDecimal(Consts.BTC_IN_SATOSHI));
-			toSend = amount.longValue();
-
-			if (!SendCoinFormValidator.validate(Consts.form, Consts.account, toSend,
-					fee, address))
-				return 0L;
-
-			try {
-				Consts.account.signAndSubmitSendCoinForm(Consts.form);
-			} catch (APIException e) {
-				e.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			return 1L;
+	
+	private void sendCoins() {
+		mSendCoinsProgressDialog = ProgressDialog.show(mContext, getString(R.string.sending_bitcoins),
+				getString(R.string.sending_bitcoins_wait), true);
+		Tx tx = AsynchronousAccount.signSendCoinForm(mFormToSend, Consts.account);
+		mSubmitTask = Consts.account.requestTransactionSubmission(tx, this);
+	}
+	
+	@Override
+	public void handleTransactionSubmission(Tx transaction, String errorMessage) {
+		mSendCoinsProgressDialog.dismiss();
+		mSubmitTask = null;
+		if(transaction == null) {
+			Utils.showConnectionAlert(this);
+		}else {
+			finish();
 		}
-
-		protected void onPreExecute() {
-			mSendCoinsProgressDialog = ProgressDialog.show(mContext,
-					getString(R.string.sending_bitcoins),
-					getString(R.string.sending_bitcoins_wait), true);
+		
+	}
+	
+	private String getReceivingAddress(){
+		return etAddress.getText().toString();
+	}
+	
+	private long getSatoshisToSend() {
+		BigDecimal amount;
+		if (etSpend.getText().toString().matches(".* BTC"))
+			amount = new BigDecimal(etSpend.getText().toString()
+					.substring(0, etSpend.getText().toString().length() - 4));
+		else {
+			amount = new BigDecimal(etSpend.getText().toString());
 		}
-
-		protected void onPostExecute(Long result) {
-			mSendCoinsProgressDialog.dismiss();
-			if (result == 1L) {
-				finish();
-			} else {
-				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				builder.setMessage("Something went wrong! Try again!")
-						.setCancelable(false)
-						.setNeutralButton("Ok",
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-									}
-								});
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-			}
-		}
+		amount = amount.multiply(new BigDecimal(Consts.SATOSHIS_PER_BITCOIN));
+		return amount.longValue();
 	}
 
 	@Override
@@ -610,103 +510,5 @@ public class SendBitcoinsActivity extends Activity implements
 
 	@Override
 	public void onDoubleTap() {
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		final Dialog dialog;
-		switch (id) {
-		case ABOUT_DIALOG:
-			dialog = new Dialog(mContext);
-			dialog.setTitle(R.string.about_title);
-			dialog.setContentView(R.layout.dialog_about);
-
-			try {
-				String VersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-				TextView tvAboutText = (TextView)dialog.findViewById(R.id.tv_about_text);
-				tvAboutText.setText(String.format(getString(R.string.about_text), VersionName));
-			} catch (NameNotFoundException e) {
-				e.printStackTrace();
-			}
-
-			dialog.findViewById(R.id.btn_about_ok).setOnClickListener(
-					new OnClickListener() {
-
-						@Override
-						public void onClick(View v) {
-							dialog.dismiss();
-						}
-					});
-			break;
-		default:
-			dialog = null;
-		}
-		return dialog;
-	}
-
-	private void readyAvailableSpend(final boolean updateAvailableSpend) {
-		long loginDiff = new Date().getTime() - preferences.getLong(Consts.LASTLOGIN, new Date().getTime());
-
-		pbAvailableSpendUpdateProgress.setVisibility(View.VISIBLE);
-		rlAvailableSpend.setVisibility(View.VISIBLE);
-
-		if (loginDiff > 1140000 && isConnected()) {
-			editor.putLong(Consts.LASTLOGIN, new Date().getTime());
-			editor.commit();
-
-			Thread t = new Thread(new Runnable() {
-
-				@Override
-				public void run() {
-					try {
-						Consts.info = Consts.account.login();
-						if (updateAvailableSpend) {
-							Message message = handler.obtainMessage();
-							message.arg1 = UPDATE_AVAILABLE_SPEND_MESSAGE;
-							handler.sendMessage(message);
-						} else {
-							pbAvailableSpendUpdateProgress
-									.setVisibility(View.INVISIBLE);
-							rlAvailableSpend.setVisibility(View.INVISIBLE);
-						}
-					} catch (APIException e) {
-						e.printStackTrace();
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-				}
-			});
-			t.start();
-		} else if (isConnected()) {
-			Message message = handler.obtainMessage();
-			message.arg1 = UPDATE_AVAILABLE_SPEND_MESSAGE;
-			handler.sendMessage(message);
-		} else {
-			mAvailableBitcoins = preferences.getString(Consts.LASTKNOWNBALANCE, "0");
-			tvAvailSpend.setText(mAvailableBitcoins + " BTC");
-		}
-	}
-
-	final Handler handler = new Handler() {
-		public void handleMessage(Message msg) {
-			switch (msg.arg1) {
-			case UPDATE_AVAILABLE_SPEND_MESSAGE:
-				mAvailableBitcoins = CoinUtils.valueString(Consts.info
-						.getAvailableBalance());
-				tvAvailSpend.setText(mAvailableBitcoins + " BTC");
-
-				pbAvailableSpendUpdateProgress.setVisibility(View.INVISIBLE);
-				rlAvailableSpend.setVisibility(View.INVISIBLE);
-				break;
-
-			case CONNECTION_MESSAGE:
-				enableSendButton();
-				break;
-			}
-		}
-	};
-
-	private boolean isConnected() {
-		return Consts.isConnected(mContext);
 	}
 }

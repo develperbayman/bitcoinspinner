@@ -1,8 +1,8 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.io.IOException;
 import java.text.DateFormat;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -12,6 +12,7 @@ import android.app.ListActivity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -20,52 +21,33 @@ import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import com.bccapi.api.APIException;
 import com.bccapi.api.AccountStatement;
 import com.bccapi.api.AccountStatement.Record;
 import com.bccapi.api.AccountStatement.Record.Type;
-import com.bccapi.core.Account;
 import com.bccapi.core.CoinUtils;
+import com.bccapi.core.Asynchronous.AccountTask;
+import com.bccapi.core.Asynchronous.RecentStatementsCallbackHandler;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
-public class TransactionHistoryActivity extends ListActivity implements SimpleGestureListener {
+public class TransactionHistoryActivity extends ListActivity implements SimpleGestureListener, RecentStatementsCallbackHandler {
 
-	private Account account;
 	private Activity mActivity;
-	private List<Record> records;
-
 	private SimpleGestureFilter detector;
-
 	private SharedPreferences preferences;
-
+	private AccountTask mTask;
+	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
 		setContentView(R.layout.transaction_history);
-		
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
-
 		mActivity = this;
-		account = Consts.account;
-		
 		detector = new SimpleGestureFilter(this, this);
-
-		try {
-			int size = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, 15);
-			AccountStatement statement = account.getRecentTransactionSummary(size);
-			if (!statement.getRecords().isEmpty()) {
-				records = statement.getRecords();
-				setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, records));
-			}
-		} catch (APIException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		int size = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, 15);
+		mTask = Consts.account.requestRecentStatements(size, this);
 	}
 	
 	@Override
@@ -81,6 +63,14 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 			      getBaseContext().getResources().getDisplayMetrics());
 		}
 	}
+	
+	@Override
+	protected void onDestroy() {
+		if(mTask != null){
+			mTask.cancel();
+		}
+		super.onDestroy();
+}
 	
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent me) {
@@ -121,16 +111,14 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 			TextView tvDate = (TextView) v.findViewById(R.id.tv_date);
 			TextView tvAddress = (TextView) v.findViewById(R.id.tv_address);
 			TextView tvCredits = (TextView) v.findViewById(R.id.tv_credits);
-
-			Record r = (Record) records.get(position);
-
+			Record r = getItem(position);
             String description;
             if (r.getType() == Type.Sent) {
-               description = getString(R.string.sent_to);
+               description = getContext().getString(R.string.sent_to);
             } else if (r.getType() == Type.Received) {
-               description = getString(R.string.received_from);
+               description = getContext().getString(R.string.received_from);
             } else {
-               description = getString(R.string.sent_to_yourself);
+               description = getContext().getString(R.string.sent_to_yourself);
             }
 
             String valueString = CoinUtils.valueString(r.getAmount());
@@ -147,6 +135,12 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 			tvDate.setText(dateFormat.format(date));
 			tvAddress.setText(r.getAddresses());
 			tvCredits.setText(valueString);
+			if(r.getConfirmations() == 0) {
+				tvDescription.setTextColor(Color.GRAY);
+				tvDate.setTextColor(Color.GRAY);
+				tvAddress.setTextColor(Color.GRAY);
+				tvCredits.setTextColor(Color.GRAY);
+			}
 			return v;
 		}
 }
@@ -156,6 +150,19 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 		midnight.set(midnight.get(Calendar.YEAR), midnight.get(Calendar.MONTH),
 				midnight.get(Calendar.DAY_OF_MONTH), 0, 0, 0);
 		return midnight.getTime();
+	}
+
+	@Override
+	public void handleRecentStatementsCallback(AccountStatement statements, String errorMessage) {
+		if(statements == null ){
+			Utils.showConnectionAlert(this);
+			return;
+		}
+		if (!statements.getRecords().isEmpty()) {
+			List<Record> records = statements.getRecords();
+			Collections.reverse(records);
+			setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, records));
+		}
 	}
 
 }

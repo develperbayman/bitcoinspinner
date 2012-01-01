@@ -50,10 +50,11 @@ public class Base58 {
       if(input.length() == 0) {
         return null;
       }
-      byte[] bytes = decodeToBigInteger(input).toByteArray();
-      if (bytes == null) {
+      BigInteger decoded = decodeToBigInteger(input);
+      if(decoded == null) {
          return null;
       }
+      byte[] bytes = decoded.toByteArray();
       // We may have got one more byte than we wanted, if the high bit of the
       // next-to-last byte was not zero. This
       // is because BigIntegers are represented with twos-compliment notation,

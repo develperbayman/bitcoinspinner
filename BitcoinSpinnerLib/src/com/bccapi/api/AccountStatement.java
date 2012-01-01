@@ -3,7 +3,6 @@ package com.bccapi.api;
 import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -89,7 +88,6 @@ public class AccountStatement {
          }
       }
 
-      private static Charset UTF8 = Charset.forName("UTF-8");
       private int _index;
       private int _confirmations;
       private long _date;

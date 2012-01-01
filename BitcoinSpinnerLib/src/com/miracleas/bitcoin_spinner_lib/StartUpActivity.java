@@ -1,21 +1,19 @@
 package com.miracleas.bitcoin_spinner_lib;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URL;
 import java.security.SecureRandom;
-import java.util.Date;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -23,33 +21,22 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.ProgressBar;
 
-import com.bccapi.api.APIException;
 import com.bccapi.api.Network;
-import com.bccapi.core.Account;
 import com.bccapi.core.BitcoinClientApiImpl;
 import com.bccapi.core.DeterministicECKeyManager;
-import com.bccapi.core.ECKeyManager;
 import com.bccapi.core.HashUtils;
-import com.miracleas.bitcoin_spinner_lib.R;
 
 public class StartUpActivity extends Activity {
 
 	private SharedPreferences preferences;
-	private SharedPreferences.Editor editor;
 
-	private static final int STARTUP_PROGRESS_MESSAGE = 1;
+	private static final int SET_PROGRESS_MESSAGE = 1;
 
-	private static final int SETUP_MESSAGE = 100;
-	private static final int SAVE_SEED_MESSAGE = 101;
-	private static final int STARTUP_MESSAGE = 102;
+	private static final int INITIALIZE_MESSAGE = 100;
 
 	private static final int STARTUP_DIALOG = 1;
 
-	ProgressBar progressbarShake, progressbarStartup;
-	ProgressThread progressThread;
-
-	ECKeyManager keyManager;
-	BitcoinClientApiImpl api;
+	private ProgressBar progressbarStartup;
 
 	String seedFile;
 	byte[] seed = new byte[Consts.SEED_SIZE];
@@ -67,16 +54,16 @@ public class StartUpActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
-		editor = preferences.edit();
-
 		context = this;
-		
+		Consts.applicationContext = getApplicationContext();
+		Message message = handler.obtainMessage();
+		message.arg1 = INITIALIZE_MESSAGE;
+		handler.sendMessage(message);
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		editor.commit();
 		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
 			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
 			Locale.setDefault(locale);
@@ -85,154 +72,52 @@ public class StartUpActivity extends Activity {
 			getBaseContext().getResources().updateConfiguration(config,
 			      getBaseContext().getResources().getDisplayMetrics());
 		}
-
-		if (preferences.getBoolean("ShowQrCode", false) && null != noConnDialog) {
-			noConnDialog.show();
-		} else {
-
-			firstTime = preferences.getBoolean(Consts.FIRSTTIME_PREFS, true);
-
-			Intent i = getIntent();
-			
-			try {
-				switch (i.getExtras().getInt(Consts.EXTRA_NETWORK)) {
-				case Consts.PRODNET:
-					Consts.network = Network.productionNetwork;
-					seedFile = Consts.PRODNET_FILE;
-					Consts.url = new URL("https://prodnet.bccapi.com:443");
-					editor.putInt(Consts.NETWORK, Consts.PRODNET);
-					break;
-		
-				case Consts.TESTNET:
-					Consts.network = Network.testNetwork;
-					seedFile = Consts.TESTNET_FILE;
-					Consts.url = new URL("https://testnet.bccapi.com:444");
-					editor.putInt(Consts.NETWORK, Consts.TESTNET);
-					break;
-					
-				case Consts.CLOSEDTESTNET:
-					Consts.network = Network.testNetwork;
-					seedFile = Consts.CLOSED_TESTNET_FILE;
-					Consts.url = new URL("https://testnet.bccapi.com:445");
-					editor.putInt(Consts.NETWORK, Consts.CLOSEDTESTNET);
-					break;
-				}
-				editor.commit();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-
-			Message message = handler.obtainMessage();
-			message.arg1 = SETUP_MESSAGE;
-			handler.sendMessage(message);
+	}
+	
+	private byte[] createSeed(String seedFileName) {
+		FileOutputStream fos = null;
+		try {
+			SecureRandom random = new SecureRandom();
+			byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
+			seed = HashUtils.sha256(genseed);
+			fos = openFileOutput(seedFileName, MODE_PRIVATE);
+			fos.write(seed);
+			fos.close();
+			return seed;
+		} catch (IOException e) {
+			return null;
+		}
+	}
+	
+	private byte[] readSeed(String seedFileName) {
+		FileInputStream fis;
+		byte[] seed = new byte[Consts.SEED_SIZE];
+		try {
+			fis = openFileInput(seedFile);
+			fis.read(seed);
+			fis.close();
+			return seed;
+		} catch (IOException e) {
+			return null;
 		}
 	}
 
 	@Override
 	protected void onPause() {
 		super.onPause();
-		if (null != noConnDialog) {
-			editor.putBoolean("ShowNoConn", noConnDialog.isShowing());
-			editor.commit();
-			noConnDialog.dismiss();
-		} else {
-			editor.putBoolean("ShowNoConn", false);
-			editor.commit();
-		}
 	}
 
 	// Define the Handler that receives messages from the thread and update UI
 	final Handler handler = new Handler() {
 		public void handleMessage(Message msg) {
-			int total;
-			Message message;
 			switch (msg.arg1) {
-			case STARTUP_PROGRESS_MESSAGE:
-				total = msg.arg2;
-				progressbarStartup.setProgress(total);
-				break;
-			case SETUP_MESSAGE:
-				Consts.isConnected(context);
-				if (isConnected()) {
-					if (firstTime) {
-						message = handler.obtainMessage();
-						message.arg1 = SAVE_SEED_MESSAGE;
-						handler.sendMessage(message);
-					} else {
-						message = handler.obtainMessage();
-						message.arg1 = STARTUP_MESSAGE;
-						handler.sendMessage(message);
-					}
-				} else {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							context);
-					builder.setMessage(
-							R.string.need_connection)
-							.setCancelable(false)
-							.setPositiveButton(R.string.try_again,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											Message message = handler
-													.obtainMessage();
-											message.arg1 = SETUP_MESSAGE;
-											handler.sendMessage(message);
-											dialog.cancel();
-										}
-									})
-							.setNegativeButton("Exit",
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											finish();
-											dialog.cancel();
-										}
-									});
-					noConnDialog = builder.create();
-					noConnDialog.show();
-				}
-				break;
-			case SAVE_SEED_MESSAGE:
-				FileOutputStream fos = null;
-				try {
-					SecureRandom random = new SecureRandom();
-					byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
-					seed = HashUtils.sha256(genseed);
-					fos = openFileOutput(seedFile, MODE_PRIVATE);
-					fos.write(seed);
-
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				message = handler.obtainMessage();
-				message.arg1 = STARTUP_MESSAGE;
-				handler.sendMessage(message);
-
-				break;
-			case STARTUP_MESSAGE:
-				FileInputStream fis;
-				try {
-					fis = openFileInput(seedFile);
-					fis.read(seed);
-					fis.close();
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			case INITIALIZE_MESSAGE:
 				showDialog(STARTUP_DIALOG);
-
-				keyManager = new DeterministicECKeyManager(seed);
-				
-				api = new BitcoinClientApiImpl(Consts.url, Consts.network);
-				
-				Consts.account = new Account(keyManager, api);
-				
-				new AsyncLogin().execute(Consts.account);
-				
+				new AsyncInit().execute();
+				break;
+			case SET_PROGRESS_MESSAGE:
+				int total = msg.arg2;
+				progressbarStartup.setProgress(total);
 				break;
 			}
 		}
@@ -244,101 +129,72 @@ public class StartUpActivity extends Activity {
 		dialog.setCancelable(false);
 		switch (id) {
 		case STARTUP_DIALOG:
-
 			dialog.setContentView(R.layout.dialog_startup);
 			dialog.setTitle(R.string.startup_dialog_title);
 			progressbarStartup = (ProgressBar) dialog
 					.findViewById(R.id.pb_startup);
-
-			editor.putBoolean(Consts.FIRSTTIME_PREFS, false);
-			editor.commit();
 			break;
 		}
 		return dialog;
 	}
 
-	@Override
-	protected void onPrepareDialog(int id, Dialog dialog) {
-		switch (id) {
-		case STARTUP_DIALOG:
-			progressbarStartup = (ProgressBar) dialog
-					.findViewById(R.id.pb_startup);
-			progressbarStartup.setProgress(0);
-			progressThread = new ProgressThread(ProgressThread.STARTUP);
-			progressThread.start();
-			break;
+	private void initialize(){
+		Intent i = getIntent();
+		Editor editor = preferences.edit();
+		Network network = Network.productionNetwork;
+		try {
+			switch (i.getExtras().getInt(Consts.EXTRA_NETWORK)) {
+			case Consts.PRODNET:
+				network = Network.productionNetwork;
+				seedFile = Consts.PRODNET_FILE;
+				Consts.url = new URL("https://prodnet.bccapi.com:443");
+				editor.putInt(Consts.NETWORK, Consts.PRODNET);
+				break;
+	
+			case Consts.TESTNET:
+				network = Network.testNetwork;
+				seedFile = Consts.TESTNET_FILE;
+				Consts.url = new URL("https://testnet.bccapi.com:444");
+				editor.putInt(Consts.NETWORK, Consts.TESTNET);
+				break;
+				
+			case Consts.CLOSEDTESTNET:
+				network = Network.testNetwork;
+				seedFile = Consts.CLOSED_TESTNET_FILE;
+				Consts.url = new URL("https://testnet.bccapi.com:445");
+				editor.putInt(Consts.NETWORK, Consts.CLOSEDTESTNET);
+				break;
+			}
+			editor.commit();
+			
+			seed = readSeed(seedFile);
+			if (seed == null) {
+				seed = createSeed(seedFile);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
 		}
+
+		DeterministicECKeyManager keyManager = new DeterministicECKeyManager(seed);
+		BitcoinClientApiImpl api = new BitcoinClientApiImpl(Consts.url, network);
+		Consts.account = new AndroidAccount(keyManager, api, Consts.applicationContext);
+		// Force deterministic key manager to calculate its keys, this is CPU intensive
+		Consts.account.getPrimaryBitcoinAddress();
 	}
 
-	private class AsyncLogin extends AsyncTask<Account, Integer, Long> {
+	private class AsyncInit extends AsyncTask<Void, Integer, Long> {
 
 		@Override
-		protected Long doInBackground(Account... params) {
-			try {
-				Consts.info = Consts.account.login();
-				if (Consts.info.getKeys() == 0) {
-					// upload first wallet public key
-					Consts.account.addKey();
-				}
-//				Consts.account.login();
-				editor.putLong(Consts.LASTLOGIN, new Date().getTime());
-				
-				String mAddress = null;
-				for (String address : Consts.account.getAddresses()) {
-					mAddress = address;
-					break;
-				}
-				editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
-				editor.commit();
-
-			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (APIException e) {
-				e.printStackTrace();
-			}
-			Message msg = handler.obtainMessage();
-			msg.arg1 = STARTUP_PROGRESS_MESSAGE;
-			msg.arg2 = 100;
-			handler.sendMessage(msg);
+		protected Long doInBackground(Void... params) {
+			initialize();
 			return null;
 		}
 
 		protected void onPostExecute(Long result) {
-			progressThread.mState = ProgressThread.STOP;
 			Intent intent = new Intent();
 			intent.setClass(context, MainActivity.class);
 			startActivity(intent);
 			finish();
-//			progressThread.mState = ProgressThread.STOP;
-//			Message message = handler.obtainMessage();
-//			message.arg1 = GET_ACCOUNT_INFO_MESSAGE;
-//			handler.sendMessage(message);
 		}
-	}
-
-	private class ProgressThread extends Thread {
-		private static final int STOP = 0;
-		private static final int STARTUP = 1;
-		private int mState;
-
-		public ProgressThread(int state) {
-			mState = state;
-		}
-
-		public void run() {
-			Message msg;
-			switch (mState) {
-			case STARTUP:
-				msg = handler.obtainMessage();
-				msg.arg1 = STARTUP_PROGRESS_MESSAGE;
-				msg.arg2 = 1;
-				handler.sendMessage(msg);
-				break;
-			}
-		}
-	}
-
-	private boolean isConnected() {
-		return Consts.isConnected(context);
 	}
 }

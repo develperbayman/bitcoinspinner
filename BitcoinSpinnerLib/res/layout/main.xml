@@ -59,7 +59,7 @@
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
         android:layout_marginBottom="10dp"
-        android:text="This is a beta release. Use at your own risk."
+        android:text="@string/beta_warning"
         android:textColor="@color/Black" />
 
 </RelativeLayout>

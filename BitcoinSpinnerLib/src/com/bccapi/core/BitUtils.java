@@ -112,5 +112,11 @@ public class BitUtils {
       }
       return true;
    }
+   
+   public static byte[] copyByteArray(byte[] source) {
+      byte[] buf = new byte[source.length];
+      System.arraycopy(source, 0, buf, 0, buf.length);
+      return buf;
+   }   
 
 }

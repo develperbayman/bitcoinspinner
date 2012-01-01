@@ -12,11 +12,11 @@
     <!-- Startup -->
     <string name="initialize">Initializing Random Seed</string>
     <string name="startup_dialog_text">Please wait...</string>
-    <string name="startup_dialog_title">Connecting</string>
+    <string name="startup_dialog_title">Initializing</string>
     <!-- Backup and Restore -->
     <string name="backup_dialog_text">You are about to display a QR code which can be used to restore your wallet on a different device.\n\nTake a picture of it and/or print it out on Paper.\n\nWarning, this QR code enables anyone who scans it to take possession of the funds controlled by this device.\n\nDo you want to proceed?</string>
     <string name="restore_complete_dialog_text">Restore complete</string>
-    <string name="restore_dialog_coins">You cannot restore a backup as your wallet contains funds.\n\nPlease send your funds elsewhere before proceeding.</string>
+    <string name="restore_dialog_coins">You should not restore a backup as your wallet contains funds.\n\nPlease send your funds elsewhere before proceeding.\n\nDo you want to restore a backup anyway?</string>
     <string name="restore_dialog_no_coins">You are about to restore your wallet from a backup.\n\nThis is done by scanning a previously generated backup QR code.\n\nDo you want to continue?</string>
     <string name="restore_dialog_title">Restoring</string>
     <!-- Preferences -->
@@ -30,17 +30,17 @@
     <string name="received_from">Received from:</string>
     <string name="sent_to">Sent to:</string>
     <string name="sent_to_yourself">Sent to yourself:</string>
-    <string name="transaction_history">Transaction history</string>
+    <string name="transaction_history">Transaction History</string>
     <!-- Common -->
     <string name="no">No</string>
     <string name="yes">Yes</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="please_wait">Please wait...</string>
     <string name="try_again">Try again?</string>
     <!-- Calculation and sending of bitcoins -->
     <string name="calculating_fee">Calculating network fee</string>
     <string name="calculating_fee_wait">Please wait while network fee is being calculated...</string>
-    <string name="calculating_fee_done">Network fee have been calculated to %s BTC.\n\nProceed?</string>
+    <string name="calculating_fee_done">Network fee has been calculated to %s BTC.\n\nProceed?</string>
     <string name="send_bitcoins">Send Bitcoins</string>
     <string name="sending_bitcoins">Sending Bitcoins</string>
     <string name="sending_bitcoins_wait">Please wait while sending bitcoins</string>
@@ -63,9 +63,16 @@
     <string name="prefs_choose_default_locale">Choose default language</string>
     <string name="pay_to">Pay to:</string>
     <string name="address">Address</string>
+    <string name="private_key">Private Key</string>
+    <string name="bitcoinspinner_backup">BitcoinSpinner Backup</string>
+    <string name="bitcoin_address">Bitcoin Address</string>
     <string name="amount_to_pay">Amount to pay:</string>
     <string name="prefs_category_advanced">Advanced</string>
     <string name="prefs_transaction_history_size">Transaction history size</string>
     <string name="pref_export_private_key_title">Export private key</string>
-    <string name="export_private_key_dialog_text">Warning. You are about to export the private key that controls all the bitcoins managed by BitcoinSpinner.\n\nAnyone who gains access to this key can take possession of the bitcoins it controls.</string>
+    <string name="export_private_key_dialog_text">Warning. You are about to export the private key that controls all the bitcoins managed by BitcoinSpinner.\n\nAnyone who gains access to this key can take possession of the bitcoins it controls.\n\nDo you want to continue?</string>
+    <string name="beta_warning">This is a beta release. Use at your own risk.</string>
+    <string name="no_network">No network connectivity.</string>
+    <string name="unexpected_error">An unexpected error occurred. Please try again.</string>
+    <string name="unknown">Unknown</string>
 </resources>

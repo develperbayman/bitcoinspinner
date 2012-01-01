@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import com.bccapi.api.Network;
 import com.bccapi.api.SendCoinForm;
 import com.bccapi.api.TxOutput;
 import com.bccapi.core.BccScript.BccScriptException;
@@ -69,22 +70,22 @@ public class SendCoinFormSummary {
     *           The account sending the form
     * @throws BccScriptException
     */
-   public SendCoinFormSummary(SendCoinForm form, Account account) throws BccScriptException {
+   public SendCoinFormSummary(SendCoinForm form, List<String> myAddresses, Network network) throws BccScriptException {
       _inputs = new ArrayList<Element>();
       _outputs = new ArrayList<Element>();
       _inCoins = 0;
       _coinsSentToOtherWallet = 0;
       _coinsSentToMe = 0;
-      Set<String> addresses = new HashSet<String>(account.getAddresses());
+      Set<String> addresses = new HashSet<String>(myAddresses);
       for (TxOutput out : form.getFunding()) {
          BccScriptOutput script = new BccScriptOutput(out.getScript());
-         String address = AddressUtil.byteAddressToStringAddress(account.getNetwork(), script.getAddress());
+         String address = AddressUtil.byteAddressToStringAddress(network, script.getAddress());
          _inputs.add(new Element(address, out.getValue()));
          _inCoins += out.getValue();
       }
       for (TxOutput out : form.getTransaction().getOutputs()) {
          BccScriptOutput script = new BccScriptOutput(out.getScript());
-         String address = AddressUtil.byteAddressToStringAddress(account.getNetwork(), script.getAddress());
+         String address = AddressUtil.byteAddressToStringAddress(network, script.getAddress());
          _outputs.add(new Element(address, out.getValue()));
          if (addresses.contains(address)) {
             _coinsSentToMe += out.getValue();

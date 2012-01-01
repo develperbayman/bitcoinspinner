@@ -4,8 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
-import java.util.Date;
 import java.util.Hashtable;
 import java.util.Locale;
 
@@ -35,17 +33,16 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bccapi.api.APIException;
-import com.bccapi.api.AccountInfo;
 import com.bccapi.api.Network;
-import com.bccapi.core.Account;
 import com.bccapi.core.Base58;
 import com.bccapi.core.BitcoinClientApiImpl;
 import com.bccapi.core.DeterministicECKeyExporter;
 import com.bccapi.core.DeterministicECKeyManager;
 import com.bccapi.core.ECKeyManager;
+import com.bccapi.core.Asynchronous.AsynchronousAccount;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -73,8 +70,6 @@ public class SettingsActivity extends PreferenceActivity {
 
 	private ProgressDialog restoreDialog;
 	
-	private Account account;
-
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
@@ -86,8 +81,6 @@ public class SettingsActivity extends PreferenceActivity {
 				Activity.MODE_PRIVATE);
 		editor = preferences.edit();
 
-		account = Consts.account;
-		
 		mContext = this;
 
 		addPreferencesFromResource(R.xml.preferences);
@@ -174,6 +167,8 @@ public class SettingsActivity extends PreferenceActivity {
 									backupWalletDialog = builder.create();
 									backupWalletDialog
 											.setCanceledOnTouchOutside(true);
+									TextView text =(TextView ) layout.findViewById(R.id.tv_title_text); 
+									text.setText(R.string.bitcoinspinner_backup);
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
 
@@ -227,143 +222,55 @@ public class SettingsActivity extends PreferenceActivity {
 
 		public boolean onPreferenceClick(Preference preference) {
 
-			if (isConnected()) {
-				AccountInfo info = null;
-				try {
-					info = Consts.account.getInfo();
-				} catch (APIException e) {
-					if (e.getMessage().matches("Invalid session")) {
-						try {
-							Consts.account.login();
-							info = Consts.account.getInfo();
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						} catch (APIException e1) {
-							e1.printStackTrace();
-						}
-					}
-					e.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
+			AsynchronousAccount accountManager = Consts.account;
+			if (accountManager.getCachedBalance() > 0 || accountManager.getCachedCoinsOnTheWay() > 0) {
+				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+				builder.setMessage(R.string.restore_dialog_coins).setCancelable(false)
+						.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+								ShowRestoreWalletAlert();
+							}
+						}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 
-				if (info.getAvailableBalance() > 0
-						|| info.getEstimatedBalance() > 0) {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							mContext);
-					builder.setMessage(R.string.restore_dialog_coins)
-							.setCancelable(false)
-							.setPositiveButton(R.string.yes,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											dialog.cancel();
-											AlertDialog.Builder builder = new AlertDialog.Builder(
-													mContext);
-											builder.setMessage(
-													R.string.restore_dialog_no_coins)
-													.setCancelable(false)
-													.setPositiveButton(
-															R.string.yes,
-															new DialogInterface.OnClickListener() {
-																public void onClick(
-																		DialogInterface dialog,
-																		int id) {
-
-																	final PackageManager pm = getPackageManager();
-																	if (pm.resolveActivity(
-																			Consts.zxingIntent,
-																			0) != null) {
-																		startActivityForResult(
-																				Consts.zxingIntent,
-																				REQUEST_CODE_SCAN);
-																	} else if (pm
-																			.resolveActivity(
-																					Consts.gogglesIntent,
-																					0) != null) {
-																		startActivity(Consts.gogglesIntent);
-																	} else {
-																		showMarketPage(Consts.PACKAGE_NAME_ZXING);
-																		Toast.makeText(
-																				mContext,
-																				R.string.install_qr_scanner,
-																				Toast.LENGTH_LONG)
-																				.show();
-																	}
-																}
-															})
-													.setNegativeButton(
-															R.string.no,
-															new DialogInterface.OnClickListener() {
-																public void onClick(
-																		DialogInterface dialog,
-																		int id) {
-																	dialog.cancel();
-																}
-															});
-											AlertDialog alertDialog = builder
-													.create();
-											alertDialog.show();
-										}
-									})
-							.setNegativeButton(R.string.no,
-									new DialogInterface.OnClickListener() {
-
-										@Override
-										public void onClick(
-												DialogInterface dialog,
-												int which) {
-											dialog.cancel();
-										}
-									});
-					AlertDialog alertDialog = builder.create();
-					alertDialog.show();
-				} else {
-					AlertDialog.Builder builder = new AlertDialog.Builder(
-							mContext);
-					builder.setMessage(R.string.restore_dialog_no_coins)
-							.setCancelable(false)
-							.setPositiveButton(R.string.yes,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-
-											final PackageManager pm = getPackageManager();
-											if (pm.resolveActivity(
-													Consts.zxingIntent, 0) != null) {
-												startActivityForResult(
-														Consts.zxingIntent,
-														REQUEST_CODE_SCAN);
-											} else if (pm.resolveActivity(
-													Consts.gogglesIntent, 0) != null) {
-												startActivity(Consts.gogglesIntent);
-											} else {
-												showMarketPage(Consts.PACKAGE_NAME_ZXING);
-												Toast.makeText(
-														mContext,
-														R.string.install_qr_scanner,
-														Toast.LENGTH_LONG)
-														.show();
-											}
-										}
-									})
-							.setNegativeButton(R.string.no,
-									new DialogInterface.OnClickListener() {
-										public void onClick(
-												DialogInterface dialog, int id) {
-											dialog.cancel();
-										}
-									});
-					AlertDialog alertDialog = builder.create();
-					alertDialog.show();
-				}
+							@Override
+							public void onClick(DialogInterface dialog, int which) {
+								dialog.cancel();
+							}
+						});
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
 			} else {
-				Toast.makeText(mContext, R.string.need_connection,
-						Toast.LENGTH_LONG).show();
+				ShowRestoreWalletAlert();
 			}
 			return true;
 		}
 	};
+	
+	private void ShowRestoreWalletAlert(){
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setMessage(R.string.restore_dialog_no_coins).setCancelable(false)
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+
+						final PackageManager pm = getPackageManager();
+						if (pm.resolveActivity(Consts.zxingIntent, 0) != null) {
+							startActivityForResult(Consts.zxingIntent, REQUEST_CODE_SCAN);
+						} else if (pm.resolveActivity(Consts.gogglesIntent, 0) != null) {
+							startActivity(Consts.gogglesIntent);
+						} else {
+							showMarketPage(Consts.PACKAGE_NAME_ZXING);
+							Toast.makeText(mContext, R.string.install_qr_scanner, Toast.LENGTH_LONG).show();
+						}
+					}
+				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+					}
+				});
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
+	}
 
 	private final OnPreferenceClickListener exportPrivateKeyClickListener = new OnPreferenceClickListener() {
 
@@ -414,21 +321,16 @@ public class SettingsActivity extends PreferenceActivity {
 										e.printStackTrace();
 									}
 
+									TextView text =(TextView ) layout.findViewById(R.id.tv_title_text); 
+									text.setText(R.string.private_key);
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
 									
-									int keys = account.getAddresses().size();
-									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(
-											seed);
-									for (int i = 0; i < keys; i++) {
-										keyString = exporter
-												.getPrivateKeyExporter(i + 1)
-												.getBase58EncodedKey(
-														account.getNetwork());
-									}
-									
+									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
+									keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(Consts.account.getNetwork());
 									qrAdress.setImageBitmap(getQRCodeBitmap(
 											keyString, 320));
+									
 									qrAdress.setOnClickListener(new OnClickListener() {
 
 										@Override
@@ -470,90 +372,80 @@ public class SettingsActivity extends PreferenceActivity {
 	@Override
 	public void onActivityResult(final int requestCode, final int resultCode,
 			final Intent intent) {
-		if (requestCode == REQUEST_CODE_SCAN
-				&& resultCode == RESULT_OK
-				&& "QR_CODE"
-						.equals(intent.getStringExtra("SCAN_RESULT_FORMAT"))) {
-			final String contents = intent.getStringExtra("SCAN_RESULT");
-			if (contents.matches("[a-zA-Z0-9]*")) {
-				AlertDialog.Builder builder = new AlertDialog.Builder(this);
-				builder.setMessage(R.string.restore_invalid_qr_code)
-						.setCancelable(false)
-						.setNeutralButton(R.string.ok,
-								new DialogInterface.OnClickListener() {
-									public void onClick(DialogInterface dialog,
-											int id) {
-										dialog.cancel();
-									}
-								});
-				AlertDialog alertDialog = builder.create();
-				alertDialog.show();
-			} else {
-				Uri uri = Uri.parse(contents);
-				final Uri u = Uri.parse("bsb://" + uri.getSchemeSpecificPart());
-
-				final int network = Integer
-						.parseInt(u.getQueryParameter("net"));
-
-				String seedFile = null;
-				switch (network) {
-				case Consts.PRODNET:
-					seedFile = Consts.PRODNET_FILE;
-					break;
-				case Consts.TESTNET:
-					seedFile = Consts.TESTNET_FILE;
-					break;
-				case Consts.CLOSEDTESTNET:
-					seedFile = Consts.CLOSED_TESTNET_FILE;
-					break;
-				}
-
-				FileOutputStream fos = null;
-				byte seed[] = new byte[Consts.SEED_SIZE];
-				try {
-					String host = u.getHost();
-					seed = Base58.decode(host);
-					fos = openFileOutput(seedFile, MODE_PRIVATE);
-					fos.write(seed);
-				} catch (FileNotFoundException e1) {
-					e1.printStackTrace();
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-
-				ECKeyManager keyManager = new DeterministicECKeyManager(seed);
-				BitcoinClientApiImpl api = new BitcoinClientApiImpl(Consts.url,
-						Consts.network);
-				Consts.account = new Account(keyManager, api);
-				restoreDialog = ProgressDialog.show(this,
-						getString(R.string.restore_dialog_title),
-						getString(R.string.please_wait), true);
-				new AsyncLogin().execute(Consts.account);
-			}
+		if (requestCode != REQUEST_CODE_SCAN || 
+		    resultCode != RESULT_OK ||
+		    !("QR_CODE".equals(intent.getStringExtra("SCAN_RESULT_FORMAT")))) {
+			return;
 		}
+		final String contents = intent.getStringExtra("SCAN_RESULT");
+		if (contents.matches("[a-zA-Z0-9]*")) {
+			AlertDialog.Builder builder = new AlertDialog.Builder(this);
+			builder.setMessage(R.string.restore_invalid_qr_code)
+					.setCancelable(false)
+					.setNeutralButton(R.string.ok,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									dialog.cancel();
+								}
+							});
+			AlertDialog alertDialog = builder.create();
+			alertDialog.show();
+			return;
+		} 
+		
+		restoreDialog = ProgressDialog.show(this,
+				getString(R.string.restore_dialog_title),
+				getString(R.string.please_wait), true);
+		new AsyncInit().execute(contents);
 	}
 
-	private class AsyncLogin extends AsyncTask<Account, Integer, Long> {
+	private class AsyncInit extends AsyncTask<String, Integer, Long> {
 
 		@Override
-		protected Long doInBackground(Account... params) {
-			try {
-				editor.putLong(Consts.LASTLOGIN, new Date().getTime());
-				editor.commit();
+		protected Long doInBackground(String... params) {
+			Uri uri = Uri.parse(params[0]);
+			final Uri u = Uri.parse("bsb://" + uri.getSchemeSpecificPart());
 
-				Consts.account.login();
-				Consts.info = Consts.account.getInfo();
-				for (String address : Consts.account.getAddresses()) {
-					editor.putString(Consts.BITCOIN_ADDRESS, address);
-					break;
-				}
-				editor.commit();
+			final int networkId = Integer
+					.parseInt(u.getQueryParameter("net"));
+
+			String seedFile = null;
+			Network network = Network.productionNetwork;
+			switch (networkId) {
+			case Consts.PRODNET:
+				seedFile = Consts.PRODNET_FILE;
+				network = Network.productionNetwork;
+				break;
+			case Consts.TESTNET:
+				seedFile = Consts.TESTNET_FILE;
+				network = Network.testNetwork;
+				break;
+			case Consts.CLOSEDTESTNET:
+				seedFile = Consts.CLOSED_TESTNET_FILE;
+				network = Network.testNetwork;
+				break;
+			}
+
+			FileOutputStream fos = null;
+			byte seed[] = new byte[Consts.SEED_SIZE];
+			try {
+				String host = u.getHost();
+				seed = Base58.decode(host);
+				fos = openFileOutput(seedFile, MODE_PRIVATE);
+				fos.write(seed);
+			} catch (FileNotFoundException e1) {
+				e1.printStackTrace();
 			} catch (IOException e) {
-				e.printStackTrace();
-			} catch (APIException e) {
 				e.printStackTrace();
 			}
 
+			ECKeyManager keyManager = new DeterministicECKeyManager(seed);
+			BitcoinClientApiImpl api = new BitcoinClientApiImpl(Consts.url,
+					network);
+			Consts.account = new AndroidAccount(keyManager, api, Consts.applicationContext);
+			// Force deterministic key manager to calculate its keys, this is CPU intensive
+			Consts.account.getPrimaryBitcoinAddress();
 			return null;
 		}
 
@@ -641,7 +533,4 @@ public class SettingsActivity extends PreferenceActivity {
 					.format(Consts.WEBMARKET_APP_URL, packageName))));
 	}
 
-	private boolean isConnected() {
-		return Consts.isConnected(mContext);
-	}
 }

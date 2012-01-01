@@ -36,7 +36,7 @@ public class TxOutput {
     */
    public TxOutput(TxOutput other) {
       _value = other._value;
-      _script = (byte[]) resizeArray(other._script, other._script.length);
+      _script = BitUtils.copyByteArray(other._script);
    }
 
    /**
@@ -85,14 +85,4 @@ public class TxOutput {
       stream.write(_script);
    }
 
-	private static Object resizeArray(Object oldArray, int newSize) {
-		int oldSize = java.lang.reflect.Array.getLength(oldArray);
-		Class elementType = oldArray.getClass().getComponentType();
-		Object newArray = java.lang.reflect.Array.newInstance(elementType,
-				newSize);
-		int preserveLength = Math.min(oldSize, newSize);
-		if (preserveLength > 0)
-			System.arraycopy(oldArray, 0, newArray, 0, preserveLength);
-		return newArray;
-	}
 }

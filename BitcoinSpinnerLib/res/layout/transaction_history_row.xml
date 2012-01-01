@@ -10,6 +10,7 @@
 
         <TextView
             android:id="@+id/tv_description"
+            android:textColor="@color/White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
@@ -18,6 +19,7 @@
 
         <TextView
             android:id="@+id/tv_date"
+            android:textColor="@color/White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -31,6 +33,7 @@
 
         <TextView
             android:id="@+id/tv_credits"
+            android:textColor="@color/White"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
@@ -40,6 +43,8 @@
 
         <TextView
             android:id="@+id/tv_address"
+            android:textColor="@color/White"
+		      android:textSize="10dp"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignParentTop="true"

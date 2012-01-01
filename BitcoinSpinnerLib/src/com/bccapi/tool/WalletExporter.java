@@ -7,11 +7,7 @@ import java.security.GeneralSecurityException;
 
 import com.bccapi.api.Network;
 import com.bccapi.core.AddressUtil;
-import com.bccapi.core.Base58;
 import com.bccapi.core.DeterministicECKeyExporter;
-import com.bccapi.core.DeterministicECKeyManager;
-import com.bccapi.core.HashUtils;
-import com.bccapi.core.PrivateECKey;
 import com.bccapi.core.PrivateECKeyExporter;
 import com.bccapi.core.SeedManager;
 

@@ -1,11 +1,11 @@
 package com.miracleas.bitcoin_spinner_testnet;
 
-import com.miracleas.bitcoin_spinner_lib.Consts;
-import com.miracleas.bitcoin_spinner_lib.StartUpActivity;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+
+import com.miracleas.bitcoin_spinner_lib.Consts;
+import com.miracleas.bitcoin_spinner_lib.StartUpActivity;
 
 public class Main extends Activity {
 	/**

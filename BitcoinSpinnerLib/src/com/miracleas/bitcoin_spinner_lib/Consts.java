@@ -4,27 +4,17 @@ import java.net.URL;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 
-import com.bccapi.api.AccountInfo;
-import com.bccapi.api.Network;
-import com.bccapi.api.SendCoinForm;
-import com.bccapi.core.Account;
+import com.bccapi.core.Asynchronous.AsynchronousAccount;
 
 public final class Consts {
 	public static final String TAG = "Bitcoin Spinner";
 	
 	public static final String PREFS_NAME = "BitcoinSpinnerPrefs";
-	public static final String FIRSTTIME_PREFS = "FistTimeStart";
 	public static final String SEEDSTRING = "SeedString";
-	public static final String LASTKNOWNBALANCE = "LastKnownBalance";
-	public static final String LASTKNOWNONTHEWAY = "LastKnownOnTheWay";
-	public static final String LASTLOGIN = "LastLogin";  
 	public static final String NETWORKFEESIZE = "NetworkFeeSize";
 	public static final String AVAIABLE_BITCOINS = "AvailableBitcoins";
 	public static final String BITCOINS_ON_THE_WAY = "BitcoinsOnTheWay";
-	public static final String BITCOIN_ADDRESS = "BitcoinAddress";
 	public static final String NETWORK = "BitcoinNetwork";
 	public static final String LOCALE = "Locale";
 	public static final String TRANSACTION_HISTORY_SIZE = "TransactionHistorySize";
@@ -45,14 +35,12 @@ public final class Consts {
 	public static final int SEED_SIZE = 32;
 	public static final int SEED_GEN_SIZE = 64;
 	
-	public static final int BTC_IN_SATOSHI = 100000000;
+	public static final int SATOSHIS_PER_BITCOIN = 100000000;
 	
-	public static Account account;
-	public static Network network;
+	public static AsynchronousAccount account;
 	public static URL url;
-	public static AccountInfo info;
-	public static SendCoinForm form;
-
+	public static Context applicationContext;
+	
 	public static final String PACKAGE_NAME_ZXING = "com.google.zxing.client.android";
 	public static final String MARKET_APP_URL = "market://details?id=%s";
 	public static final String WEBMARKET_APP_URL = "https://market.android.com/details?id=%s";
@@ -64,18 +52,4 @@ public final class Consts {
 			"com.google.android.apps.unveil",
 			"com.google.android.apps.unveil.CaptureActivity");
 	
-	static boolean isConnected(Context context) {
-		boolean IsConnected = false;
-		ConnectivityManager cm = (ConnectivityManager) context
-				.getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo[] NI = cm.getAllNetworkInfo();
-		for (int i = 0; i < NI.length; i++) {
-			if (NI[i].isConnected()) {
-				IsConnected = true;
-				break;
-			}
-		}
-		return IsConnected;
-	}
-
 }
