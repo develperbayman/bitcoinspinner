@@ -280,7 +280,7 @@ public class SendBitcoinsActivity extends Activity implements
 			if (spendText.matches(""))
 				mValidAmount = false;
 			else {
-				long spend = (long) Double.parseDouble(spendText) * Consts.SATOSHIS_PER_BITCOIN;
+				long spend = (long) (Double.parseDouble(spendText) * Consts.SATOSHIS_PER_BITCOIN);
 				long available = Consts.account.getCachedBalance();
 				if (spend > 0 && (spend + STANDARD_FEE <= available)) {
 					mValidAmount = true;
