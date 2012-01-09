@@ -43,7 +43,8 @@ import com.google.zxing.qrcode.QRCodeWriter;
 import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
-public class MainActivity extends Activity implements SimpleGestureListener, GetAccountInfoCallbackHandler{
+public class MainActivity extends Activity implements SimpleGestureListener,
+		GetAccountInfoCallbackHandler {
 
 	private Context mContext;
 
@@ -68,7 +69,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 	private SimpleGestureFilter detector;
 
 	private SharedPreferences preferences;
-	
+
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -79,32 +80,33 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
 		setContentView(R.layout.main);
 
-		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
-			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE,
+					"en"));
 			Locale.setDefault(locale);
 			Configuration config = new Configuration();
 			config.locale = locale;
 			getBaseContext().getResources().updateConfiguration(config,
-			      getBaseContext().getResources().getDisplayMetrics());
+					getBaseContext().getResources().getDisplayMetrics());
 		}
 
 		detector = new SimpleGestureFilter(this, this);
 
-		//new Thread(ConnectionWatcher).start();
+		// new Thread(ConnectionWatcher).start();
 
-//		for (String address : Consts.account.getAddresses()) {
-//			mAddress = address;
-//			break;
-//		}
+		// for (String address : Consts.account.getAddresses()) {
+		// mAddress = address;
+		// break;
+		// }
 
-//		editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
-//		editor.commit();
+		// editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
+		// editor.commit();
 
 		tvAddress = (TextView) findViewById(R.id.tv_address);
 		ivAddress = (ImageView) findViewById(R.id.iv_address);
@@ -119,10 +121,11 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
 		rlBalance = (RelativeLayout) findViewById(R.id.rl_balance_ref);
 		btnSendMoney.setOnClickListener(sendMoneyClickListener);
-		btnTransactionHistory.setOnClickListener(transactionHistoryClickListener);
+		btnTransactionHistory
+				.setOnClickListener(transactionHistoryClickListener);
 		rlBalance.setOnClickListener(refreshMoneyClickListener);
 		rlBalance.setOnLongClickListener(refreshMoneyLongClickListener);
-		
+
 		pbBalanceUpdateProgress = (ProgressBar) findViewById(R.id.pb_balance_update);
 		vBalanceUpdateView = findViewById(R.id.v_balance_update);
 		vBalanceNoConnView = findViewById(R.id.v_balance_no_conn);
@@ -147,27 +150,27 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 		editor.commit();
 	}
 
-//	private Runnable ConnectionWatcher = new Runnable() {
-//		@Override
-//		public void run() {
-//			while (true) {
-//				if (isConnected()) {
-//					Message message = handler.obtainMessage();
-//					message.arg1 = CONNECTION_MESSAGE;
-//					handler.sendMessage(message);
-//				} else {
-//					Message message = handler.obtainMessage();
-//					message.arg1 = NO_CONNECTION_MESSAGE;
-//					handler.sendMessage(message);
-//				}
-//				try {
-//					Thread.sleep(1000);
-//				} catch (InterruptedException e) {
-//					e.printStackTrace();
-//				}
-//			}
-//		}
-//	};
+	// private Runnable ConnectionWatcher = new Runnable() {
+	// @Override
+	// public void run() {
+	// while (true) {
+	// if (isConnected()) {
+	// Message message = handler.obtainMessage();
+	// message.arg1 = CONNECTION_MESSAGE;
+	// handler.sendMessage(message);
+	// } else {
+	// Message message = handler.obtainMessage();
+	// message.arg1 = NO_CONNECTION_MESSAGE;
+	// handler.sendMessage(message);
+	// }
+	// try {
+	// Thread.sleep(1000);
+	// } catch (InterruptedException e) {
+	// e.printStackTrace();
+	// }
+	// }
+	// }
+	// };
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent me) {
@@ -214,11 +217,13 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 					.setView(layout);
 			qrCodeDialog = builder.create();
 			qrCodeDialog.setCanceledOnTouchOutside(true);
-			TextView text =(TextView ) layout.findViewById(R.id.tv_title_text); 
+			TextView text = (TextView) layout.findViewById(R.id.tv_title_text);
 			text.setText(R.string.bitcoin_address);
+			
 			ImageView qrAdress = (ImageView) layout
 					.findViewById(R.id.iv_qr_Address);
-			qrAdress.setImageBitmap(getQRCodeBitmap("bitcoin:" + Consts.account.getPrimaryBitcoinAddress(), 320));
+			qrAdress.setImageBitmap(getQRCodeBitmap(
+					"bitcoin:" + Consts.account.getPrimaryBitcoinAddress(), 320));
 			qrAdress.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -243,14 +248,14 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 		}
 	};
 
-
 	private final OnClickListener addressClickListener = new OnClickListener() {
 
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("text/plain");
-			intent.putExtra(Intent.EXTRA_TEXT, "bitcoin:" + Consts.account.getPrimaryBitcoinAddress());
+			intent.putExtra(Intent.EXTRA_TEXT,
+					"bitcoin:" + Consts.account.getPrimaryBitcoinAddress());
 			startActivity(Intent.createChooser(intent,
 					getString(R.string.share_bitcoin_address)));
 		}
@@ -277,14 +282,14 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 	};
 
 	private final OnLongClickListener refreshMoneyLongClickListener = new OnLongClickListener() {
-		
+
 		@Override
 		public boolean onLongClick(View v) {
 			UpdateInfo();
 			return true;
 		}
 	};
-	
+
 	private final OnClickListener refreshMoneyClickListener = new OnClickListener() {
 
 		@Override
@@ -329,14 +334,15 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
 	}
 
-//	private final OnLongClickListener addressOnLongClickListener = new OnLongClickListener() {
-//
-//		@Override
-//		public boolean onLongClick(View v) {
-//			return true;
-//		}
-//	};
-//
+	// private final OnLongClickListener addressOnLongClickListener = new
+	// OnLongClickListener() {
+	//
+	// @Override
+	// public boolean onLongClick(View v) {
+	// return true;
+	// }
+	// };
+	//
 
 	/** Called when menu button is pressed. */
 	@Override
@@ -376,9 +382,12 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 			dialog.setContentView(R.layout.dialog_about);
 
 			try {
-				String VersionName = getPackageManager().getPackageInfo(getPackageName(), 0).versionName;
-				TextView tvAboutText = (TextView)dialog.findViewById(R.id.tv_about_text);
-				tvAboutText.setText(String.format(getString(R.string.about_text), VersionName));
+				String VersionName = getPackageManager().getPackageInfo(
+						getPackageName(), 0).versionName;
+				TextView tvAboutText = (TextView) dialog
+						.findViewById(R.id.tv_about_text);
+				tvAboutText.setText(String.format(
+						getString(R.string.about_text), VersionName));
 			} catch (NameNotFoundException e) {
 				e.printStackTrace();
 			}
@@ -398,7 +407,8 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
 			dialog.setContentView(R.layout.dialog_about);
 
-			TextView tvAboutText = (TextView)dialog.findViewById(R.id.tv_about_text);
+			TextView tvAboutText = (TextView) dialog
+					.findViewById(R.id.tv_about_text);
 			tvAboutText.setText(R.string.credits_text);
 
 			dialog.findViewById(R.id.btn_about_ok).setOnClickListener(
@@ -418,7 +428,8 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
 	private void UpdateInfo() {
 		// first update from cache
-		updateBalances(Consts.account.getCachedBalance(), Consts.account.getCachedCoinsOnTheWay());
+		updateBalances(Consts.account.getCachedBalance(),
+				Consts.account.getCachedCoinsOnTheWay());
 		if (mGetInfoTask != null) {
 			// we already have a task for getting account info in progress
 			return;
@@ -431,7 +442,8 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 	}
 
 	@Override
-	public void handleGetAccountInfoCallback(AccountInfo info, String errorMessage) {
+	public void handleGetAccountInfoCallback(AccountInfo info,
+			String errorMessage) {
 		mGetInfoTask = null;
 		pbBalanceUpdateProgress.setVisibility(View.INVISIBLE);
 		vBalanceUpdateView.setVisibility(View.INVISIBLE);
@@ -441,13 +453,14 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 				Utils.showNoNetworkTip(this);
 			}
 		} else {
-			updateBalances(info.getAvailableBalance(), info.getEstimatedBalance() - info.getAvailableBalance());
+			updateBalances(info.getAvailableBalance(),
+					info.getEstimatedBalance() - info.getAvailableBalance());
 			vBalanceNoConnView.setVisibility(View.INVISIBLE);
 			btnSendMoney.setEnabled(true);
 			btnTransactionHistory.setEnabled(true);
 		}
 	}
-	
+
 	private void updateBalances(long balance, long onTheWayToMe) {
 		if (balance >= 0) {
 			tvBalance.setText(CoinUtils.valueString(balance) + " BTC");
@@ -455,7 +468,8 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 			tvBalance.setText(R.string.unknown);
 		}
 		if (onTheWayToMe >= 0) {
-			tvEstimatedOnTheWay.setText(CoinUtils.valueString(onTheWayToMe) + " BTC");
+			tvEstimatedOnTheWay.setText(CoinUtils.valueString(onTheWayToMe)
+					+ " BTC");
 		} else {
 			tvEstimatedOnTheWay.setText(R.string.unknown);
 		}

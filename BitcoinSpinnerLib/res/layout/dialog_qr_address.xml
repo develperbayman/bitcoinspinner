@@ -4,32 +4,33 @@
     android:layout_gravity="center"
     android:padding="10dp" >
 
+    <TextView
+        android:id="@+id/tv_title_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:text="Test text"
+        android:textColor="@color/White"
+        android:textSize="25dp" />
+    
     <ImageView
         android:id="@+id/iv_qr_Address"
         style="@style/QRAddressStyle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/tv_title_text"
         android:layout_centerHorizontal="true"
         android:padding="5dp" />
-
-    <TextView
-        android:id="@+id/tv_title_text"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-		  android:textSize="25dp"
-		  android:layout_centerHorizontal="true"		  
-        android:text=""
-        android:layout_marginTop="10dp"
-        android:textColor="@color/Black"/>
 
     <Button
         android:id="@+id/btn_copy_to_clip"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/iv_qr_Address"
+        android:layout_below="@id/iv_qr_Address"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="5dp"
         android:text="Copy to clipboard" />
+
 
 </RelativeLayout>
