@@ -11,6 +11,7 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
@@ -31,22 +32,35 @@ public class StartUpActivity extends Activity {
 	private SharedPreferences preferences;
 
 	private static final int SET_PROGRESS_MESSAGE = 1;
-
 	private static final int INITIALIZE_MESSAGE = 100;
+	private static final int START_MESSAGE = 101;
+	private static final int ERROR_MESSAGE = 102;
+	
 
 	private static final int STARTUP_DIALOG = 1;
 
 	private ProgressBar progressbarStartup;
 
-	String seedFile;
-	byte[] seed = new byte[Consts.SEED_SIZE];
-	int seedNbr = 1;
+	private String seedFile;
+	private byte[] seed = new byte[Consts.SEED_SIZE];
 
-	Context context;
-
-	boolean firstTime;
-	AlertDialog noConnDialog;
-
+	private Context context;
+	private String mInitializationError;
+	private AsyncInit mAsyncInit;
+	
+	
+	// Guard to avoid that we get two StartupActivities competing to initialize.
+	// For some reason that I cannot understand we some times experience that two StartupActivity instances are created.
+	// This crude code makes sure that only one of them gets to initialize
+	private static boolean wasStarted = false;
+	private static synchronized boolean isFirst(){
+		if(!wasStarted) {
+			wasStarted = true;
+			return true;
+		}
+		return false;
+	}
+	
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
@@ -56,9 +70,6 @@ public class StartUpActivity extends Activity {
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		context = this;
 		Consts.applicationContext = getApplicationContext();
-		Message message = handler.obtainMessage();
-		message.arg1 = INITIALIZE_MESSAGE;
-		handler.sendMessage(message);
 	}
 
 	@Override
@@ -72,6 +83,12 @@ public class StartUpActivity extends Activity {
 			getBaseContext().getResources().updateConfiguration(config,
 			      getBaseContext().getResources().getDisplayMetrics());
 		}
+		if (isFirst()) {
+			Message message = handler.obtainMessage();
+			message.arg1 = INITIALIZE_MESSAGE;
+			handler.sendMessage(message);
+		}
+		
 	}
 	
 	private byte[] createSeed(String seedFileName) {
@@ -112,12 +129,32 @@ public class StartUpActivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.arg1) {
 			case INITIALIZE_MESSAGE:
-				showDialog(STARTUP_DIALOG);
-				new AsyncInit().execute();
+				if(mAsyncInit == null) {
+					mAsyncInit = new AsyncInit();
+					mAsyncInit.execute();
+					showDialog(STARTUP_DIALOG);
+				}
 				break;
 			case SET_PROGRESS_MESSAGE:
 				int total = msg.arg2;
 				progressbarStartup.setProgress(total);
+				break;
+			case START_MESSAGE:
+				Intent intent = new Intent();
+				intent.setClass(context, MainActivity.class);
+				startActivity(intent);
+				finish();
+				break;
+			case ERROR_MESSAGE:
+				AlertDialog.Builder builder = new AlertDialog.Builder(context);
+				builder.setMessage(mInitializationError).setCancelable(false)
+						.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								finish();
+							}
+						});
+				AlertDialog alertDialog = builder.create();
+				alertDialog.show();
 				break;
 			}
 		}
@@ -130,7 +167,7 @@ public class StartUpActivity extends Activity {
 		switch (id) {
 		case STARTUP_DIALOG:
 			dialog.setContentView(R.layout.dialog_startup);
-			dialog.setTitle(R.string.startup_dialog_title);
+			dialog.setTitle(R.string.initializing_bitcoinspinner);
 			progressbarStartup = (ProgressBar) dialog
 					.findViewById(R.id.pb_startup);
 			break;
@@ -172,14 +209,18 @@ public class StartUpActivity extends Activity {
 				seed = createSeed(seedFile);
 			}
 		} catch (Exception e) {
-			e.printStackTrace();
+			mInitializationError = e.getMessage();
+			return;
 		}
 
 		DeterministicECKeyManager keyManager = new DeterministicECKeyManager(seed);
 		BitcoinClientApiImpl api = new BitcoinClientApiImpl(Consts.url, network);
-		Consts.account = new AndroidAccount(keyManager, api, Consts.applicationContext);
+		AndroidAccount account = new AndroidAccount(keyManager, api, Consts.applicationContext);
 		// Force deterministic key manager to calculate its keys, this is CPU intensive
-		Consts.account.getPrimaryBitcoinAddress();
+		account.getPrimaryBitcoinAddress();
+		// Force the QR code to get generated (it is cached)
+		Utils.getPrimaryAddressAsSmallQrCode(account);
+		Consts.account = account;
 	}
 
 	private class AsyncInit extends AsyncTask<Void, Integer, Long> {
@@ -191,10 +232,15 @@ public class StartUpActivity extends Activity {
 		}
 
 		protected void onPostExecute(Long result) {
-			Intent intent = new Intent();
-			intent.setClass(context, MainActivity.class);
-			startActivity(intent);
-			finish();
+			if (mInitializationError != null) {
+				Message message = handler.obtainMessage();
+				message.arg1 = ERROR_MESSAGE;
+				handler.sendMessage(message);
+			}else{
+				Message message = handler.obtainMessage();
+				message.arg1 = START_MESSAGE;
+				handler.sendMessage(message);
+			}
 		}
 	}
 }

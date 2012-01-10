@@ -1,20 +1,19 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.util.Hashtable;
 import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.ClipboardManager;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -32,23 +31,18 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bccapi.api.AccountInfo;
+import com.bccapi.api.Network;
 import com.bccapi.core.CoinUtils;
 import com.bccapi.core.Asynchronous.AccountTask;
 import com.bccapi.core.Asynchronous.GetAccountInfoCallbackHandler;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
+import com.miracleas.bitcoin_spinner_lib.Ticker.BtcToUsdCallbackHandler;
 
 public class MainActivity extends Activity implements SimpleGestureListener,
-		GetAccountInfoCallbackHandler {
+		GetAccountInfoCallbackHandler, BtcToUsdCallbackHandler {
 
 	private Context mContext;
-
-	private TextView tvAddress, tvBalance, tvEstimatedOnTheWay;
+	private TextView tvAddress, tvBalance, tvUsdValue, tvEstimatedOnTheWay;
 	private ImageView ivAddress;
 	private Button btnSendMoney, btnTransactionHistory;
 	private RelativeLayout rlBalance;
@@ -58,18 +52,19 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	private AccountTask mGetInfoTask;
 
 	private AlertDialog qrCodeDialog;
-	private static final QRCodeWriter QR_CODE_WRITER = new QRCodeWriter();
 
 	private static final int REQUEST_CODE_SEND_MONEY = 10001;
 	private static final int REQUEST_CODE_SETTINGS = 10002;
 
 	private static final int ABOUT_DIALOG = 1001;
 	private static final int THANKS_DIALOG = 1002;
+	private static final int DONATE_DIALOG = 1003;
 
 	private SimpleGestureFilter detector;
 
 	private SharedPreferences preferences;
-
+	private ConnectionWatcher mConnectionWatcher;
+	
 	/** Called when the activity is first created. */
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -97,20 +92,13 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		}
 
 		detector = new SimpleGestureFilter(this, this);
-
-		// new Thread(ConnectionWatcher).start();
-
-		// for (String address : Consts.account.getAddresses()) {
-		// mAddress = address;
-		// break;
-		// }
-
-		// editor.putString(Consts.BITCOIN_ADDRESS, mAddress);
-		// editor.commit();
+		mConnectionWatcher = new ConnectionWatcher(mContext);
+		new Thread(mConnectionWatcher).start();
 
 		tvAddress = (TextView) findViewById(R.id.tv_address);
 		ivAddress = (ImageView) findViewById(R.id.iv_address);
 		tvBalance = (TextView) findViewById(R.id.tv_balance);
+		tvUsdValue = (TextView) findViewById(R.id.tv_usd_value);
 		tvEstimatedOnTheWay = (TextView) findViewById(R.id.tv_estimated_on_the_way);
 		btnSendMoney = (Button) findViewById(R.id.btn_send_money);
 		btnTransactionHistory = (Button) findViewById(R.id.btn_transaction_history);
@@ -140,6 +128,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	@Override
 	protected void onPause() {
 		super.onPause();
+		mConnectionWatcher.stop();
 		Editor editor = preferences.edit();
 		if (null != qrCodeDialog) {
 			editor.putBoolean("ShowQrCode", qrCodeDialog.isShowing());
@@ -150,61 +139,58 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		editor.commit();
 	}
 
-	// private Runnable ConnectionWatcher = new Runnable() {
-	// @Override
-	// public void run() {
-	// while (true) {
-	// if (isConnected()) {
-	// Message message = handler.obtainMessage();
-	// message.arg1 = CONNECTION_MESSAGE;
-	// handler.sendMessage(message);
-	// } else {
-	// Message message = handler.obtainMessage();
-	// message.arg1 = NO_CONNECTION_MESSAGE;
-	// handler.sendMessage(message);
-	// }
-	// try {
-	// Thread.sleep(1000);
-	// } catch (InterruptedException e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// }
-	// };
+	private class ConnectionWatcher implements Runnable {
+		private boolean _quit;
+		private Context _context;
+		private boolean _isCurrentlyConnected;
+		private Handler _handler;
+
+		public ConnectionWatcher(Context context) {
+			_quit = false;
+			_context = context;
+			_handler = new Handler();
+		}
+
+		public void stop() {
+			_quit = true;
+		}
+
+		@Override
+		public void run() {
+			try {
+				_isCurrentlyConnected = Utils.isConnected(_context);
+				while (!_quit) {
+					Thread.sleep(1000);
+					if (_quit) {
+						return;
+					}
+					boolean connected = Utils.isConnected(_context);
+					if (connected && !_isCurrentlyConnected) {
+						// We went from not connected to connected
+						// Post a handler that updates our balance
+						_handler.post(new Runnable() {
+							@Override
+							public void run() {
+								if (_quit) {
+									return;
+								}
+								UpdateInfo();
+							}
+						});
+					}
+					_isCurrentlyConnected = connected;
+				}
+			} catch (InterruptedException e) {
+				return;
+			}
+
+		}
+	}
 
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent me) {
 		this.detector.onTouchEvent(me);
 		return super.dispatchTouchEvent(me);
-	}
-
-	public static Bitmap getQRCodeBitmap(final String url, final int size) {
-		try {
-			final Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
-			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-			final BitMatrix result = QR_CODE_WRITER.encode(url,
-					BarcodeFormat.QR_CODE, size, size, hints);
-
-			final int width = result.getWidth();
-			final int height = result.getHeight();
-			final int[] pixels = new int[width * height];
-
-			for (int y = 0; y < height; y++) {
-				final int offset = y * width;
-				for (int x = 0; x < width; x++) {
-					pixels[offset + x] = result.get(x, y) ? Color.BLACK
-							: Color.WHITE;
-				}
-			}
-
-			final Bitmap bitmap = Bitmap.createBitmap(width, height,
-					Bitmap.Config.ARGB_8888);
-			bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-			return bitmap;
-		} catch (final WriterException x) {
-			x.printStackTrace();
-			return null;
-		}
 	}
 
 	private final OnClickListener qrClickListener = new OnClickListener() {
@@ -222,8 +208,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			
 			ImageView qrAdress = (ImageView) layout
 					.findViewById(R.id.iv_qr_Address);
-			qrAdress.setImageBitmap(getQRCodeBitmap(
-					"bitcoin:" + Consts.account.getPrimaryBitcoinAddress(), 320));
+			qrAdress.setImageBitmap(Utils.getPrimaryAddressAsLargeQrCode(Consts.account));
 			qrAdress.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -303,9 +288,9 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			final Intent intent) {
 		if (Utils.isConnected(this)) {
 			if (requestCode == REQUEST_CODE_SEND_MONEY) {
-				UpdateInfo();
+				// do nothing, balance is refreshed by onResume()
 			} else if (requestCode == REQUEST_CODE_SETTINGS) {
-				UpdateInfo();
+				// do nothing, balance is refreshed by onResume()
 			}
 		}
 	}
@@ -334,15 +319,11 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 	}
 
-	// private final OnLongClickListener addressOnLongClickListener = new
-	// OnLongClickListener() {
-	//
-	// @Override
-	// public boolean onLongClick(View v) {
-	// return true;
-	// }
-	// };
-	//
+	@Override
+	public void onBackPressed() {
+		moveTaskToBack(true);
+	};
+	
 
 	/** Called when menu button is pressed. */
 	@Override
@@ -365,6 +346,9 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			return true;
 		} else if (item.getItemId() == R.id.credits) {
 			showDialog(THANKS_DIALOG);
+			return true;
+		} else if (item.getItemId() == R.id.donate) {
+			showDialog(DONATE_DIALOG);
 			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
@@ -420,6 +404,32 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 						}
 					});
 			break;
+		case DONATE_DIALOG:
+			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+			builder.setMessage(R.string.donations_appreciated)
+					.setCancelable(false)
+					.setPositiveButton(R.string.yes,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+									Intent i = new Intent();
+									i.setClass(MainActivity.this, SendBitcoinsActivity.class);
+									if(Consts.account.getNetwork() == Network.testNetwork){
+								        i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.TESTNET_DONATION_ADDRESS);
+									}else{
+								        i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.DONATION_ADDRESS);
+									}
+								startActivityForResult(i, REQUEST_CODE_SEND_MONEY);
+								}
+							})
+					.setNegativeButton(R.string.no,
+							new DialogInterface.OnClickListener() {
+								public void onClick(DialogInterface dialog,
+										int id) {
+								}
+							});
+			dialog = builder.create();
+			break;
 		default:
 			dialog = null;
 		}
@@ -464,8 +474,10 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	private void updateBalances(long balance, long onTheWayToMe) {
 		if (balance >= 0) {
 			tvBalance.setText(CoinUtils.valueString(balance) + " BTC");
+			Ticker.requestBtcToUsd(balance, this);
 		} else {
 			tvBalance.setText(R.string.unknown);
+			tvUsdValue.setText("");
 		}
 		if (onTheWayToMe >= 0) {
 			tvEstimatedOnTheWay.setText(CoinUtils.valueString(onTheWayToMe)
@@ -475,10 +487,22 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		}
 	}
 
+	@Override
+	public void handleBtcToUsdCallback(Double usdValue) {
+		if(usdValue == null){
+			tvUsdValue.setText("");
+		}else{
+			String value = String.format("%1$.2f", usdValue); 
+			tvUsdValue.setText(getResources().getString(R.string.usd_value, value));
+		}
+	}
+
 	private void updateAddress() {
 		String address = Consts.account.getPrimaryBitcoinAddress();
 		tvAddress.setText(address);
-		ivAddress.setImageBitmap(getQRCodeBitmap("bitcoin:" + address, 100));
+		ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(Consts.account));
 	}
+
+
 
 }

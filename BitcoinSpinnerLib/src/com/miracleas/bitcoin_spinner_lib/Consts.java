@@ -27,6 +27,9 @@ public final class Consts {
 	public static final int TESTNET = 1;
 	public static final int CLOSEDTESTNET = 2;
 	public static final String EXTRA_NETWORK = "Extra network";
+	public static final String BTC_ADDRESS_KEY = "BTC address key";
+	public static final String DONATION_ADDRESS = "14VWYvbHd4R7oTFS8kEfoWZFTzbedDgwKg";
+	public static final String TESTNET_DONATION_ADDRESS = "mnXc9S1HqLiG8n7N5fi6R6RRF7oBR5FfbN";
 
 	public static final String PRODNET_FILE = "seed.bin";
 	public static final String TESTNET_FILE = "test-seed.bin";
@@ -36,6 +39,9 @@ public final class Consts {
 	public static final int SEED_GEN_SIZE = 64;
 	
 	public static final int SATOSHIS_PER_BITCOIN = 100000000;
+	public static final long MILLISECOND_IN_NANOSECONDS = 1000000;
+	public static final long SECOND_IN_NANOSECONDS = MILLISECOND_IN_NANOSECONDS * 1000;
+	public static final long MINUTE_IN_NANOSECONDS = SECOND_IN_NANOSECONDS * 60;
 	
 	public static AsynchronousAccount account;
 	public static URL url;

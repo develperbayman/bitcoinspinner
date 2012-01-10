@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <!-- Name, about, credits and versioning -->
-    <string name="app_name">BitCoinSpinner</string>
+    <string name="app_name">BitcoinSpinner</string>
     <string name="about_title">About BitcoinSpinner</string>
     <string name="about_text">V.: %1$s\nBitcoinSpinner is a light-weight, secure, and user friendly Bitcoin client for Android, which is built on top of the BCCAPI.\nBitcoinSpinner is not a Bitcoin bank. All your funds are secured by private keys in app-private storage on your Android device.\n\nPlease note that this is a beta release, and that you should only use it for small change.\n</string>
     <string name="credits_text">Thanks  to:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
@@ -10,9 +10,7 @@
     <string name="credits_menu">Credits</string>
     <string name="settings_menu">Settings</string>
     <!-- Startup -->
-    <string name="initialize">Initializing Random Seed</string>
     <string name="startup_dialog_text">Please wait...</string>
-    <string name="startup_dialog_title">Initializing</string>
     <!-- Backup and Restore -->
     <string name="backup_dialog_text">You are about to display a QR code which can be used to restore your wallet on a different device.\n\nTake a picture of it and/or print it out on Paper.\n\nWarning, this QR code enables anyone who scans it to take possession of the funds controlled by this device.\n\nDo you want to proceed?</string>
     <string name="restore_complete_dialog_text">Restore complete</string>
@@ -35,6 +33,7 @@
     <string name="no">No</string>
     <string name="yes">Yes</string>
     <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
     <string name="please_wait">Please wait...</string>
     <string name="try_again">Try again?</string>
     <!-- Calculation and sending of bitcoins -->
@@ -75,4 +74,9 @@
     <string name="no_network">No network connectivity.</string>
     <string name="unexpected_error">An unexpected error occurred. Please try again.</string>
     <string name="unknown">Unknown</string>
+    <string name="donations_appreciated">BitcoinSpinner and the servers it depends on are provided for free.\n\nPlease help us continue improving a great free Bitcoin wallet.\n\nDo you want to give a small donation?</string>
+    <string name="usd_value">worth about %s USD</string>
+    <string name="coins_on_their_way">Coins on their way to you:</string>
+    <string name="donate_menu">Donate</string>
+    <string name="initializing_bitcoinspinner">Initializing BitcoinSpinner</string>
 </resources>

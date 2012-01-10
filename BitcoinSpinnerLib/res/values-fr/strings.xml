@@ -3,16 +3,14 @@
     <!-- Name, about, credits and versioning -->
     <string name="about_text">V.: %1$s\nBitcoinSpinner est un client Bitcoin léger, sécurisé et facile à utiliser pour Android, basé sur BCCAPI.\nBitcoinSpinner n\'est pas une banque Bitcoin. Tous vos fonds sont sécurisés par une clé privée résidant dans l\'espace de stockage des applications de votre appareil Android.\n\nMerci de prendre note que ce logiciel est encore en beta, et que vous devriez l\'utiliser uniquement pour des petites sommes.\n</string>
     <string name="about_title">À propos de BitCoinSpinner</string>
-    <string name="app_name">BitCoinSpinner</string>
+    <string name="app_name">BitcoinSpinner</string>
     <string name="credits_text">Merci à:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
     <!-- Menu -->
     <string name="about_menu">À propos de BS</string>
     <string name="credits_menu">Crédits</string>
     <string name="settings_menu">Paramètres</string>
     <!-- Startup -->
-    <string name="initialize">Initialisation du générateur de nombres peuso-aléatoire</string>
     <string name="startup_dialog_text">Veuillez patienter...</string>
-    <string name="startup_dialog_title">En cours de connection</string>
     <!-- Backup and Restore -->
     <string name="backup_dialog_text">Ceci va afficher un QR code qui pourra être utilisé pour récupérer votre porte-monnaie sur un appareil différent.\n\nPrenez une photo et/ou imprimez le sur papier.\n\nAttention, le QR code permet à quiconque qui le scanne de prendre possession des fonds stockés sur l\'appareil.\n\nVoulez-vous continuer?</string>
     <string name="restore_complete_dialog_text">Restauration complète</string>
@@ -34,7 +32,7 @@
     <!-- Common -->
     <string name="no">Non</string>
     <string name="yes">Oui</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="please_wait">Veuillez patienter...</string>
     <string name="try_again">Essayer à nouveau?</string>
     <!-- Calculation and sending of bitcoins -->

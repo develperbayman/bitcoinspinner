@@ -69,7 +69,7 @@
                 android:layout_alignBaseline="@+id/btn_spend"
                 android:layout_alignBottom="@+id/btn_spend"
                 android:layout_toRightOf="@+id/btn_spend"
-                android:text="Cancel" />
+                android:text="@string/cancel" />
         </LinearLayout>
     </RelativeLayout>
 

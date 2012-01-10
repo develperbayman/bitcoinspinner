@@ -13,18 +13,18 @@
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         layout="@layout/addressbox" />
 
     <include
         android:id="@+id/rl_balance_ref"
         android:layout_width="fill_parent"
-        android:layout_height="90dp"
-        android:layout_below="@+id/rl_address_ref"
+        android:layout_height="110dp"
+        android:layout_below="@id/rl_address_ref"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         layout="@layout/balancebox" />
 
     <Button
@@ -32,11 +32,11 @@
         style="@style/SendMoneyButton"
         android:layout_width="fill_parent"
         android:layout_height="70dp"
-        android:layout_below="@+id/rl_balance_ref"
+        android:layout_below="@id/rl_balance_ref"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="15dp"
         android:text="@string/send_bitcoins"
         true="" />
 
@@ -45,11 +45,11 @@
         style="@style/SendMoneyButton"
         android:layout_width="fill_parent"
         android:layout_height="70dp"
-        android:layout_below="@+id/btn_send_money"
+        android:layout_below="@id/btn_send_money"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="15dp"
         android:text="@string/transaction_history"
         true="" />
 
@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerInParent="true"
-        android:layout_marginBottom="10dp"
+        android:layout_marginBottom="2dp"
         android:text="@string/beta_warning"
         android:textColor="@color/Black" />
 

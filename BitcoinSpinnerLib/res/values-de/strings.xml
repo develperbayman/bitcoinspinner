@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <!-- Name, about, credits and versioning -->
-    <string name="app_name">BitCoinSpinner</string>
+    <string name="app_name">BitcoinSpinner</string>
     <string name="about_title">Über BitcoinSpinner</string>
     <string name="about_text">V.: %1$s\nBitcoinSpinner ist ein schlanker, sicherer, und benutzerfreundlicher Bitcoin Client für Android, aufbauend auf der BCCAPI.\nBitcoinSpinner ist keine Bitcoin Bank. Ihr Guthaben ist durch ihre privaten Schlüssel gesichert, auf die nur diese App auf ihren Android Smartphone Zugriff hat. \n\nBitte beachten Sie, dass dies eine Beta Version ist. Bitte verwenden Sie sie nur für kleinere Beträge.\n</string>
     <string name="credits_text">Dank an:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
@@ -10,9 +10,7 @@
     <string name="credits_menu">Credits</string>
     <string name="settings_menu">Einstellungen</string>
     <!-- Startup -->
-    <string name="initialize">Initialisiere Random Seed</string>
     <string name="startup_dialog_text">Bitte warten...</string>
-    <string name="startup_dialog_title">Verbinde</string>
     <!-- Backup and Restore -->
     <string name="backup_dialog_text">Sie sind dabei, einen QR-Code anzuzeigen, mit dem ihr Wallet auf einem anderen Gerät wiederhergestellt werden kann.\n\nPhotographieren Sie es und/oder drucken Sie es aus.\n\nAchtung, mithilfe dieses QR-Codes kann jeder, der ihn einscannt, sich das Guthaben auf diesem Gerät aneignen.\n\nMöchten Sie fortfahren?</string>
     <string name="restore_complete_dialog_text">Wiederherstellung abgeschlossen</string>
@@ -34,7 +32,7 @@
     <!-- Common -->
     <string name="no">Nein</string>
     <string name="yes">Ja</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="please_wait">Bitte warten...</string>
     <string name="try_again">Nochmal versuchen?</string>
     <!-- Calculation and sending of bitcoins -->

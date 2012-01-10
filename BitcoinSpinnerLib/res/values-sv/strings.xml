@@ -10,9 +10,7 @@
     <string name="credits_menu">Tack</string>
     <string name="settings_menu">Inställningar</string>
     <!-- Startup -->
-    <string name="initialize">Skapar frö för slumptal</string>
     <string name="startup_dialog_text">Var vänlig vänta...</string>
-    <string name="startup_dialog_title">Ansluter</string>
     <!-- Backup and Restore -->
     <string name="backup_dialog_text">Du får snart se en QR-kod som kan användas för att återställa din plånbok på en annan enhet.\n\nTag ett foto av den och/eller skriv ut den på papper.\n\nVarning, den som scannar denna QR-kod kan ta kontroll över alla de Bitcoins som finns på denna enhet.\n\nVill du fortsätta?</string>
     <string name="restore_complete_dialog_text">Återställningen färdig</string>
@@ -34,7 +32,7 @@
     <!-- Common -->
     <string name="no">Nej</string>
     <string name="yes">Ja</string>
-    <string name="ok">Ok</string>
+    <string name="ok">OK</string>
     <string name="please_wait">Vänligen vänta...</string>
     <string name="try_again">Prova igen?</string>
     <!-- Calculation and sending of bitcoins -->

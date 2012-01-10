@@ -132,6 +132,16 @@ public class SendBitcoinsActivity extends Activity implements
 		btnQRScan.setOnClickListener(qrScanClickListener);
 		btnSpend.setOnClickListener(spendMoneyClickListener);
 		btnCancel.setOnClickListener(cancelClickListener);
+		
+		// If an address has been added pre-populate it. This allows for the Donation feature.
+		Bundle extras = getIntent().getExtras();
+		if (extras != null) {
+			String address = getIntent().getExtras().getString(Consts.BTC_ADDRESS_KEY);
+			if (address != null) {
+				etAddress.setText(address);
+			}
+		}
+		
 	}
 
 	@Override
