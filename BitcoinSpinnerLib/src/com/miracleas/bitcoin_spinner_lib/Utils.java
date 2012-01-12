@@ -77,7 +77,7 @@ public class Utils {
 			return _lastQrAddressBitmapSmall;
 		}
 		_lastQrAddressStringSmall = address;
-		_lastQrAddressBitmapSmall = getQRCodeBitmap("bitcoin:" + address, 100);
+		_lastQrAddressBitmapSmall = getSmallQRCodeBitmap("bitcoin:" + address);
 		return _lastQrAddressBitmapSmall;
 	}
 
@@ -90,11 +90,23 @@ public class Utils {
 			return _lastQrAddressBitmapLarge;
 		}
 		_lastQrAddressStringLarge = address;
-		_lastQrAddressBitmapLarge = getQRCodeBitmap("bitcoin:" + address, 320);
+		_lastQrAddressBitmapLarge = getLargeQRCodeBitmap("bitcoin:" + address);
 		return _lastQrAddressBitmapLarge;
 	}
 
-	public static Bitmap getQRCodeBitmap(final String url, final int size) {
+	public static Bitmap getLargeQRCodeBitmap(final String url) {
+		// make size 85% of display size
+		int size = Math.min(Consts.displayWidth, Consts.displayHeight)*85/100;
+		return getQRCodeBitmapX(url, size);
+	}
+
+	public static Bitmap getSmallQRCodeBitmap(final String url) {
+		// make size 34% of display size
+		int size = Math.min(Consts.displayWidth, Consts.displayHeight)*34/100;
+		return getQRCodeBitmapX(url, size);
+	}
+	
+	private static Bitmap getQRCodeBitmapX(final String url, final int size) {
 		try {
 			final Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
 			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);

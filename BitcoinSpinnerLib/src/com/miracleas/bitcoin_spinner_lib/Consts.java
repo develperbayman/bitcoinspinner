@@ -46,7 +46,8 @@ public final class Consts {
 	public static AsynchronousAccount account;
 	public static URL url;
 	public static Context applicationContext;
-	
+	public static int displayWidth;  // Total width of the device display in pixels
+	public static int displayHeight; // Total height of the device display in pixels
 	public static final String PACKAGE_NAME_ZXING = "com.google.zxing.client.android";
 	public static final String MARKET_APP_URL = "market://details?id=%s";
 	public static final String WEBMARKET_APP_URL = "https://market.android.com/details?id=%s";

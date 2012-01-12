@@ -20,6 +20,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.DisplayMetrics;
 import android.widget.ProgressBar;
 
 import com.bccapi.api.Network;
@@ -70,6 +71,10 @@ public class StartUpActivity extends Activity {
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		context = this;
 		Consts.applicationContext = getApplicationContext();
+		DisplayMetrics dm = new DisplayMetrics();
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        Consts.displayWidth = dm.widthPixels;
+        Consts.displayHeight = dm.heightPixels;
 	}
 
 	@Override

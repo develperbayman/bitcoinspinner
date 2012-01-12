@@ -4,7 +4,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.Hashtable;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -16,8 +15,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -43,12 +40,6 @@ import com.bccapi.core.DeterministicECKeyExporter;
 import com.bccapi.core.DeterministicECKeyManager;
 import com.bccapi.core.ECKeyManager;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
-import com.google.zxing.BarcodeFormat;
-import com.google.zxing.EncodeHintType;
-import com.google.zxing.WriterException;
-import com.google.zxing.common.BitMatrix;
-import com.google.zxing.qrcode.QRCodeWriter;
-import com.google.zxing.qrcode.decoder.ErrorCorrectionLevel;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -56,7 +47,6 @@ public class SettingsActivity extends PreferenceActivity {
 	private SharedPreferences.Editor editor;
 
 	private AlertDialog backupWalletDialog, exportKeyDialog;
-	private static final QRCodeWriter QR_CODE_WRITER = new QRCodeWriter();
 	private String qrString, keyString;
 
 	private static final int REQUEST_CODE_SCAN = 0;
@@ -178,8 +168,8 @@ public class SettingsActivity extends PreferenceActivity {
 									qrString += preferences.getInt(
 											Consts.NETWORK, Consts.PRODNET);
 
-									qrAdress.setImageBitmap(getQRCodeBitmap(
-											qrString, 320));
+									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
+											qrString));
 									qrAdress.setOnClickListener(new OnClickListener() {
 
 										@Override
@@ -328,8 +318,8 @@ public class SettingsActivity extends PreferenceActivity {
 									
 									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
 									keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(Consts.account.getNetwork());
-									qrAdress.setImageBitmap(getQRCodeBitmap(
-											keyString, 320));
+									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
+											keyString));
 									
 									qrAdress.setOnClickListener(new OnClickListener() {
 
@@ -463,35 +453,6 @@ public class SettingsActivity extends PreferenceActivity {
 							});
 			AlertDialog alertDialog = builder.create();
 			alertDialog.show();
-		}
-	}
-
-	private static Bitmap getQRCodeBitmap(final String url, final int size) {
-		try {
-			final Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
-			hints.put(EncodeHintType.ERROR_CORRECTION, ErrorCorrectionLevel.H);
-			final BitMatrix result = QR_CODE_WRITER.encode(url,
-					BarcodeFormat.QR_CODE, size, size, hints);
-
-			final int width = result.getWidth();
-			final int height = result.getHeight();
-			final int[] pixels = new int[width * height];
-
-			for (int y = 0; y < height; y++) {
-				final int offset = y * width;
-				for (int x = 0; x < width; x++) {
-					pixels[offset + x] = result.get(x, y) ? Color.BLACK
-							: Color.WHITE;
-				}
-			}
-
-			final Bitmap bitmap = Bitmap.createBitmap(width, height,
-					Bitmap.Config.ARGB_8888);
-			bitmap.setPixels(pixels, 0, width, 0, 0, width, height);
-			return bitmap;
-		} catch (final WriterException x) {
-			x.printStackTrace();
-			return null;
 		}
 	}
 

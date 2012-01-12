@@ -20,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bccapi.api.AccountStatement;
 import com.bccapi.api.AccountStatement.Record;
@@ -112,6 +113,9 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 			TextView tvAddress = (TextView) v.findViewById(R.id.tv_address);
 			TextView tvCredits = (TextView) v.findViewById(R.id.tv_credits);
 			Record r = getItem(position);
+			if(r == null) {
+				tvDescription.setText("No Records");
+			}
             String description;
             if (r.getType() == Type.Sent) {
                description = getContext().getString(R.string.sent_to);
@@ -158,7 +162,10 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 			Utils.showConnectionAlert(this);
 			return;
 		}
-		if (!statements.getRecords().isEmpty()) {
+		if (statements.getRecords().isEmpty()) {
+			Toast.makeText(this, R.string.no_transactions,
+					Toast.LENGTH_SHORT).show();
+		} else {
 			List<Record> records = statements.getRecords();
 			Collections.reverse(records);
 			setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, records));
