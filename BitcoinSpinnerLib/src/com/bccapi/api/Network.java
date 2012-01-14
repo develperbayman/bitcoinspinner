@@ -1,10 +1,13 @@
 package com.bccapi.api;
 
+import java.io.Serializable;
+
 /**
  * Settings for the network used. Can be either the test or production network.
  */
-public class Network {
+public class Network implements Serializable {
 
+   private static final long serialVersionUID = 1L;
    public static Network testNetwork = new Network(111);
    public static Network productionNetwork = new Network(0);
 
@@ -24,6 +27,20 @@ public class Network {
     */
    public int getAddressHeader() {
       return _addressHeader;
+   }
+   
+   @Override
+   public int hashCode() {
+      return _addressHeader;
+   };
+   
+   @Override
+   public boolean equals(Object obj) {
+      if (!(obj instanceof Network)) {
+         return false;
+      }
+      Network other = (Network) obj;
+      return other._addressHeader == _addressHeader;
    }
 
 }

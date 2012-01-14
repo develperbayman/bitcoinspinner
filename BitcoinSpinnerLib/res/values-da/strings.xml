@@ -79,4 +79,6 @@
     <string name="private_key">Privat Nøgle</string>
     <string name="donations_appreciated">BitcoinSpinner og de servere den afhænger af er stillet gratis til rådighed.\n\nHjælp os med at forbedre en fantastisk gratis Bitcoin pung.\n\nVil du give en lille donation?</string>
     <string name="initializing_bitcoinspinner">Initialisererer BitcoinSpinner</string>
+    <string name="unconfirmed_from">Modtager fra (ukonfirmeret):</string>
+    <string name="unconfirmed_to">Sender til (ukonfimeret):</string>
 </resources>

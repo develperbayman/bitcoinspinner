@@ -1,5 +1,9 @@
 package com.miracleas.bitcoin_spinner_lib;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.net.URL;
+import java.security.SecureRandom;
 import java.util.Hashtable;
 
 import android.app.AlertDialog;
@@ -11,6 +15,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.widget.Toast;
 
+import com.bccapi.api.Network;
+import com.bccapi.core.HashUtils;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
@@ -33,11 +39,10 @@ public class Utils {
 
 	public static void showAlert(Context context, String message) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(context);
-		builder.setMessage(message).setCancelable(false)
-				.setNeutralButton("Ok", new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-					}
-				});
+		builder.setMessage(message).setCancelable(false).setNeutralButton("Ok", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+			}
+		});
 		AlertDialog alertDialog = builder.create();
 		alertDialog.show();
 	}
@@ -96,16 +101,16 @@ public class Utils {
 
 	public static Bitmap getLargeQRCodeBitmap(final String url) {
 		// make size 85% of display size
-		int size = Math.min(Consts.displayWidth, Consts.displayHeight)*85/100;
+		int size = Math.min(Consts.displayWidth, Consts.displayHeight) * 85 / 100;
 		return getQRCodeBitmapX(url, size);
 	}
 
 	public static Bitmap getSmallQRCodeBitmap(final String url) {
 		// make size 34% of display size
-		int size = Math.min(Consts.displayWidth, Consts.displayHeight)*34/100;
+		int size = Math.min(Consts.displayWidth, Consts.displayHeight) * 34 / 100;
 		return getQRCodeBitmapX(url, size);
 	}
-	
+
 	private static Bitmap getQRCodeBitmapX(final String url, final int size) {
 		try {
 			final Hashtable<EncodeHintType, Object> hints = new Hashtable<EncodeHintType, Object>();
@@ -130,6 +135,69 @@ public class Utils {
 			x.printStackTrace();
 			return null;
 		}
+	}
+
+	public static URL getBccapiUrl(Network network) {
+		try {
+			if (network.equals(Network.testNetwork)) {
+				return Consts.USE_CLOSED_TESTNET ? new URL("https://testnet.bccapi.com:445") : new URL(
+						"https://testnet.bccapi.com:444");
+			}
+			return new URL("https://prodnet.bccapi.com:443");
+		} catch (Exception e) {
+			// never happens
+			return null;
+		}
+	}
+
+	private static String getSeedFileName(Network network) {
+		if (network.equals(Network.testNetwork)) {
+			return Consts.USE_CLOSED_TESTNET ? Consts.CLOSED_TESTNET_FILE : Consts.TESTNET_FILE;
+		}
+		return Consts.PRODNET_FILE;
+	}
+
+	public static byte[] readSeed(Network network) {
+		String seedFile = getSeedFileName(network);
+		byte[] seed = new byte[Consts.SEED_SIZE];
+		FileInputStream fis;
+		try {
+			fis = Consts.applicationContext.openFileInput(seedFile);
+			fis.read(seed);
+			fis.close();
+			return seed;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public static boolean writeSeed(Network network, byte[] seed) {
+		String seedFile = getSeedFileName(network);
+		FileOutputStream fos = null;
+		try {
+			fos = Consts.applicationContext.openFileOutput(seedFile, Context.MODE_PRIVATE);
+			fos.write(seed);
+			fos.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return false;
+	}
+
+	public static byte[] createandWriteSeed(Network network) {
+		try {
+			SecureRandom random = new SecureRandom();
+			byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
+			byte[] seed = HashUtils.sha256(genseed);
+			if (writeSeed(network, seed)) {
+				return seed;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
 	}
 
 }

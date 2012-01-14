@@ -1,5 +1,6 @@
 package com.miracleas.bitcoin_spinner;
 
+import com.bccapi.api.Network;
 import com.miracleas.bitcoin_spinner_lib.Consts;
 import com.miracleas.bitcoin_spinner_lib.StartUpActivity;
 
@@ -15,7 +16,7 @@ public class Main extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
         Intent i = new Intent(this, StartUpActivity.class);
-        i.putExtra(Consts.EXTRA_NETWORK, Consts.PRODNET);
+        i.putExtra(Consts.EXTRA_NETWORK, Network.productionNetwork);
         startActivity(i);
         finish();
 	}

@@ -117,13 +117,21 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 				tvDescription.setText("No Records");
 			}
             String description;
-            if (r.getType() == Type.Sent) {
-               description = getContext().getString(R.string.sent_to);
-            } else if (r.getType() == Type.Received) {
-               description = getContext().getString(R.string.received_from);
-            } else {
-               description = getContext().getString(R.string.sent_to_yourself);
-            }
+			if (r.getType() == Type.Sent) {
+				if (r.getConfirmations() == 0) {
+					description = getContext().getString(R.string.unconfirmed_to);
+				} else {
+					description = getContext().getString(R.string.sent_to);
+				}
+			} else if (r.getType() == Type.Received) {
+				if (r.getConfirmations() == 0) {
+					description = getContext().getString(R.string.unconfirmed_from);
+				} else {
+					description = getContext().getString(R.string.received_from);
+				}
+			} else {
+				description = getContext().getString(R.string.sent_to_yourself);
+			}
 
             String valueString = CoinUtils.valueString(r.getAmount());
             
@@ -140,6 +148,11 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 			tvAddress.setText(r.getAddresses());
 			tvCredits.setText(valueString);
 			if(r.getConfirmations() == 0) {
+				tvDescription.setTextColor(Color.GRAY);
+				tvDate.setTextColor(Color.GRAY);
+				tvAddress.setTextColor(Color.GRAY);
+				tvCredits.setTextColor(Color.GRAY);
+			} else if(r.getConfirmations() < 5) {
 				tvDescription.setTextColor(Color.GRAY);
 				tvDate.setTextColor(Color.GRAY);
 				tvAddress.setTextColor(Color.GRAY);

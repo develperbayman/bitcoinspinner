@@ -13,7 +13,7 @@ import com.bccapi.core.StreamReader;
 public class Ticker {
 
 	private static final int MTGOX_RETRIES = 3;
-	private static final long MTGOX_CACHE_INTERVAL = Consts.MINUTE_IN_NANOSECONDS * 10;
+	private static final long MTGOX_CACHE_INTERVAL = Consts.MINUTE_IN_NANOSECONDS * 5;
 
 	private static Double _mtgoxInUsd;
 	private static long _lastMtgoxInUsd;
@@ -45,8 +45,7 @@ public class Ticker {
 				for (int i = 0; i < MTGOX_RETRIES; i++) {
 					Double mtgox = getMtGoxUsdBuy();
 					if (mtgox != null) {
-						Double btc = new Double(_satoshis) / Consts.SATOSHIS_PER_BITCOIN;
-						doCallback(mtgox * btc);
+						doCallback(mtgox);
 						return;
 					}
 					// Sleep a little before we try again
@@ -88,12 +87,19 @@ public class Ticker {
 			}
 		}
 
-		private void doCallback(final Double value) {
+		private synchronized void doCallback(Double value) {
 			_mtgoxInUsd = value;
+			final Double btc = new Double(_satoshis) / Consts.SATOSHIS_PER_BITCOIN;
+			final Double usd;
+			if (_mtgoxInUsd != null) {
+				usd = btc * _mtgoxInUsd;
+			} else {
+				usd = null;
+			}
 			_handler.post(new Runnable() {
 				@Override
 				public void run() {
-					_callBackhandler.handleBtcToUsdCallback(value);
+					_callBackhandler.handleBtcToUsdCallback(usd);
 				}
 			});
 		}

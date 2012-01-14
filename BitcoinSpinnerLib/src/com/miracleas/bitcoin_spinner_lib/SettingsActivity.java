@@ -1,9 +1,6 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.net.URL;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -47,7 +44,6 @@ public class SettingsActivity extends PreferenceActivity {
 	private SharedPreferences.Editor editor;
 
 	private AlertDialog backupWalletDialog, exportKeyDialog;
-	private String qrString, keyString;
 
 	private static final int REQUEST_CODE_SCAN = 0;
 
@@ -161,15 +157,11 @@ public class SettingsActivity extends PreferenceActivity {
 									text.setText(R.string.bitcoinspinner_backup);
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
-
-									qrString = "bsb:" + getSeedAsBase58()
-											+ "?net=";
-
-									qrString += preferences.getInt(
-											Consts.NETWORK, Consts.PRODNET);
-
+									Network net = Consts.account.getNetwork();
+									final BackupInfo info = new BackupInfo(Utils.readSeed(net),net);
+									info.getBackupUrl();
 									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
-											qrString));
+											info.getBackupUrl()));
 									qrAdress.setOnClickListener(new OnClickListener() {
 
 										@Override
@@ -185,7 +177,7 @@ public class SettingsActivity extends PreferenceActivity {
 										@Override
 										public void onClick(View v) {
 											ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-											clipboard.setText(qrString);
+											clipboard.setText(info.getBackupUrl());
 											Toast.makeText(mContext,
 													R.string.clipboard_copy,
 													Toast.LENGTH_SHORT).show();
@@ -283,40 +275,15 @@ public class SettingsActivity extends PreferenceActivity {
 									exportKeyDialog = builder.create();
 									exportKeyDialog
 											.setCanceledOnTouchOutside(true);
-									
-									byte[] seed = new byte[Consts.SEED_SIZE];
-									String seedFile = null;
-									switch (preferences.getInt(Consts.NETWORK, 0)) {
-									case Consts.PRODNET:
-										seedFile = Consts.PRODNET_FILE;
-										break;
-							
-									case Consts.TESTNET:
-										seedFile = Consts.TESTNET_FILE;
-										break;
-										
-									case Consts.CLOSEDTESTNET:
-										seedFile = Consts.CLOSED_TESTNET_FILE;
-										break;
-									}
-
-									FileInputStream fis;
-									try {
-										fis = openFileInput(seedFile);
-										fis.read(seed);
-										fis.close();
-									} catch (FileNotFoundException e1) {
-										e1.printStackTrace();
-									} catch (IOException e) {
-										e.printStackTrace();
-									}
-
 									TextView text =(TextView ) layout.findViewById(R.id.tv_title_text); 
 									text.setText(R.string.private_key);
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
 									
+									Network net = Consts.account.getNetwork();
+									byte[] seed = Utils.readSeed(net);
 									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
+									final String keyString;
 									keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(Consts.account.getNetwork());
 									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
 											keyString));
@@ -360,79 +327,32 @@ public class SettingsActivity extends PreferenceActivity {
 	};
 
 	@Override
-	public void onActivityResult(final int requestCode, final int resultCode,
-			final Intent intent) {
-		if (requestCode != REQUEST_CODE_SCAN || 
-		    resultCode != RESULT_OK ||
-		    !("QR_CODE".equals(intent.getStringExtra("SCAN_RESULT_FORMAT")))) {
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
+		if (requestCode != REQUEST_CODE_SCAN || resultCode != RESULT_OK
+				|| !("QR_CODE".equals(intent.getStringExtra("SCAN_RESULT_FORMAT")))) {
 			return;
 		}
-		final String contents = intent.getStringExtra("SCAN_RESULT");
-		if (contents.matches("[a-zA-Z0-9]*")) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(this);
-			builder.setMessage(R.string.restore_invalid_qr_code)
-					.setCancelable(false)
-					.setNeutralButton(R.string.ok,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-								}
-							});
-			AlertDialog alertDialog = builder.create();
-			alertDialog.show();
+		String contents = intent.getStringExtra("SCAN_RESULT");
+		BackupInfo info = BackupInfo.fromString(contents);
+		if (info == null || !info.getNetwork().equals(Consts.account.getNetwork())) {
+			Utils.showAlert(this, R.string.restore_invalid_qr_code);
 			return;
-		} 
-		
-		restoreDialog = ProgressDialog.show(this,
-				getString(R.string.restore_dialog_title),
+		}
+		restoreDialog = ProgressDialog.show(this, getString(R.string.restore_dialog_title),
 				getString(R.string.please_wait), true);
-		new AsyncInit().execute(contents);
+		new AsyncInit().execute(info);
 	}
 
-	private class AsyncInit extends AsyncTask<String, Integer, Long> {
+	private class AsyncInit extends AsyncTask<BackupInfo, Integer, Long> {
 
 		@Override
-		protected Long doInBackground(String... params) {
-			Uri uri = Uri.parse(params[0]);
-			final Uri u = Uri.parse("bsb://" + uri.getSchemeSpecificPart());
+		protected Long doInBackground(BackupInfo... params) {
+			BackupInfo info = params[0];
+			Utils.writeSeed(info.getNetwork(), info.getSeed());
 
-			final int networkId = Integer
-					.parseInt(u.getQueryParameter("net"));
-
-			String seedFile = null;
-			Network network = Network.productionNetwork;
-			switch (networkId) {
-			case Consts.PRODNET:
-				seedFile = Consts.PRODNET_FILE;
-				network = Network.productionNetwork;
-				break;
-			case Consts.TESTNET:
-				seedFile = Consts.TESTNET_FILE;
-				network = Network.testNetwork;
-				break;
-			case Consts.CLOSEDTESTNET:
-				seedFile = Consts.CLOSED_TESTNET_FILE;
-				network = Network.testNetwork;
-				break;
-			}
-
-			FileOutputStream fos = null;
-			byte seed[] = new byte[Consts.SEED_SIZE];
-			try {
-				String host = u.getHost();
-				seed = Base58.decode(host);
-				fos = openFileOutput(seedFile, MODE_PRIVATE);
-				fos.write(seed);
-			} catch (FileNotFoundException e1) {
-				e1.printStackTrace();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-			ECKeyManager keyManager = new DeterministicECKeyManager(seed);
-			BitcoinClientApiImpl api = new BitcoinClientApiImpl(Consts.url,
-					network);
+			ECKeyManager keyManager = new DeterministicECKeyManager(info.getSeed());
+			URL url = Utils.getBccapiUrl(info.getNetwork());
+			BitcoinClientApiImpl api = new BitcoinClientApiImpl(url, info.getNetwork());
 			Consts.account = new AndroidAccount(keyManager, api, Consts.applicationContext);
 			// Force deterministic key manager to calculate its keys, this is CPU intensive
 			Consts.account.getPrimaryBitcoinAddress();
@@ -441,48 +361,10 @@ public class SettingsActivity extends PreferenceActivity {
 
 		protected void onPostExecute(Long result) {
 			restoreDialog.dismiss();
-			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setMessage(R.string.restore_complete_dialog_text)
-					.setCancelable(false)
-					.setNeutralButton(R.string.ok,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-								}
-							});
-			AlertDialog alertDialog = builder.create();
-			alertDialog.show();
+			Utils.showAlert(mContext, R.string.restore_complete_dialog_text);
 		}
 	}
 
-	private String getSeedAsBase58() {
-		String seedFile;
-		byte[] seed = new byte[Consts.SEED_SIZE];
-
-		if (Consts.TESTNET == preferences
-				.getInt(Consts.NETWORK, Consts.PRODNET)) {
-			seedFile = Consts.TESTNET_FILE;
-		} else if (Consts.CLOSEDTESTNET == preferences.getInt(Consts.NETWORK,
-				Consts.PRODNET)) {
-			seedFile = Consts.CLOSED_TESTNET_FILE;
-		} else {
-			seedFile = Consts.PRODNET_FILE;
-		}
-
-		FileInputStream fis;
-		try {
-			fis = openFileInput(seedFile);
-			fis.read(seed);
-			fis.close();
-		} catch (FileNotFoundException e1) {
-			e1.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		return Base58.encode(seed);
-	}
 
 	private void showMarketPage(final String packageName) {
 		final Intent marketIntent = new Intent(Intent.ACTION_VIEW,
@@ -494,4 +376,55 @@ public class SettingsActivity extends PreferenceActivity {
 					.format(Consts.WEBMARKET_APP_URL, packageName))));
 	}
 
+	public static class BackupInfo {
+		private byte[] _seed;
+		private Network _network;
+
+		public static BackupInfo fromString(String string) {
+			try {
+				Uri temp = Uri.parse(string);
+				final Uri uri = Uri.parse("bsb://" + temp.getSchemeSpecificPart());
+				int netId = Integer.parseInt(uri.getQueryParameter("net"));
+				Network network;
+				if (netId == 0) {
+					network = Network.productionNetwork;
+				} else if (netId == 1) {
+					network = Network.testNetwork;
+				} else {
+					return null;
+				}
+				String host = uri.getHost();
+				byte[] seed = Base58.decode(host);
+				if (seed != null) {
+					return new BackupInfo(seed, network);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+			return null;
+		}
+
+		public BackupInfo(byte[] seed, Network network) {
+			_seed = seed;
+			_network = network;
+		}
+
+		public byte[] getSeed() {
+			return _seed;
+		}
+
+		public Network getNetwork() {
+			return _network;
+		}
+
+		String getBackupUrl() {
+			StringBuilder sb = new StringBuilder();
+			sb.append("bsb:");
+			sb.append(Base58.encode(_seed));
+			sb.append("?net=");
+			sb.append(_network.equals(Network.productionNetwork) ? 0 : 1);
+			return sb.toString();
+		}
+	}
+	
 }

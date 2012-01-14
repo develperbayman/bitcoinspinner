@@ -79,4 +79,6 @@
     <string name="coins_on_their_way">Coins on their way to you:</string>
     <string name="donate_menu">Donate</string>
     <string name="initializing_bitcoinspinner">Initializing BitcoinSpinner</string>
+    <string name="unconfirmed_from">Receiving from (uncomfirmed):</string>
+    <string name="unconfirmed_to">Sending to (unconfirmed):</string>
 </resources>

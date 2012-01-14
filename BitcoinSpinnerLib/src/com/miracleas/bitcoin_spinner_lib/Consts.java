@@ -1,7 +1,5 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.net.URL;
-
 import android.content.Context;
 import android.content.Intent;
 
@@ -23,9 +21,10 @@ public final class Consts {
 	public static final String PACKAGE_NAME_TEST = "com.miracleas.bitcoin_spinner" + '_' + "test";
 	public static final String PACKAGE_NAME_CLOSEDTEST = "com.miracleas.bitcoin_spinner" + '_' + "closedtest";
 
-	public static final int PRODNET = 0;
-	public static final int TESTNET = 1;
-	public static final int CLOSEDTESTNET = 2;
+	/**
+	 * Set this to true if you want to use closed test net when on test network
+	 */
+	public static final boolean USE_CLOSED_TESTNET = false;  
 	public static final String EXTRA_NETWORK = "Extra network";
 	public static final String BTC_ADDRESS_KEY = "BTC address key";
 	public static final String DONATION_ADDRESS = "14VWYvbHd4R7oTFS8kEfoWZFTzbedDgwKg";
@@ -44,7 +43,6 @@ public final class Consts {
 	public static final long MINUTE_IN_NANOSECONDS = SECOND_IN_NANOSECONDS * 60;
 	
 	public static AsynchronousAccount account;
-	public static URL url;
 	public static Context applicationContext;
 	public static int displayWidth;  // Total width of the device display in pixels
 	public static int displayHeight; // Total height of the device display in pixels
