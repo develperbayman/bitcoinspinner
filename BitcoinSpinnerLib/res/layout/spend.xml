@@ -21,7 +21,22 @@
         android:layout_below="@+id/tv_spend"
         android:layout_marginRight="30dp"
         android:inputType="numberDecimal"
-        android:text="0.0000 BTC"
+        android:hint="0.00"
         android:textColor="@color/Black" />
+
+    <TextView
+        android:id="@+id/tv_validation_of_amount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tv_spend"
+        android:layout_alignBottom="@id/tv_spend"
+        android:layout_marginLeft="10dp"
+        android:layout_toRightOf="@+id/tv_spend"
+        android:text=""
+		  android:shadowColor="@color/White"
+        android:shadowDx="2" 
+        android:shadowDy="2"
+        android:shadowRadius="1"
+        android:textColor="@color/Red" />
 
 </RelativeLayout>

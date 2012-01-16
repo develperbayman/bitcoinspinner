@@ -81,4 +81,6 @@
     <string name="initializing_bitcoinspinner">Initializing BitcoinSpinner</string>
     <string name="unconfirmed_from">Receiving from (uncomfirmed):</string>
     <string name="unconfirmed_to">Sending to (unconfirmed):</string>
+    <string name="invalid_amount">Invalid amount</string>
+    <string name="amount_too_large">Amount too large</string>
 </resources>

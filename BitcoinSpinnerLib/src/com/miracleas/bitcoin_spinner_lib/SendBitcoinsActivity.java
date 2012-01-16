@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -46,6 +47,7 @@ import com.bccapi.core.Asynchronous.AccountTask;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
 import com.bccapi.core.Asynchronous.GetSendCoinFormCallbackHandler;
 import com.bccapi.core.Asynchronous.TransactionSubmissionCallbackHandler;
+import com.miracleas.bitcoin_spinner_lib.R.color;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
 public class SendBitcoinsActivity extends Activity implements
@@ -54,7 +56,7 @@ public class SendBitcoinsActivity extends Activity implements
 	private final int STANDARD_FEE = 50000;
 	private Context mContext;
 
-	private TextView tvValidAdress, tvAvailSpend, tvFeeInfo;
+	private TextView tvValidAdress, tvAvailSpend, tvFeeInfo, tvValidAmount;
 	private EditText etAddress, etSpend;
 	private Button btnQRScan, btnSpend, btnCancel;
 
@@ -95,6 +97,7 @@ public class SendBitcoinsActivity extends Activity implements
 		detector = new SimpleGestureFilter(this, this);
 
 		tvValidAdress = (TextView) findViewById(R.id.tv_validation_of_adress);
+		tvValidAmount = (TextView) findViewById(R.id.tv_validation_of_amount);
 		tvAvailSpend = (TextView) findViewById(R.id.tv_available_spend_balance);
 		
 		tvFeeInfo = (TextView) findViewById(R.id.tv_fee_info);
@@ -221,17 +224,6 @@ public class SendBitcoinsActivity extends Activity implements
 				}
 			}
 			return false;
-			// Handle all other keys in the default way
-//			if (currentapiVersion <= android.os.Build.VERSION_CODES.FROYO) {
-//				if (event.getAction() == KeyEvent.ACTION_UP) {
-//					return v.onKeyDown(keyCode, event);
-//				} else if (keyCode == KeyEvent.KEYCODE_BACK) {
-//					return v.onKeyDown(keyCode, event);
-//				}
-//			} else {
-//				return v.onKeyDown(keyCode, event);
-//			}
-//			return true;
 		}
 	};
 
@@ -239,28 +231,27 @@ public class SendBitcoinsActivity extends Activity implements
 
 		@Override
 		public void afterTextChanged(Editable e) {
-			String tempString = e.toString();
+			String tempString = e.toString().trim();
 		
-			if (tempString.matches("\\W")) {
-				tempString = tempString.replaceAll("[\\W]", "");
-				etAddress.setText("");
-				etAddress.append(tempString);
-			} else {
-				if (tempString.matches(""))
-					tvValidAdress.setText("");
-				else if (!AddressUtil.validateAddress(tempString, Consts.account.getNetwork())) {
-					if (Consts.account.getNetwork() == Network.testNetwork)
-						tvValidAdress.setText(R.string.invalid_address_for_testnet);
-					else if (Consts.account.getNetwork() == Network.productionNetwork)
-						tvValidAdress.setText(R.string.invalid_address_for_prodnet);
-					mValidAdress = false;
-				} else {
-					tvValidAdress.setText("");
-					mValidAdress = true;
-					etSpend.requestFocus();
+			if (tempString.matches("")) {
+				tvValidAdress.setText("");
+				tvValidAdress.setError(null);
+				mValidAdress = false;
+			} else if (!AddressUtil.validateAddress(tempString, Consts.account.getNetwork())) {
+				if (Consts.account.getNetwork().equals(Network.testNetwork)){
+					tvValidAdress.setText(R.string.invalid_address_for_testnet);
 				}
-				enableSendButton();
+				else if (Consts.account.getNetwork().equals(Network.productionNetwork))
+					tvValidAdress.setText(R.string.invalid_address_for_prodnet);
+				mValidAdress = false;
+				tvValidAdress.setError("");
+			} else {
+				tvValidAdress.setText("");
+				tvValidAdress.setError(null);
+				mValidAdress = true;
+				etSpend.requestFocus();
 			}
+			enableSendButton();
 		}
 
 		@Override
@@ -279,27 +270,35 @@ public class SendBitcoinsActivity extends Activity implements
 
 		@Override
 		public void afterTextChanged(Editable e) {
-			String spendText = etSpend.getText().toString();
+			String spendText = etSpend.getText().toString().trim();
 
-			if (spendText.contains(" BTC"))
-				spendText = spendText.substring(0, spendText.length() - 4);
-			else if (spendText.matches("\\.")) {
-				spendText = "0.";
+			if(spendText.equals("")) {
+				mValidAmount = false;
+				tvValidAmount.setText("");
+				tvValidAmount.setError(null);
+				enableSendButton();
+				return;
 			}
 
-			if (spendText.matches(""))
+			long spend = getSatoshisToSend();
+			long available = Consts.account.getCachedBalance();
+			if(spend <=0){
 				mValidAmount = false;
-			else {
-				long spend = (long) (Double.parseDouble(spendText) * Consts.SATOSHIS_PER_BITCOIN);
-				long available = Consts.account.getCachedBalance();
-				if (spend > 0 && (spend + STANDARD_FEE <= available)) {
-					mValidAmount = true;
-				} else
-					mValidAmount = false;
+				tvValidAmount.setText(R.string.invalid_amount);
+				tvValidAmount.setError("");
+			} else if (spend + STANDARD_FEE > available) {
+				mValidAmount = false;
+				tvValidAmount.setText(R.string.amount_too_large);
+				tvValidAmount.setError("");
+			} else{
+				mValidAmount = true;
+				tvValidAmount.setText("");
+				tvValidAmount.setError(null);
 			}
 			enableSendButton();
 		}
 
+		
 		@Override
 		public void beforeTextChanged(CharSequence s, int start, int count,
 				int after) {
@@ -316,17 +315,6 @@ public class SendBitcoinsActivity extends Activity implements
 
 		@Override
 		public void onFocusChange(View v, boolean hasFocus) {
-			String text = ((EditText) v).getText().toString();
-			if (text.matches("0.0000 BTC")) {
-				((EditText) v).setText("");
-			} else if (text.matches("")) {
-				((EditText) v).setText("0.0000 BTC");
-			} else if (text.matches(".* BTC")) {
-				((EditText) v).setText("");
-				((EditText) v).append(text.substring(0, text.length() - 4));
-			} else {
-				((EditText) v).setText(text.replaceAll("[^.0-9]", "") + " BTC");
-			}
 			if (hasFocus)
 				getWindow()
 						.setSoftInputMode(
@@ -407,8 +395,6 @@ public class SendBitcoinsActivity extends Activity implements
 								.group(1)).movePointRight(8).toBigIntegerExact()));
 						if (m.group(2) != null)
 							;
-						// amount.multiply(BigInteger.valueOf(10).pow(Integer.parseInt(m.group(2))
-						// - 8));
 					}
 				}
 			}
@@ -448,8 +434,8 @@ public class SendBitcoinsActivity extends Activity implements
 			return;
 		}
 
-		if (fee != STANDARD_FEE) {
-			// If the fee is not 0.0005 we ask the user for confirmation
+		if (fee > STANDARD_FEE) {
+			// If the fee is larger than 0.0005 we ask the user for confirmation
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setMessage(String.format(getString(R.string.calculating_fee_done), CoinUtils.valueString(fee)))
 					.setCancelable(false)
@@ -497,15 +483,23 @@ public class SendBitcoinsActivity extends Activity implements
 	}
 	
 	private long getSatoshisToSend() {
-		BigDecimal amount;
-		if (etSpend.getText().toString().matches(".* BTC"))
-			amount = new BigDecimal(etSpend.getText().toString()
-					.substring(0, etSpend.getText().toString().length() - 4));
-		else {
-			amount = new BigDecimal(etSpend.getText().toString());
+		String spendText = etSpend.getText().toString().trim();
+		if(spendText.equals("")){
+			return -1;
 		}
-		amount = amount.multiply(new BigDecimal(Consts.SATOSHIS_PER_BITCOIN));
-		return amount.longValue();
+		if(spendText.charAt(0)=='.'){
+			spendText = "0" + spendText;
+		}
+		
+		long spend;
+		try {
+			BigDecimal amount = new BigDecimal(spendText);
+			amount = amount.multiply(new BigDecimal(Consts.SATOSHIS_PER_BITCOIN));
+			spend = amount.longValue();
+		} catch (NumberFormatException ex) {
+			return -1;
+		}
+		return spend;
 	}
 
 	@Override

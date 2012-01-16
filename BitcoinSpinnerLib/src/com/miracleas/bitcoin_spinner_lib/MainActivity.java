@@ -414,7 +414,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 										int id) {
 									Intent i = new Intent();
 									i.setClass(MainActivity.this, SendBitcoinsActivity.class);
-									if(Consts.account.getNetwork() == Network.testNetwork){
+									if(Consts.account.getNetwork().equals(Network.testNetwork)){
 								        i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.TESTNET_DONATION_ADDRESS);
 									}else{
 								        i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.DONATION_ADDRESS);

@@ -50,6 +50,10 @@
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@+id/tv_pay_to"
         android:text=""
+        android:shadowColor="@color/White"
+        android:shadowDx="2" 
+        android:shadowDy="2"
+        android:shadowRadius="1"
         android:textColor="@color/Red" />
 
 </RelativeLayout>
