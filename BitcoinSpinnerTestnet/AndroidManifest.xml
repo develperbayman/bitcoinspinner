@@ -1,8 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.miracleas.bitcoin_spinner_testnet"
+<<<<<<< .mine
+    android:versionCode="19"
+    android:versionName="0.4.3b" >
+=======
     android:versionCode="19"
     android:versionName="0.4.4b" >
+>>>>>>> .r21
     
     <uses-sdk android:minSdkVersion="8" />
     
