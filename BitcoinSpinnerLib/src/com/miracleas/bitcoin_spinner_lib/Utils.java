@@ -101,13 +101,15 @@ public class Utils {
 
 	public static Bitmap getLargeQRCodeBitmap(final String url) {
 		// make size 85% of display size
-		int size = Math.min(Consts.displayWidth, Consts.displayHeight) * 85 / 100;
+		SpinnerContext sc = SpinnerContext.getInstance();
+		int size = Math.min(sc.getDisplayWidth(), sc.getDisplayWidth()) * 85 / 100;
 		return getQRCodeBitmapX(url, size);
 	}
 
 	public static Bitmap getSmallQRCodeBitmap(final String url) {
 		// make size 34% of display size
-		int size = Math.min(Consts.displayWidth, Consts.displayHeight) * 34 / 100;
+		SpinnerContext sc = SpinnerContext.getInstance();
+		int size = Math.min(sc.getDisplayWidth(), sc.getDisplayWidth()) * 34 / 100;
 		return getQRCodeBitmapX(url, size);
 	}
 
@@ -157,12 +159,12 @@ public class Utils {
 		return Consts.PRODNET_FILE;
 	}
 
-	public static byte[] readSeed(Network network) {
+	public static byte[] readSeed(Context context, Network network) {
 		String seedFile = getSeedFileName(network);
 		byte[] seed = new byte[Consts.SEED_SIZE];
 		FileInputStream fis;
 		try {
-			fis = Consts.applicationContext.openFileInput(seedFile);
+			fis = context.openFileInput(seedFile);
 			fis.read(seed);
 			fis.close();
 			return seed;
@@ -172,11 +174,11 @@ public class Utils {
 		return null;
 	}
 
-	public static boolean writeSeed(Network network, byte[] seed) {
+	public static boolean writeSeed(Context context, Network network, byte[] seed) {
 		String seedFile = getSeedFileName(network);
 		FileOutputStream fos = null;
 		try {
-			fos = Consts.applicationContext.openFileOutput(seedFile, Context.MODE_PRIVATE);
+			fos = context.openFileOutput(seedFile, Context.MODE_PRIVATE);
 			fos.write(seed);
 			fos.close();
 			return true;
@@ -186,12 +188,12 @@ public class Utils {
 		return false;
 	}
 
-	public static byte[] createandWriteSeed(Network network) {
+	public static byte[] createAndWriteSeed(Context context, Network network) {
 		try {
 			SecureRandom random = new SecureRandom();
 			byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
 			byte[] seed = HashUtils.sha256(genseed);
-			if (writeSeed(network, seed)) {
+			if (writeSeed(context, network, seed)) {
 				return seed;
 			}
 		} catch (Exception e) {

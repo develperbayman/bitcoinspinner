@@ -1,6 +1,5 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.net.URL;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -32,10 +31,7 @@ import android.widget.Toast;
 
 import com.bccapi.api.Network;
 import com.bccapi.core.Base58;
-import com.bccapi.core.BitcoinClientApiImpl;
 import com.bccapi.core.DeterministicECKeyExporter;
-import com.bccapi.core.DeterministicECKeyManager;
-import com.bccapi.core.ECKeyManager;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
 
 public class SettingsActivity extends PreferenceActivity {
@@ -62,6 +58,9 @@ public class SettingsActivity extends PreferenceActivity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (!SpinnerContext.isInitialized()) {
+			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
+		}
 
 		preferences = getSharedPreferences(Consts.PREFS_NAME,
 				Activity.MODE_PRIVATE);
@@ -157,8 +156,8 @@ public class SettingsActivity extends PreferenceActivity {
 									text.setText(R.string.bitcoinspinner_backup);
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
-									Network net = Consts.account.getNetwork();
-									final BackupInfo info = new BackupInfo(Utils.readSeed(net),net);
+									Network net = SpinnerContext.getInstance().getNetwork();
+									final BackupInfo info = new BackupInfo(Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(),net),net);
 									info.getBackupUrl();
 									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
 											info.getBackupUrl()));
@@ -204,7 +203,7 @@ public class SettingsActivity extends PreferenceActivity {
 
 		public boolean onPreferenceClick(Preference preference) {
 
-			AsynchronousAccount accountManager = Consts.account;
+			AsynchronousAccount accountManager = SpinnerContext.getInstance().getAccount();
 			if (accountManager.getCachedBalance() > 0 || accountManager.getCachedCoinsOnTheWay() > 0) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 				builder.setMessage(R.string.restore_dialog_coins).setCancelable(false)
@@ -280,11 +279,11 @@ public class SettingsActivity extends PreferenceActivity {
 									ImageView qrAdress = (ImageView) layout
 											.findViewById(R.id.iv_qr_Address);
 									
-									Network net = Consts.account.getNetwork();
-									byte[] seed = Utils.readSeed(net);
+									Network net = SpinnerContext.getInstance().getNetwork();
+									byte[] seed = Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(), net);
 									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
 									final String keyString;
-									keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(Consts.account.getNetwork());
+									keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(SpinnerContext.getInstance().getNetwork());
 									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
 											keyString));
 									
@@ -334,7 +333,7 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 		String contents = intent.getStringExtra("SCAN_RESULT");
 		BackupInfo info = BackupInfo.fromString(contents);
-		if (info == null || !info.getNetwork().equals(Consts.account.getNetwork())) {
+		if (info == null || !info.getNetwork().equals(SpinnerContext.getInstance().getNetwork())) {
 			Utils.showAlert(this, R.string.restore_invalid_qr_code);
 			return;
 		}
@@ -348,14 +347,7 @@ public class SettingsActivity extends PreferenceActivity {
 		@Override
 		protected Long doInBackground(BackupInfo... params) {
 			BackupInfo info = params[0];
-			Utils.writeSeed(info.getNetwork(), info.getSeed());
-
-			ECKeyManager keyManager = new DeterministicECKeyManager(info.getSeed());
-			URL url = Utils.getBccapiUrl(info.getNetwork());
-			BitcoinClientApiImpl api = new BitcoinClientApiImpl(url, info.getNetwork());
-			Consts.account = new AndroidAccount(keyManager, api, Consts.applicationContext);
-			// Force deterministic key manager to calculate its keys, this is CPU intensive
-			Consts.account.getPrimaryBitcoinAddress();
+			SpinnerContext.getInstance().recoverWallet(info.getSeed());
 			return null;
 		}
 

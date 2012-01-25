@@ -44,11 +44,14 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.transaction_history);
+		if (!SpinnerContext.isInitialized()) {
+			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
+		}
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		mActivity = this;
 		detector = new SimpleGestureFilter(this, this);
 		int size = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, 15);
-		mTask = Consts.account.requestRecentStatements(size, this);
+		mTask = SpinnerContext.getInstance().getAccount().requestRecentStatements(size, this);
 	}
 	
 	@Override
@@ -125,9 +128,9 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 				}
 			} else if (r.getType() == Type.Received) {
 				if (r.getConfirmations() == 0) {
-					description = getContext().getString(R.string.unconfirmed_from);
+					description = getContext().getString(R.string.unconfirmed_received_with);
 				} else {
-					description = getContext().getString(R.string.received_from);
+					description = getContext().getString(R.string.received_with);
 				}
 			} else {
 				description = getContext().getString(R.string.sent_to_yourself);

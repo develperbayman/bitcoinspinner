@@ -118,7 +118,7 @@ public class Ticker {
 			_lastMtgoxInUsd = System.nanoTime();
 			final Handler handler = new Handler();
 			Thread t = new Thread(new BtcToUsdRequester(satoshis, handler, callback));
-			t.run();
+			t.start();
 		} else {
 			new BtcToUsdRequester(satoshis, new Handler(), callback).doCallback(_mtgoxInUsd);
 		}

@@ -68,8 +68,24 @@ public class PrivateECKey {
       }
       byte[] keyBytes = new byte[33];
       System.arraycopy(bytes, 0, keyBytes, 1, 32);
-      _privateKey = new BigInteger(bytes);
+      _privateKey = new BigInteger(keyBytes);
       _publicKey = new PublicECKey(PublicECKey.ecParams.getG().multiply(_privateKey).getEncoded());
+   }
+
+   /**
+    * Construct from private and public key bytes
+    * 
+    * @param bytes
+    *           The private key as an array of bytes
+    */
+   public PrivateECKey(byte[] priBytes, byte[] pubBytes) {
+      if (priBytes.length != 32) {
+         throw new IllegalArgumentException("The length of the array of bytes must be 32");
+      }
+      byte[] keyBytes = new byte[33];
+      System.arraycopy(priBytes, 0, keyBytes, 1, 32);
+      _privateKey = new BigInteger(keyBytes);
+      _publicKey = new PublicECKey(pubBytes);
    }
 
    /**

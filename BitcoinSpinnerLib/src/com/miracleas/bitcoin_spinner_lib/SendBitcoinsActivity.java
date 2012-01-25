@@ -16,7 +16,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
@@ -47,11 +46,10 @@ import com.bccapi.core.Asynchronous.AccountTask;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
 import com.bccapi.core.Asynchronous.GetSendCoinFormCallbackHandler;
 import com.bccapi.core.Asynchronous.TransactionSubmissionCallbackHandler;
-import com.miracleas.bitcoin_spinner_lib.R.color;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
-public class SendBitcoinsActivity extends Activity implements
-		SimpleGestureListener, GetSendCoinFormCallbackHandler, TransactionSubmissionCallbackHandler {
+public class SendBitcoinsActivity extends Activity implements SimpleGestureListener, GetSendCoinFormCallbackHandler,
+		TransactionSubmissionCallbackHandler {
 
 	private final int STANDARD_FEE = 50000;
 	private Context mContext;
@@ -65,8 +63,7 @@ public class SendBitcoinsActivity extends Activity implements
 	private ProgressDialog mCalcFeeProgressDialog;
 	private ProgressDialog mSendCoinsProgressDialog;
 
-	private static final Pattern P_AMOUNT = Pattern
-			.compile("([\\d.]+)(?:X(\\d+))?");
+	private static final Pattern P_AMOUNT = Pattern.compile("([\\d.]+)(?:X(\\d+))?");
 
 	private SimpleGestureFilter detector;
 
@@ -81,7 +78,7 @@ public class SendBitcoinsActivity extends Activity implements
 	private AccountTask mGetFormTask;
 	private AccountTask mSubmitTask;
 	private SendCoinForm mFormToSend;
-	
+
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
@@ -89,6 +86,9 @@ public class SendBitcoinsActivity extends Activity implements
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.send_money);
+		if (!SpinnerContext.isInitialized()) {
+			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
+		}
 
 		mContext = this;
 
@@ -99,25 +99,25 @@ public class SendBitcoinsActivity extends Activity implements
 		tvValidAdress = (TextView) findViewById(R.id.tv_validation_of_adress);
 		tvValidAmount = (TextView) findViewById(R.id.tv_validation_of_amount);
 		tvAvailSpend = (TextView) findViewById(R.id.tv_available_spend_balance);
-		
+
 		tvFeeInfo = (TextView) findViewById(R.id.tv_fee_info);
-		tvFeeInfo.setText(Html.fromHtml(String.format(getString(R.string.transaction_fee_text), "<br /><a href=''>", "</a>")));
+		tvFeeInfo.setText(Html.fromHtml(String.format(getString(R.string.transaction_fee_text), "<br /><a href=''>",
+				"</a>")));
 		tvFeeInfo.setOnClickListener(new OnClickListener() {
-			
+
 			@Override
 			public void onClick(View v) {
 				AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-				builder.setMessage(R.string.transaction_fee_text_info)
-				       .setCancelable(false)
-				       .setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
-				           public void onClick(DialogInterface dialog, int id) {
-				           }
-				       });
+				builder.setMessage(R.string.transaction_fee_text_info).setCancelable(false)
+						.setNeutralButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+							}
+						});
 				AlertDialog alertDialog = builder.create();
 				alertDialog.show();
 			}
 		});
-		
+
 		etAddress = (EditText) findViewById(R.id.et_address);
 		etSpend = (EditText) findViewById(R.id.et_spend);
 
@@ -135,8 +135,9 @@ public class SendBitcoinsActivity extends Activity implements
 		btnQRScan.setOnClickListener(qrScanClickListener);
 		btnSpend.setOnClickListener(spendMoneyClickListener);
 		btnCancel.setOnClickListener(cancelClickListener);
-		
-		// If an address has been added pre-populate it. This allows for the Donation feature.
+
+		// If an address has been added pre-populate it. This allows for the
+		// Donation feature.
 		Bundle extras = getIntent().getExtras();
 		if (extras != null) {
 			String address = getIntent().getExtras().getString(Consts.BTC_ADDRESS_KEY);
@@ -144,23 +145,23 @@ public class SendBitcoinsActivity extends Activity implements
 				etAddress.setText(address);
 			}
 		}
-		
+
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
 
-		if(!preferences.getString(Consts.LOCALE, "").matches("")) {
+		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
 			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
 			Locale.setDefault(locale);
 			Configuration config = new Configuration();
 			config.locale = locale;
 			getBaseContext().getResources().updateConfiguration(config,
-			      getBaseContext().getResources().getDisplayMetrics());
+					getBaseContext().getResources().getDisplayMetrics());
 		}
 
-		long balance = Consts.account.getCachedBalance();
+		long balance = SpinnerContext.getInstance().getAccount().getCachedBalance();
 		if (balance == -1) {
 			tvAvailSpend.setText(R.string.unknown);
 		} else {
@@ -183,7 +184,7 @@ public class SendBitcoinsActivity extends Activity implements
 		}
 		super.onDestroy();
 	};
-	
+
 	@Override
 	public boolean dispatchTouchEvent(MotionEvent me) {
 		this.detector.onTouchEvent(me);
@@ -213,8 +214,7 @@ public class SendBitcoinsActivity extends Activity implements
 		@Override
 		public boolean onKey(View v, int keyCode, KeyEvent event) {
 			if (event.getAction() == KeyEvent.ACTION_DOWN) {
-				if (keyCode == KeyEvent.KEYCODE_ENTER
-						&& !(event.getAction() == KeyEvent.ACTION_UP)) {
+				if (keyCode == KeyEvent.KEYCODE_ENTER && !(event.getAction() == KeyEvent.ACTION_UP)) {
 					if (null != v && v == etSpend) {
 						imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
 						imm.hideSoftInputFromWindow(etSpend.getWindowToken(), 0);
@@ -232,16 +232,15 @@ public class SendBitcoinsActivity extends Activity implements
 		@Override
 		public void afterTextChanged(Editable e) {
 			String tempString = e.toString().trim();
-		
+			Network network = SpinnerContext.getInstance().getNetwork();
 			if (tempString.matches("")) {
 				tvValidAdress.setText("");
 				tvValidAdress.setError(null);
 				mValidAdress = false;
-			} else if (!AddressUtil.validateAddress(tempString, Consts.account.getNetwork())) {
-				if (Consts.account.getNetwork().equals(Network.testNetwork)){
+			} else if (!AddressUtil.validateAddress(tempString, network)) {
+				if (network.equals(Network.testNetwork)) {
 					tvValidAdress.setText(R.string.invalid_address_for_testnet);
-				}
-				else if (Consts.account.getNetwork().equals(Network.productionNetwork))
+				} else if (network.equals(Network.productionNetwork))
 					tvValidAdress.setText(R.string.invalid_address_for_prodnet);
 				mValidAdress = false;
 				tvValidAdress.setError("");
@@ -255,13 +254,11 @@ public class SendBitcoinsActivity extends Activity implements
 		}
 
 		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,
-				int after) {
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		}
 
 		@Override
-		public void onTextChanged(CharSequence s, int start, int before,
-				int count) {
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
 
 	};
@@ -272,7 +269,7 @@ public class SendBitcoinsActivity extends Activity implements
 		public void afterTextChanged(Editable e) {
 			String spendText = etSpend.getText().toString().trim();
 
-			if(spendText.equals("")) {
+			if (spendText.equals("")) {
 				mValidAmount = false;
 				tvValidAmount.setText("");
 				tvValidAmount.setError(null);
@@ -281,8 +278,8 @@ public class SendBitcoinsActivity extends Activity implements
 			}
 
 			long spend = getSatoshisToSend();
-			long available = Consts.account.getCachedBalance();
-			if(spend <=0){
+			long available = SpinnerContext.getInstance().getAccount().getCachedBalance();
+			if (spend <= 0) {
 				mValidAmount = false;
 				tvValidAmount.setText(R.string.invalid_amount);
 				tvValidAmount.setError("");
@@ -290,7 +287,7 @@ public class SendBitcoinsActivity extends Activity implements
 				mValidAmount = false;
 				tvValidAmount.setText(R.string.amount_too_large);
 				tvValidAmount.setError("");
-			} else{
+			} else {
 				mValidAmount = true;
 				tvValidAmount.setText("");
 				tvValidAmount.setError(null);
@@ -298,15 +295,12 @@ public class SendBitcoinsActivity extends Activity implements
 			enableSendButton();
 		}
 
-		
 		@Override
-		public void beforeTextChanged(CharSequence s, int start, int count,
-				int after) {
+		public void beforeTextChanged(CharSequence s, int start, int count, int after) {
 		}
 
 		@Override
-		public void onTextChanged(CharSequence s, int start, int before,
-				int count) {
+		public void onTextChanged(CharSequence s, int start, int before, int count) {
 		}
 
 	};
@@ -316,9 +310,7 @@ public class SendBitcoinsActivity extends Activity implements
 		@Override
 		public void onFocusChange(View v, boolean hasFocus) {
 			if (hasFocus)
-				getWindow()
-						.setSoftInputMode(
-								WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
 		}
 	};
 
@@ -333,9 +325,7 @@ public class SendBitcoinsActivity extends Activity implements
 				startActivity(Consts.gogglesIntent);
 			} else {
 				showMarketPage(Consts.PACKAGE_NAME_ZXING);
-				Toast.makeText(mContext,
-						getString(R.string.install_qr_scanner),
-						Toast.LENGTH_LONG).show();
+				Toast.makeText(mContext, getString(R.string.install_qr_scanner), Toast.LENGTH_LONG).show();
 			}
 		}
 	};
@@ -361,29 +351,25 @@ public class SendBitcoinsActivity extends Activity implements
 	}
 
 	private void showMarketPage(final String packageName) {
-		final Intent marketIntent = new Intent(Intent.ACTION_VIEW,
-				Uri.parse(String.format(Consts.MARKET_APP_URL, packageName)));
+		final Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Consts.MARKET_APP_URL,
+				packageName)));
 		if (getPackageManager().resolveActivity(marketIntent, 0) != null)
 			startActivity(marketIntent);
 		else
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String
-					.format(Consts.WEBMARKET_APP_URL, packageName))));
+			startActivity(new Intent(Intent.ACTION_VIEW,
+					Uri.parse(String.format(Consts.WEBMARKET_APP_URL, packageName))));
 	}
 
 	@Override
-	public void onActivityResult(final int requestCode, final int resultCode,
-			final Intent intent) {
-		if (requestCode == REQUEST_CODE_SCAN
-				&& resultCode == RESULT_OK
-				&& "QR_CODE"
-						.equals(intent.getStringExtra("SCAN_RESULT_FORMAT"))) {
+	public void onActivityResult(final int requestCode, final int resultCode, final Intent intent) {
+		if (requestCode == REQUEST_CODE_SCAN && resultCode == RESULT_OK
+				&& "QR_CODE".equals(intent.getStringExtra("SCAN_RESULT_FORMAT"))) {
 			final String contents = intent.getStringExtra("SCAN_RESULT");
 			if (contents.matches("[a-zA-Z0-9]*")) {
 				etAddress.setText(contents);
 			} else {
 				Uri uri = Uri.parse(contents);
-				final Uri u = Uri.parse("bitcoin://"
-						+ uri.getSchemeSpecificPart());
+				final Uri u = Uri.parse("bitcoin://" + uri.getSchemeSpecificPart());
 
 				etAddress.setText(u.getHost());
 
@@ -391,8 +377,8 @@ public class SendBitcoinsActivity extends Activity implements
 				if (amountStr != null) {
 					final Matcher m = P_AMOUNT.matcher(amountStr);
 					if (m.matches()) {
-						etSpend.setText(CoinUtils.valueString(new BigDecimal(m
-								.group(1)).movePointRight(8).toBigIntegerExact()));
+						etSpend.setText(CoinUtils.valueString(new BigDecimal(m.group(1)).movePointRight(8)
+								.toBigIntegerExact()));
 						if (m.group(2) != null)
 							;
 					}
@@ -407,30 +393,30 @@ public class SendBitcoinsActivity extends Activity implements
 
 		String address = getReceivingAddress();
 		Long satoshisToSend = getSatoshisToSend();
-		mGetFormTask = Consts.account.requestSendCoinForm(address, satoshisToSend, -1, this);
+		mGetFormTask = SpinnerContext.getInstance().getAccount().requestSendCoinForm(address, satoshisToSend, -1, this);
 	}
-	
+
 	@Override
 	public void handleGetSendCoinFormCallback(SendCoinForm form, String errorMessage) {
 		mFormToSend = form;
 		mGetFormTask = null;
 		mCalcFeeProgressDialog.dismiss();
-		if(form == null) {
+		if (form == null) {
 			Utils.showConnectionAlert(this);
 			return;
 		}
-		
+
 		long fee = SendCoinFormValidator.calculateFee(mFormToSend);
-		
+
 		String address = getReceivingAddress();
 		Long satoshisToSend = getSatoshisToSend();
-		
+
 		// Validate that the server is not cheating us
 		List<String> addresses = new ArrayList<String>();
-		addresses.add(Consts.account.getPrimaryBitcoinAddress());
-		if (!SendCoinFormValidator.validate(mFormToSend, addresses, Consts.account.getNetwork(), satoshisToSend,
-				fee, address)){
-			Utils.showAlert(this,R.string.unexpected_error);
+		addresses.add(SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
+		if (!SendCoinFormValidator.validate(mFormToSend, addresses, SpinnerContext.getInstance().getNetwork(), satoshisToSend, fee,
+				address)) {
+			Utils.showAlert(this, R.string.unexpected_error);
 			return;
 		}
 
@@ -438,59 +424,54 @@ public class SendBitcoinsActivity extends Activity implements
 			// If the fee is larger than 0.0005 we ask the user for confirmation
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setMessage(String.format(getString(R.string.calculating_fee_done), CoinUtils.valueString(fee)))
-					.setCancelable(false)
-					.setPositiveButton(R.string.yes,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									sendCoins();
-								}
-							})
-					.setNegativeButton(R.string.no,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-								}
-							});
+					.setCancelable(false).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							sendCoins();
+						}
+					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+						}
+					});
 			AlertDialog alertDialog = builder.create();
 			alertDialog.show();
 		} else {
 			sendCoins();
 		}
 	}
-	
+
 	private void sendCoins() {
 		mSendCoinsProgressDialog = ProgressDialog.show(mContext, getString(R.string.sending_bitcoins),
 				getString(R.string.sending_bitcoins_wait), true);
-		Tx tx = AsynchronousAccount.signSendCoinForm(mFormToSend, Consts.account);
-		mSubmitTask = Consts.account.requestTransactionSubmission(tx, this);
+		AsynchronousAccount account = SpinnerContext.getInstance().getAccount();
+		Tx tx = AsynchronousAccount.signSendCoinForm(mFormToSend, account);
+		mSubmitTask = account.requestTransactionSubmission(tx, this);
 	}
-	
+
 	@Override
 	public void handleTransactionSubmission(Tx transaction, String errorMessage) {
 		mSendCoinsProgressDialog.dismiss();
 		mSubmitTask = null;
-		if(transaction == null) {
+		if (transaction == null) {
 			Utils.showConnectionAlert(this);
-		}else {
+		} else {
 			finish();
 		}
-		
+
 	}
-	
-	private String getReceivingAddress(){
+
+	private String getReceivingAddress() {
 		return etAddress.getText().toString();
 	}
-	
+
 	private long getSatoshisToSend() {
 		String spendText = etSpend.getText().toString().trim();
-		if(spendText.equals("")){
+		if (spendText.equals("")) {
 			return -1;
 		}
-		if(spendText.charAt(0)=='.'){
+		if (spendText.charAt(0) == '.') {
 			spendText = "0" + spendText;
 		}
-		
+
 		long spend;
 		try {
 			BigDecimal amount = new BigDecimal(spendText);

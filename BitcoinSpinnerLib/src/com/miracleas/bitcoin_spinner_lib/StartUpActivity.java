@@ -1,6 +1,5 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.net.URL;
 import java.util.Locale;
 
 import android.app.Activity;
@@ -13,12 +12,9 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.util.DisplayMetrics;
 import android.widget.ProgressBar;
 
 import com.bccapi.api.Network;
-import com.bccapi.core.BitcoinClientApiImpl;
-import com.bccapi.core.DeterministicECKeyManager;
 
 public class StartUpActivity extends Activity {
 
@@ -54,11 +50,6 @@ public class StartUpActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mPreferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		mContext = this;
-		Consts.applicationContext = getApplicationContext();
-		DisplayMetrics dm = new DisplayMetrics();
-        getWindowManager().getDefaultDisplay().getMetrics(dm);
-        Consts.displayWidth = dm.widthPixels;
-        Consts.displayHeight = dm.heightPixels;
 	}
 
 	@Override
@@ -125,29 +116,14 @@ public class StartUpActivity extends Activity {
 		return dialog;
 	}
 
-	private void initialize() {
-		Intent i = getIntent();
-		Network network = (Network) i.getExtras().getSerializable(Consts.EXTRA_NETWORK);
-		URL url = Utils.getBccapiUrl(network);
-		byte[] seed = Utils.readSeed(network);
-		if (seed == null) {
-			seed = Utils.createandWriteSeed(network);
-		}
-		DeterministicECKeyManager keyManager = new DeterministicECKeyManager(seed);
-		BitcoinClientApiImpl api = new BitcoinClientApiImpl(url, network);
-		AndroidAccount account = new AndroidAccount(keyManager, api, Consts.applicationContext);
-		// Force deterministic key manager to calculate its keys, this is CPU intensive
-		account.getPrimaryBitcoinAddress();
-		// Force the QR code to get generated (it is cached)
-		Utils.getPrimaryAddressAsSmallQrCode(account);
-		Consts.account = account;
-	}
 
 	private class AsyncInit extends AsyncTask<Void, Integer, Long> {
 
 		@Override
 		protected Long doInBackground(Void... params) {
-			initialize();
+			Intent i = getIntent();
+			Network network = (Network) i.getExtras().getSerializable(Consts.EXTRA_NETWORK);
+			SpinnerContext.initialize(mContext, getWindowManager().getDefaultDisplay(), network);
 			return null;
 		}
 

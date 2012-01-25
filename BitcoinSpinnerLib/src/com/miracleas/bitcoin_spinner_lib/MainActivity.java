@@ -34,6 +34,7 @@ import com.bccapi.api.AccountInfo;
 import com.bccapi.api.Network;
 import com.bccapi.core.CoinUtils;
 import com.bccapi.core.Asynchronous.AccountTask;
+import com.bccapi.core.Asynchronous.AsynchronousAccount;
 import com.bccapi.core.Asynchronous.GetAccountInfoCallbackHandler;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 import com.miracleas.bitcoin_spinner_lib.Ticker.BtcToUsdCallbackHandler;
@@ -70,10 +71,10 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		mContext = this;
-
-		Consts.applicationContext = getApplicationContext();
-
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
+		if(!SpinnerContext.isInitialized()){
+			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
+		}
 	}
 
 	@Override
@@ -208,7 +209,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			
 			ImageView qrAdress = (ImageView) layout
 					.findViewById(R.id.iv_qr_Address);
-			qrAdress.setImageBitmap(Utils.getPrimaryAddressAsLargeQrCode(Consts.account));
+			qrAdress.setImageBitmap(Utils.getPrimaryAddressAsLargeQrCode(SpinnerContext.getInstance().getAccount()));
 			qrAdress.setOnClickListener(new OnClickListener() {
 
 				@Override
@@ -223,7 +224,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 				@Override
 				public void onClick(View v) {
 					ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-					clipboard.setText(Consts.account.getPrimaryBitcoinAddress());
+					clipboard.setText(SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
 					Toast.makeText(mContext, R.string.clipboard_copy,
 							Toast.LENGTH_SHORT).show();
 				}
@@ -240,7 +241,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			Intent intent = new Intent(Intent.ACTION_SEND);
 			intent.setType("text/plain");
 			intent.putExtra(Intent.EXTRA_TEXT,
-					"bitcoin:" + Consts.account.getPrimaryBitcoinAddress());
+					"bitcoin:" + SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
 			startActivity(Intent.createChooser(intent,
 					getString(R.string.share_bitcoin_address)));
 		}
@@ -414,7 +415,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 										int id) {
 									Intent i = new Intent();
 									i.setClass(MainActivity.this, SendBitcoinsActivity.class);
-									if(Consts.account.getNetwork().equals(Network.testNetwork)){
+									if(SpinnerContext.getInstance().getNetwork().equals(Network.testNetwork)){
 								        i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.TESTNET_DONATION_ADDRESS);
 									}else{
 								        i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.DONATION_ADDRESS);
@@ -438,8 +439,9 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 	private void UpdateInfo() {
 		// first update from cache
-		updateBalances(Consts.account.getCachedBalance(),
-				Consts.account.getCachedCoinsOnTheWay());
+		AsynchronousAccount account = SpinnerContext.getInstance().getAccount();
+		updateBalances(account.getCachedBalance(),
+				account.getCachedCoinsOnTheWay());
 		if (mGetInfoTask != null) {
 			// we already have a task for getting account info in progress
 			return;
@@ -448,7 +450,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		btnTransactionHistory.setEnabled(false);
 		pbBalanceUpdateProgress.setVisibility(View.VISIBLE);
 		vBalanceUpdateView.setVisibility(View.VISIBLE);
-		mGetInfoTask = Consts.account.requestAccountInfo(this);
+		mGetInfoTask = account.requestAccountInfo(this);
 	}
 
 	@Override
@@ -498,9 +500,9 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	}
 
 	private void updateAddress() {
-		String address = Consts.account.getPrimaryBitcoinAddress();
+		String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
 		tvAddress.setText(address);
-		ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(Consts.account));
+		ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(SpinnerContext.getInstance().getAccount()));
 	}
 
 

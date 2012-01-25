@@ -30,8 +30,8 @@ import java.util.Map;
 public class DeterministicECKeyManager implements ECKeyManager {
 
    private SecureRandom _prng;
-   List<PrivateECKey> _privateKeys;
-   Map<PublicECKey, Integer> _publicKeyMap;
+   protected List<PrivateECKey> _privateKeys;
+   protected Map<PublicECKey, Integer> _publicKeyMap;
 
    /**
     * Construct a deterministic key manager using a seed. The quality and
@@ -87,7 +87,7 @@ public class DeterministicECKeyManager implements ECKeyManager {
       return _privateKeys.get(index);
    }
 
-   private void generateKeysForIndex(int index) {
+   protected void generateKeysForIndex(int index) {
       int missingKeys = index + 1 - _privateKeys.size();
       for (int i = 0; i < missingKeys; i++) {
          PrivateECKey key = generateNextKey();

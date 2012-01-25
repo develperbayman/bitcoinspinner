@@ -83,4 +83,6 @@
     <string name="unconfirmed_to">Sending to (unconfirmed):</string>
     <string name="invalid_amount">Invalid amount</string>
     <string name="amount_too_large">Amount too large</string>
+    <string name="unconfirmed_received_with">Receiving with (uncomfirmed):</string>
+    <string name="received_with">Received with:</string>
 </resources>

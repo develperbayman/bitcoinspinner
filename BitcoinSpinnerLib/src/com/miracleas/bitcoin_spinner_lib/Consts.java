@@ -1,9 +1,6 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import android.content.Context;
 import android.content.Intent;
-
-import com.bccapi.core.Asynchronous.AsynchronousAccount;
 
 public final class Consts {
 	public static final String TAG = "Bitcoin Spinner";
@@ -42,10 +39,6 @@ public final class Consts {
 	public static final long SECOND_IN_NANOSECONDS = MILLISECOND_IN_NANOSECONDS * 1000;
 	public static final long MINUTE_IN_NANOSECONDS = SECOND_IN_NANOSECONDS * 60;
 	
-	public static AsynchronousAccount account;
-	public static Context applicationContext;
-	public static int displayWidth;  // Total width of the device display in pixels
-	public static int displayHeight; // Total height of the device display in pixels
 	public static final String PACKAGE_NAME_ZXING = "com.google.zxing.client.android";
 	public static final String MARKET_APP_URL = "market://details?id=%s";
 	public static final String WEBMARKET_APP_URL = "https://market.android.com/details?id=%s";
