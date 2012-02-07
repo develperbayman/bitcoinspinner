@@ -5,7 +5,7 @@
     </style>
     
     <style name="BitCoinActivity">
-        <item name="android:background">@color/DarkOrange</item>
+        <item name="android:background">@color/Black</item>
     </style>
     
     <style name="SendMoneyButton" parent="@android:style/Widget.Button">

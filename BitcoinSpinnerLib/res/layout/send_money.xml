@@ -11,26 +11,26 @@
         android:paddingTop="10dp" >
 
         <include
-            android:id="@+id/availableToSpend_ref"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            layout="@layout/availabletospend" />
-
-        <include
             android:id="@+id/payToAddress_ref"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/availableToSpend_ref"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             layout="@layout/paytoaddress" />
 
         <include
-            android:id="@+id/spend_ref"
+            android:id="@+id/availableToSpend_ref"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/payToAddress_ref"
+            android:layout_marginLeft="30dp"
+            layout="@layout/availabletospend" />
+
+        <include
+            android:id="@+id/spend_ref"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/availableToSpend_ref"
             android:layout_marginLeft="30dp"
             android:layout_marginTop="10dp"
             layout="@layout/spend" />

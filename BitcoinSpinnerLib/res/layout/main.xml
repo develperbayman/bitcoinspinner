@@ -60,6 +60,6 @@
         android:layout_centerInParent="true"
         android:layout_marginBottom="2dp"
         android:text="@string/beta_warning"
-        android:textColor="@color/Black" />
+        android:textColor="@color/White" />
 
 </RelativeLayout>

@@ -115,7 +115,7 @@ public class AddressBookManager {
 
 	private static void saveEntries(List<Entry> entries) {
 		try {
-			Context context = BitcoinSpinnerContext.getContext().getApplicationcontext();
+			Context context = SpinnerContext.getInstance().getApplicationContext();
 			FileOutputStream out = context.openFileOutput(ADDRESS_BOOK_FILE_NAME, Context.MODE_PRIVATE);
 			BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out));
 			for (Entry entry : entries) {
@@ -137,7 +137,7 @@ public class AddressBookManager {
 			List<Entry> entries = new ArrayList<Entry>();
 			BufferedReader stream;
 			try {
-				Context context = BitcoinSpinnerContext.getContext().getApplicationcontext();
+				Context context = SpinnerContext.getInstance().getApplicationContext();
 				stream = new BufferedReader(new InputStreamReader(context.openFileInput(ADDRESS_BOOK_FILE_NAME)));
 			} catch (FileNotFoundException e) {
 				// ignore and return an empty set of addresses

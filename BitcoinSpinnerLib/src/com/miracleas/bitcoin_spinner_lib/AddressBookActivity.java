@@ -6,7 +6,6 @@ import java.util.Locale;
 import android.app.Activity;
 import android.app.ListActivity;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -19,7 +18,7 @@ import android.widget.TextView;
 import com.miracleas.bitcoin_spinner_lib.AddressBookManager.Entry;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
-public class AddressBookActivity extends ListActivity implements SimpleGestureListener  {
+public class AddressBookActivity extends ListActivity implements SimpleGestureListener {
 
 	private Activity mActivity;
 	private SharedPreferences preferences;
@@ -39,9 +38,8 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 	public void onResume() {
 		super.onResume();
 		// Check whether we need to do account initialization
-		if (!BitcoinSpinnerContext.isInitialized()) {
-			startActivity(new Intent().setClass(this, StartUpActivity.class));
-			return;
+		if (!SpinnerContext.isInitialized()) {
+			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
 		}
 
 		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
@@ -88,7 +86,7 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 	@Override
 	public void onSwipe(int direction) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 }

@@ -11,7 +11,7 @@
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
         android:text="@string/pay_to"
-        android:textColor="@color/Black" />
+        android:textColor="@color/White" />
 
     <EditText
         android:id="@+id/et_address"
@@ -50,10 +50,6 @@
         android:layout_marginLeft="10dp"
         android:layout_toRightOf="@+id/tv_pay_to"
         android:text=""
-        android:shadowColor="@color/White"
-        android:shadowDx="2" 
-        android:shadowDy="2"
-        android:shadowRadius="1"
         android:textColor="@color/Red" />
 
 </RelativeLayout>

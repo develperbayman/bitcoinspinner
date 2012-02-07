@@ -11,7 +11,7 @@
         android:layout_alignLeft="@+id/et_address"
         android:layout_below="@+id/et_address"
         android:text="@string/your_balance"
-        android:textColor="@color/Black" />
+        android:textColor="@color/White" />
 
     <TextView
         android:id="@+id/tv_available_spend_balance"
