@@ -13,7 +13,7 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".SendBitcoinsActivity" android:screenOrientation="portrait"/>
+        <activity android:name=".SendBitcoinsActivity" android:screenOrientation="portrait" />
         <activity android:name="com.miracleas.bitcoin_spinner_lib.SettingsActivity"/>
         <activity android:name=".TransactionHistoryActivity"/>
         <activity android:name=".AddressBookActivity"/>

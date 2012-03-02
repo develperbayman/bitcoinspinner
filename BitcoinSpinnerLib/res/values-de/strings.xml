@@ -43,11 +43,10 @@
     <string name="sending_bitcoins">Überweise Bitcoins</string>
     <string name="sending_bitcoins_wait">Die Bitcoins werden überwiesen. Bitte warten.</string>
     <!-- Sharing -->
-    <string name="clipboard_copy">Die Adresse wurde in die Zwischenablage kopiert</string>
     <string name="share_bitcoin_address">Bitcoin Adresse weitergeben...</string>
     <!-- Info -->
     <string name="transaction_fee_text">Eine Überweisungsgebühr 0.0005 BTC wird der Überweisung automatisch hinzugefügt.%1$sinfo...%2$s</string>
-    <string name="transaction_fee_text_info">Das Hinzufügen einer kleinen Überweisungsgebühr garantiert, dass ihre Überweisung durch das Bitcoin Netzwerk schnell bearbeitet wird. Die Überweisungsgebühr beträgt üblicherweise 0.0005 BTC, kann aber höher sein, wenn die Transaktionsdaten mehr als 1000 bytes groß ist. Sollten die Überweisungsgebühr mehr als 0.0005 BTC betragen, werden Sie gefragt, ob Sie die Überweisung ausführen trotzdem möchten. </string>
+    <string name="transaction_fee_text_info">Das Hinzufügen einer kleinen Überweisungsgebühr garantiert, dass ihre Überweisung durch das Bitcoin Netzwerk schnell bearbeitet wird. Die Überweisungsgebühr beträgt üblicherweise 0.0005 BTC, kann aber höher sein, wenn die Transaktionsdaten mehr als 1000 bytes groß ist. Sollten die Überweisungsgebühr mehr als 0.0005 BTC betragen, werden Sie gefragt, ob Sie die Überweisung trotzdem ausführen möchten. </string>
     <string name="your_balance">Ihr Guthaben:</string>
     <string name="your_bitcoin_address">Ihre Bitcoin Adresse:</string>
     <!-- Warnings -->

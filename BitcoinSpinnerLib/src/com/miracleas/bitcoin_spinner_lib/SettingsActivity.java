@@ -9,8 +9,8 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -20,13 +20,6 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
-import android.text.ClipboardManager;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.View.OnClickListener;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bccapi.api.Network;
@@ -38,8 +31,6 @@ public class SettingsActivity extends PreferenceActivity {
 
 	private SharedPreferences preferences;
 	private SharedPreferences.Editor editor;
-
-	private AlertDialog backupWalletDialog, exportKeyDialog;
 
 	private static final int REQUEST_CODE_SCAN = 0;
 
@@ -75,6 +66,9 @@ public class SettingsActivity extends PreferenceActivity {
 		useLocalePref.setOnPreferenceChangeListener(useLocalChangeListener);
 
 		transactionHistorySizePref = (EditTextPreference) findPreference("transactionHistorySize");
+		int transactionSize = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE,
+				Consts.DEFAULT_TRANSACTION_HISTORY_SIZE);
+		transactionHistorySizePref.setText(String.valueOf(transactionSize));
 		transactionHistorySizePref
 				.setOnPreferenceChangeListener(TransactionHistorySizeChangeListener);
 
@@ -121,11 +115,15 @@ public class SettingsActivity extends PreferenceActivity {
 
 		@Override
 		public boolean onPreferenceChange(Preference preference, Object newValue) {
-			String value = ((String) newValue).replaceAll("\\D", "");
-			if (value != "") {
-				editor.putInt(Consts.TRANSACTION_HISTORY_SIZE,
-						Integer.parseInt(value));
+			try {
+				int newSize = Integer.parseInt((String) newValue);
+				if(newSize < 1){
+					newSize = Consts.DEFAULT_TRANSACTION_HISTORY_SIZE;
+				}
+				editor.putInt(Consts.TRANSACTION_HISTORY_SIZE, newSize);
 				editor.commit();
+			} catch (NumberFormatException e) {
+				Toast.makeText(mContext, R.string.invalid_value, Toast.LENGTH_SHORT).show();
 			}
 			return true;
 		}
@@ -134,7 +132,6 @@ public class SettingsActivity extends PreferenceActivity {
 	private final OnPreferenceClickListener backupWalletClickListener = new OnPreferenceClickListener() {
 
 		public boolean onPreferenceClick(Preference preference) {
-
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 			builder.setMessage(R.string.backup_dialog_text)
 					.setCancelable(false)
@@ -144,53 +141,18 @@ public class SettingsActivity extends PreferenceActivity {
 										int id) {
 									dialog.cancel();
 
-									LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-									View layout = inflater.inflate(
-											R.layout.dialog_qr_address, null);
-									AlertDialog.Builder builder = new AlertDialog.Builder(
-											mContext).setView(layout);
-									backupWalletDialog = builder.create();
-									backupWalletDialog
-											.setCanceledOnTouchOutside(true);
-									TextView text =(TextView ) layout.findViewById(R.id.tv_title_text); 
-									text.setText(R.string.bitcoinspinner_backup);
-									ImageView qrAdress = (ImageView) layout
-											.findViewById(R.id.iv_qr_Address);
 									Network net = SpinnerContext.getInstance().getNetwork();
 									final BackupInfo info = new BackupInfo(Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(),net),net);
 									info.getBackupUrl();
-									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
-											info.getBackupUrl()));
-									qrAdress.setOnClickListener(new OnClickListener() {
-
-										@Override
-										public void onClick(View v) {
-											backupWalletDialog.dismiss();
-										}
-									});
-
-									Button copy = (Button) layout
-											.findViewById(R.id.btn_copy_to_clip);
-									copy.setOnClickListener(new OnClickListener() {
-
-										@Override
-										public void onClick(View v) {
-											ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-											clipboard.setText(info.getBackupUrl());
-											Toast.makeText(mContext,
-													R.string.clipboard_copy,
-													Toast.LENGTH_SHORT).show();
-										}
-									});
-
-									backupWalletDialog.show();
+									Bitmap qrCode = Utils.getLargeQRCodeBitmap(info.getBackupUrl());
+									Utils.showQrCode(mContext, R.string.bitcoinspinner_backup, qrCode);
 								}
 							})
 					.setNegativeButton(R.string.no,
 							new DialogInterface.OnClickListener() {
 								public void onClick(DialogInterface dialog,
 										int id) {
-									// put your code here
+									// do nothing
 								}
 							});
 			AlertDialog alertDialog = builder.create();
@@ -229,20 +191,12 @@ public class SettingsActivity extends PreferenceActivity {
 	};
 	
 	private void ShowRestoreWalletAlert(){
+		final Activity myself = this;
 		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
 		builder.setMessage(R.string.restore_dialog_no_coins).setCancelable(false)
 				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
-
-						final PackageManager pm = getPackageManager();
-						if (pm.resolveActivity(Consts.zxingIntent, 0) != null) {
-							startActivityForResult(Consts.zxingIntent, REQUEST_CODE_SCAN);
-						} else if (pm.resolveActivity(Consts.gogglesIntent, 0) != null) {
-							startActivity(Consts.gogglesIntent);
-						} else {
-							showMarketPage(Consts.PACKAGE_NAME_ZXING);
-							Toast.makeText(mContext, R.string.install_qr_scanner, Toast.LENGTH_LONG).show();
-						}
+						Utils.startScannerActivity(myself, REQUEST_CODE_SCAN);
 					}
 				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 					public void onClick(DialogInterface dialog, int id) {
@@ -258,67 +212,25 @@ public class SettingsActivity extends PreferenceActivity {
 		public boolean onPreferenceClick(Preference preference) {
 
 			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setMessage(R.string.export_private_key_dialog_text)
-					.setCancelable(false)
-					.setPositiveButton(R.string.yes,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
+			builder.setMessage(R.string.export_private_key_dialog_text).setCancelable(false)
+					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							dialog.cancel();
 
-									LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-									View layout = inflater.inflate(
-											R.layout.dialog_qr_address, null);
-									AlertDialog.Builder builder = new AlertDialog.Builder(
-											mContext).setView(layout);
-									exportKeyDialog = builder.create();
-									exportKeyDialog
-											.setCanceledOnTouchOutside(true);
-									TextView text =(TextView ) layout.findViewById(R.id.tv_title_text); 
-									text.setText(R.string.private_key);
-									ImageView qrAdress = (ImageView) layout
-											.findViewById(R.id.iv_qr_Address);
-									
-									Network net = SpinnerContext.getInstance().getNetwork();
-									byte[] seed = Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(), net);
-									DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
-									final String keyString;
-									keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(SpinnerContext.getInstance().getNetwork());
-									qrAdress.setImageBitmap(Utils.getLargeQRCodeBitmap(
-											keyString));
-									
-									qrAdress.setOnClickListener(new OnClickListener() {
-
-										@Override
-										public void onClick(View v) {
-											exportKeyDialog.dismiss();
-										}
-									});
-
-									Button copy = (Button) layout
-											.findViewById(R.id.btn_copy_to_clip);
-									copy.setOnClickListener(new OnClickListener() {
-
-										@Override
-										public void onClick(View v) {
-											ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-											clipboard.setText(keyString);
-											Toast.makeText(mContext,
-													R.string.clipboard_copy,
-													Toast.LENGTH_SHORT).show();
-										}
-									});
-
-									exportKeyDialog.show();
-								}
-							})
-					.setNegativeButton(R.string.no,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									// put your code here
-								}
-							});
+							Network net = SpinnerContext.getInstance().getNetwork();
+							byte[] seed = Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(), net);
+							DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
+							final String keyString;
+							keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(
+									SpinnerContext.getInstance().getNetwork());
+							Bitmap qrCode = Utils.getLargeQRCodeBitmap(keyString);
+							Utils.showQrCode(mContext, R.string.private_key, qrCode);
+						}
+					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+						public void onClick(DialogInterface dialog, int id) {
+							// put your code here
+						}
+					});
 			AlertDialog alertDialog = builder.create();
 			alertDialog.show();
 			return true;
@@ -355,17 +267,6 @@ public class SettingsActivity extends PreferenceActivity {
 			restoreDialog.dismiss();
 			Utils.showAlert(mContext, R.string.restore_complete_dialog_text);
 		}
-	}
-
-
-	private void showMarketPage(final String packageName) {
-		final Intent marketIntent = new Intent(Intent.ACTION_VIEW,
-				Uri.parse(String.format(Consts.MARKET_APP_URL, packageName)));
-		if (getPackageManager().resolveActivity(marketIntent, 0) != null)
-			startActivity(marketIntent);
-		else
-			startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String
-					.format(Consts.WEBMARKET_APP_URL, packageName))));
 	}
 
 	public static class BackupInfo {

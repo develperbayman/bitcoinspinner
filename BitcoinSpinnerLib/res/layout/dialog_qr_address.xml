@@ -37,7 +37,7 @@
             android:layout_below="@id/iv_qr_Address"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="1dp"
-            android:text="Copy to clipboard" />
+            android:text="@string/copy_to_clipboard" />
     </RelativeLayout>
 
 </ScrollView>

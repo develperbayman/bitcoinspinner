@@ -43,7 +43,6 @@
     <string name="sending_bitcoins">Skickar Bitcoins</string>
     <string name="sending_bitcoins_wait">Vänligen vänta medan bitcoins skickas</string>
     <!-- Sharing -->
-    <string name="clipboard_copy">Adressen kopierades till urklipp</string>
     <string name="share_bitcoin_address">Dela din Bitcoin adress...</string>
     <!-- Info -->
     <string name="transaction_fee_text">En transaktionsavgift på 0.0005 BTC läggs automatiskt till.%1$sinfo...%2$s</string>

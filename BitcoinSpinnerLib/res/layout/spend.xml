@@ -2,7 +2,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/spend"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
+    android:layout_height="wrap_content"
+    android:background="@drawable/infobox"  >
 
     <TextView
         android:id="@+id/tv_spend"
@@ -10,19 +11,11 @@
         android:layout_height="wrap_content"
         android:layout_alignLeft="@+id/et_available_spend"
         android:layout_below="@+id/et_available_spend"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/Black"
         android:text="@string/amount_to_pay"
-        android:textColor="@color/White" />
-
-    <EditText
-        android:id="@+id/et_spend"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_spend"
-        android:layout_below="@+id/tv_spend"
-        android:layout_marginRight="30dp"
-        android:inputType="numberDecimal"
-        android:hint="0.00"
-        android:textColor="@color/Black" />
+        android:textSize="20dp"  />
 
     <TextView
         android:id="@+id/tv_validation_of_amount"
@@ -34,5 +27,37 @@
         android:layout_toRightOf="@+id/tv_spend"
         android:text=""
         android:textColor="@color/Red" />
+
+    <EditText
+        android:id="@+id/et_spend"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tv_spend"
+        android:layout_below="@+id/tv_spend"
+        android:inputType="numberDecimal"
+        android:hint="0.00"
+        android:textColor="@color/Black" />
+
+    <TextView
+        android:id="@+id/tv_available_spend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/et_spend"
+        android:layout_below="@+id/et_spend"
+        android:text="@string/your_balance"
+        android:textColor="@color/Black" 
+        android:textSize="18dp" />
+
+    <TextView
+        android:id="@+id/tv_available_spend_balance"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tv_available_spend"
+        android:layout_alignBottom="@id/tv_available_spend"
+        android:layout_toRightOf="@+id/tv_available_spend"
+        android:layout_marginLeft="10dp"
+        android:gravity="center"
+        android:textColor="@color/Black"
+        android:textSize="20dp" />
 
 </RelativeLayout>

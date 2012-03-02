@@ -6,13 +6,24 @@ import java.net.URL;
 import java.security.SecureRandom;
 import java.util.Hashtable;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
+import android.text.ClipboardManager;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bccapi.api.Network;
@@ -202,4 +213,61 @@ public class Utils {
 		return null;
 	}
 
+	public static void startScannerActivity(Activity parent, int requestCode) {
+		final PackageManager pm = parent.getPackageManager();
+		if (pm.resolveActivity(Consts.zxingIntent, 0) != null) {
+			parent.startActivityForResult(Consts.zxingIntent, requestCode);
+		} else if (pm.resolveActivity(Consts.gogglesIntent, 0) != null) {
+			parent.startActivity(Consts.gogglesIntent);
+		} else {
+			showScannerMarketPage(parent);
+			Toast.makeText(parent, R.string.install_qr_scanner, Toast.LENGTH_LONG).show();
+		}
+
+	}
+
+	private static void showScannerMarketPage(Context context) {
+		final Intent marketIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Consts.MARKET_APP_URL,
+				Consts.PACKAGE_NAME_ZXING)));
+		if (context.getPackageManager().resolveActivity(marketIntent, 0) != null) {
+			context.startActivity(marketIntent);
+		} else {
+			context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(String.format(Consts.WEBMARKET_APP_URL,
+					Consts.PACKAGE_NAME_ZXING))));
+		}
+	}
+
+	public static AlertDialog showQrCode(final Context context, int titleMessageId, Bitmap qrCode) {
+		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View layout = inflater.inflate(R.layout.dialog_qr_address, null);
+		AlertDialog.Builder builder = new AlertDialog.Builder(context).setView(layout);
+		final AlertDialog qrCodeDialog = builder.create();
+		qrCodeDialog.setCanceledOnTouchOutside(true);
+		TextView text = (TextView) layout.findViewById(R.id.tv_title_text);
+		text.setText(titleMessageId);
+
+		ImageView qrAdress = (ImageView) layout.findViewById(R.id.iv_qr_Address);
+		qrAdress.setImageBitmap(qrCode);
+		qrAdress.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				qrCodeDialog.dismiss();
+			}
+		});
+
+		Button copy = (Button) layout.findViewById(R.id.btn_copy_to_clip);
+		copy.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+				clipboard.setText(SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
+				Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
+			}
+		});
+
+		qrCodeDialog.show();
+		return qrCodeDialog;
+	}
 }

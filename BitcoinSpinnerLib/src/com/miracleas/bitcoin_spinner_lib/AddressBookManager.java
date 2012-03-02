@@ -13,6 +13,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import com.bccapi.api.Network;
+
 import android.content.Context;
 
 public class AddressBookManager {
@@ -25,7 +27,7 @@ public class AddressBookManager {
 
 		public Entry(String address, String name) {
 			_address = address;
-			_name = _name == null ? "" : _name;
+			_name = name == null ? "" : name;
 		}
 
 		public String getAddress() {
@@ -41,19 +43,38 @@ public class AddressBookManager {
 			return _name.compareToIgnoreCase(another._name);
 		}
 
+		@Override
+		public int hashCode() {
+			return _name.hashCode() + _address.hashCode();
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (!(obj instanceof Entry)) {
+				return false;
+			}
+			Entry other = (Entry) obj;
+			return _address.equals(other._address) && _name.equals(other._name);
+		}
+
 	}
 
 	private List<Entry> _entries;
-	private Map<String, String> _addressToNameMap;
-	private Map<String, String> _nameToAddressMap;
+	private Map<String, Entry> _addressMap;
+	private Map<String, Entry> _nameMap;
 
 	private AddressBookManager() {
 		List<Entry> entries = loadEntries();
-		entries.add(new Entry("Hans Jurgen", ""));
-		entries.add(new Entry("Alfred Bennel", "143SikKpjzwh\nBy5Z7Qg5knu5\nnKXWExSqQi"));
+		if (SpinnerContext.getInstance().getNetwork() == Network.productionNetwork) {
+			// entries.add(new Entry("14VWYvbHd4R7oTFS8kEfoWZFTzbedDgwKg", "Hans Jurgen Manfred Pingel"));
+			// entries.add(new Entry("143SikKpjzwhBy5Z7Qg5knu5nKXWExSqQi", "Alfred Bennel"));
+		} else {
+			// entries.add(new Entry("miGuMc6qtVEKS6Pf1jKddaa81DeHjMzkpB", "Testnet Fauchet"));
+			// entries.add(new Entry("n2ZhcFDxvSbxSxhndbAjBtrkVs8zku955f", "Myself"));
+		}
 		_entries = new ArrayList<Entry>(entries.size());
-		_addressToNameMap = new HashMap<String, String>(entries.size());
-		_nameToAddressMap = new HashMap<String, String>(entries.size());
+		_addressMap = new HashMap<String, Entry>(entries.size());
+		_nameMap = new HashMap<String, Entry>(entries.size());
 		for (Entry entry : entries) {
 			addEntryInt(entry.getAddress(), entry.getName());
 		}
@@ -63,6 +84,19 @@ public class AddressBookManager {
 	public synchronized void addEntry(String address, String name) {
 		addEntryInt(address, name);
 		Collections.sort(_entries);
+		save();
+	}
+
+	public synchronized void deleteEntry(String address) {
+		address = address.trim();
+		Entry entry = _addressMap.get(address);
+		if (entry == null) {
+			return;
+		}
+		_entries.remove(entry);
+		_addressMap.remove(address);
+		_nameMap.remove(entry.getName());
+		save();
 	}
 
 	private void addEntryInt(String address, String name) {
@@ -77,11 +111,20 @@ public class AddressBookManager {
 			name = "";
 		}
 		name = name.trim();
-		_addressToNameMap.put(address, name);
-		if (name.length() != 0) {
-			_nameToAddressMap.put(name, address);
+
+		Entry entry = _addressMap.get(address);
+		if (entry == null) {
+			entry = new Entry(address, name);
+			_entries.add(new Entry(address, name));
+		} else {
+			_entries.remove(entry);
+			entry._name = name;
+			_entries.add(entry);
 		}
-		_entries.add(new Entry(address, name));
+		_addressMap.put(address, entry);
+		if (name.length() != 0) {
+			_nameMap.put(name, entry);
+		}
 	}
 
 	public static synchronized AddressBookManager getInstance() {
@@ -95,21 +138,33 @@ public class AddressBookManager {
 		if (name == null) {
 			return null;
 		}
-		return _nameToAddressMap.get(name.trim());
+		return _nameMap.get(name.trim()).getAddress();
+	}
+
+	public boolean hasAddress(String address) {
+		return _addressMap.containsKey(address);
 	}
 
 	public String getNameByAddress(String address) {
 		if (address == null) {
 			return null;
 		}
-		return _addressToNameMap.get(address.trim());
+		Entry entry = _addressMap.get(address.trim());
+		if (entry == null) {
+			return "";
+		}
+		return entry.getName();
 	}
 
 	public List<Entry> getEntries() {
 		return Collections.unmodifiableList(_entries);
 	}
 
-	public void save() {
+	public int numEntries() {
+		return _entries.size();
+	}
+
+	private void save() {
 		saveEntries(_entries);
 	}
 

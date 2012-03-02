@@ -37,7 +37,6 @@
     <string name="sending_bitcoins">Enviando Bitcoins</string>
     <string name="sending_bitcoins_wait">Por favor espere mientras se envían bitcoins</string>
     <!-- Sharing -->
-    <string name="clipboard_copy">Dirección copiada al portapapeles</string>
     <string name="share_bitcoin_address">Compartir su dirección bitcoin...</string>
     <!-- Info -->
     <string name="transaction_fee_text">Una tasa de transacción de 0.0005 BTC se añade automáticamente a su transacción.%1$sinformación...%2$s</string>

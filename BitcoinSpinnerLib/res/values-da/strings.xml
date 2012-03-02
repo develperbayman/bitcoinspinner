@@ -3,7 +3,7 @@
     <!-- Name, about, credits and versioning -->
     <string name="app_name">BitcoinSpinner</string>
     <string name="about_title">Om BitcoinSpinner</string>
-    <string name="about_text">V.: %1$s\nBitcoinSpinner er en letvægts, sikker, og bruger venlig Bitcoin client til Android, som er bygget ovenpå BCCAPI.\nBitcoinSpinner er ikke en Bitcoin bank. Alle dine midler er sikret af private nøgler i, for app\'en, privat hukommelse på din Android enhed.\n\nNotér venligst at dette er en beta udgave, og at du kun bør bruge den til småpenge.</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner er en letvægts, sikker, og bruger venlig Bitcoin client til Android, som er bygget ovenpå BCCAPI.\nBitcoinSpinner er ikke en Bitcoin bank. Alle dine midler er sikret af private nøgler i, for app\'en, privat hukommelse på din Android enhed.\n\Bemærk at dette er en beta udgave, og brug er under eget ansvar.</string>
     <string name="credits_text">Tak til:\n - Jan(bccapi)\n - Kevin(Fr. overs.)\n - Mats Henricson(Sv. overs.)\n - Gerhard(De. overs.)\n - Manuel Polo(Es. overs.)\n - Troels(Da. overs.)</string>
     <!-- Menu -->
     <string name="about_menu">Om BS</string>
@@ -43,7 +43,6 @@
     <string name="sending_bitcoins">Sender Bitcoins</string>
     <string name="sending_bitcoins_wait">Vent venligst mens Bitcoins bliver sendt</string>
     <!-- Sharing -->
-    <string name="clipboard_copy">Adresse kopieret til udklipsholder</string>
     <string name="share_bitcoin_address">Del din Bitcoin adresse...</string>
     <!-- Info -->
     <string name="transaction_fee_text">En Bitcoin transactionsafgift på 0.0005 BTC bliver automatist tilføjet til din transaktion.%1$sinformation...%2$s</string>
@@ -81,4 +80,27 @@
     <string name="initializing_bitcoinspinner">Initialisererer BitcoinSpinner</string>
     <string name="unconfirmed_from">Modtager fra (ukonfirmeret):</string>
     <string name="unconfirmed_to">Sender til (ukonfimeret):</string>
+    <string name="address_book_menu">Adresse Bog</string>
+    <string name="copied_to_clipboard">Kopieret til udklipsholder</string>
+    <string name="address_book">Adresse Bog</string>
+    <string name="address_book_empty">Din adressebog er tom.</string>
+    <string name="amount_too_large">Beløb for stort</string>
+    <string name="unconfirmed_received_with">Modtager med (ukonfirmeret)</string>
+    <string name="none">Ingen</string>
+    <string name="recent_receivers">Seneste Modtagere</string>
+    <string name="add_address">Tilføj Adresse</string>
+    <string name="select_recipient">Vælg Modatger</string>
+    <string name="received_with">Modtaget med:</string>
+    <string name="add_address_title">Tilføj Adresse Til Adressebog</string>
+    <string name="set_name_title">Indtast Adresse Navn</string>
+    <string name="name">Navn</string>
+    <string name="add_address_description">Vælg en modtager fra listen af modtagere nedenfor eller scan en stregkode som indeholder en bitcoin adresse.</string>
+    <string name="invalid_amount">Ugyldigt beløb</string>
+    <string name="delete_address_confirmation">Er du sikker på at du vil slette denne adresse fra din adressebog?</string>
+    <string name="invalid_value">Ugyldig Værdi</string>
+    <string name="delete_address">Slet Adresse</string>
+    <string name="show_qr_code">Vis QR-kode</string>
+    <string name="edit_address">Editer Adresse</string>
+    <string name="copy_to_clipboard">Kopier til udklipsholder</string>
+    <string name="scan_qr_code">Scan QR-kode</string>
 </resources>

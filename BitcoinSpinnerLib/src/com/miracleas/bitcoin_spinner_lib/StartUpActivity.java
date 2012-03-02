@@ -7,6 +7,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -25,23 +26,24 @@ public class StartUpActivity extends Activity {
 	private static final int STARTUP_DIALOG = 1;
 
 	private ProgressBar mProgressbarStartup;
+	private Dialog mStartupDialog;
 	private SharedPreferences mPreferences;
 	private Context mContext;
 	private AsyncInit mAsyncInit;
-	
-	
+
 	// Guard to avoid that we get two StartupActivities competing to initialize.
 	// For some reason that I cannot understand we some times experience that two StartupActivity instances are created.
 	// This crude code makes sure that only one of them gets to initialize
 	private static boolean wasStarted = false;
-	private static synchronized boolean isFirst(){
-		if(!wasStarted) {
+
+	private static synchronized boolean isFirst() {
+		if (!wasStarted) {
 			wasStarted = true;
 			return true;
 		}
 		return false;
 	}
-	
+
 	/**
 	 * @see android.app.Activity#onCreate(Bundle)
 	 */
@@ -50,27 +52,37 @@ public class StartUpActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		mPreferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		mContext = this;
+		setDefaults();
+	}
+
+	private void setDefaults() {
+		int size = mPreferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, -1);
+		if (size == -1) {
+			Editor edit = mPreferences.edit();
+			edit.putInt(Consts.TRANSACTION_HISTORY_SIZE, Consts.DEFAULT_TRANSACTION_HISTORY_SIZE);
+			edit.commit();
+		}
 	}
 
 	@Override
 	protected void onResume() {
 		super.onResume();
-		if(!mPreferences.getString(Consts.LOCALE, "").matches("")) {
+		if (!mPreferences.getString(Consts.LOCALE, "").matches("")) {
 			Locale locale = new Locale(mPreferences.getString(Consts.LOCALE, "en"));
 			Locale.setDefault(locale);
 			Configuration config = new Configuration();
 			config.locale = locale;
 			getBaseContext().getResources().updateConfiguration(config,
-			      getBaseContext().getResources().getDisplayMetrics());
+					getBaseContext().getResources().getDisplayMetrics());
 		}
 		if (isFirst()) {
 			Message message = handler.obtainMessage();
 			message.arg1 = INITIALIZE_MESSAGE;
 			handler.sendMessage(message);
 		}
-		
+
 	}
-	
+
 	@Override
 	protected void onPause() {
 		super.onPause();
@@ -81,7 +93,7 @@ public class StartUpActivity extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.arg1) {
 			case INITIALIZE_MESSAGE:
-				if(mAsyncInit == null) {
+				if (mAsyncInit == null) {
 					mAsyncInit = new AsyncInit();
 					mAsyncInit.execute();
 					showDialog(STARTUP_DIALOG);
@@ -92,6 +104,9 @@ public class StartUpActivity extends Activity {
 				mProgressbarStartup.setProgress(total);
 				break;
 			case START_MESSAGE:
+				if (mStartupDialog != null) {
+					mStartupDialog.dismiss();
+				}
 				Intent intent = new Intent();
 				intent.setClass(mContext, MainActivity.class);
 				startActivity(intent);
@@ -109,13 +124,12 @@ public class StartUpActivity extends Activity {
 		case STARTUP_DIALOG:
 			dialog.setContentView(R.layout.dialog_startup);
 			dialog.setTitle(R.string.initializing_bitcoinspinner);
-			mProgressbarStartup = (ProgressBar) dialog
-					.findViewById(R.id.pb_startup);
+			mProgressbarStartup = (ProgressBar) dialog.findViewById(R.id.pb_startup);
+			mStartupDialog = dialog;
 			break;
 		}
 		return dialog;
 	}
-
 
 	private class AsyncInit extends AsyncTask<Void, Integer, Long> {
 

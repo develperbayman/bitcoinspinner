@@ -12,10 +12,9 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
-import android.text.ClipboardManager;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -28,7 +27,6 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.bccapi.api.AccountInfo;
 import com.bccapi.api.Network;
@@ -76,12 +74,10 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
 		}
 	}
-
+	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		setContentView(R.layout.main);
-
 		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
 			Locale locale = new Locale(preferences.getString(Consts.LOCALE,
 					"en"));
@@ -91,6 +87,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			getBaseContext().getResources().updateConfiguration(config,
 					getBaseContext().getResources().getDisplayMetrics());
 		}
+		setContentView(R.layout.main);
 
 		detector = new SimpleGestureFilter(this, this);
 		mConnectionWatcher = new ConnectionWatcher(mContext);
@@ -198,39 +195,8 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 		@Override
 		public void onClick(View v) {
-			LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-			View layout = inflater.inflate(R.layout.dialog_qr_address, null);
-			AlertDialog.Builder builder = new AlertDialog.Builder(mContext)
-					.setView(layout);
-			qrCodeDialog = builder.create();
-			qrCodeDialog.setCanceledOnTouchOutside(true);
-			TextView text = (TextView) layout.findViewById(R.id.tv_title_text);
-			text.setText(R.string.bitcoin_address);
-			
-			ImageView qrAdress = (ImageView) layout
-					.findViewById(R.id.iv_qr_Address);
-			qrAdress.setImageBitmap(Utils.getPrimaryAddressAsLargeQrCode(SpinnerContext.getInstance().getAccount()));
-			qrAdress.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					qrCodeDialog.dismiss();
-				}
-			});
-
-			Button copy = (Button) layout.findViewById(R.id.btn_copy_to_clip);
-			copy.setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					ClipboardManager clipboard = (ClipboardManager) getSystemService(CLIPBOARD_SERVICE);
-					clipboard.setText(SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
-					Toast.makeText(mContext, R.string.clipboard_copy,
-							Toast.LENGTH_SHORT).show();
-				}
-			});
-
-			qrCodeDialog.show();
+			Bitmap qrCode = Utils.getPrimaryAddressAsLargeQrCode(SpinnerContext.getInstance().getAccount());
+			Utils.showQrCode(mContext, R.string.bitcoin_address, qrCode);
 		}
 	};
 
@@ -334,7 +300,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		return true;
 	}
 
-	/** Callen when menu item is selected */
+	/** Called when menu item is selected */
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// Handle item selection
@@ -345,8 +311,8 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			startActivityForResult(new Intent(this, SettingsActivity.class),
 					REQUEST_CODE_SETTINGS);
 			return true;
-		} else if (item.getItemId() == R.id.credits) {
-			showDialog(THANKS_DIALOG);
+		} else if (item.getItemId() == R.id.address_book) {
+			startActivity(new Intent(this, AddressBookActivity.class));
 			return true;
 		} else if (item.getItemId() == R.id.donate) {
 			showDialog(DONATE_DIALOG);

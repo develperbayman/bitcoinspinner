@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/et_name"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_description"
+        android:layout_marginRight="5dp"
+        android:gravity="top"
+        android:hint="@string/name"
+        android:lines="1"
+        android:textColor="@color/Black"
+        android:singleLine="true"
+        >
+
+    </EditText>
+		
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@id/et_name"
+		android:layout_marginLeft="0dp"
+		android:layout_marginBottom="10dp"
+		android:layout_marginTop="10dp" >
+        
+	<Button
+		android:id="@+id/btn_ok"
+		style="@android:style/Widget.Button"
+		android:layout_width="100dp"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:layout_below="@id/et_name"
+
+		android:text="@string/ok" />
+
+    <Button
+        android:id="@+id/btn_cancel"
+        style="@android:style/Widget.Button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@+id/btn_ok"
+        android:layout_alignBottom="@+id/btn_ok"
+        android:layout_toRightOf="@+id/btn_ok"
+        android:text="@string/cancel" />
+    </LinearLayout>
+</RelativeLayout>

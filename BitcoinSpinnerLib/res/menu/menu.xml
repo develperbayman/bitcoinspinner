@@ -12,9 +12,9 @@
         android:title="@string/settings_menu"/>
 
     <item
-        android:id="@+id/credits"
+        android:id="@+id/address_book"
         android:icon="@drawable/tab_info_dark"
-        android:title="@string/credits_menu"/>
+        android:title="@string/address_book_menu"/>
 
     <item
         android:id="@+id/donate"

@@ -56,9 +56,10 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 
 	private TextView tvValidAdress, tvAvailSpend, tvFeeInfo, tvValidAmount;
 	private EditText etAddress, etSpend;
-	private Button btnQRScan, btnSpend, btnCancel;
+	private Button btnQRScan, btnAddressBook, btnSpend, btnCancel;
 
 	private static final int REQUEST_CODE_SCAN = 0;
+	private static final int REQUEST_CODE_ADDRESS_BOOK = 1;
 
 	private ProgressDialog mCalcFeeProgressDialog;
 	private ProgressDialog mSendCoinsProgressDialog;
@@ -85,21 +86,31 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.send_money);
+		mContext = this;
+		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		if (!SpinnerContext.isInitialized()) {
 			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
 		}
 
-		mContext = this;
+	}
 
-		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
+	@Override
+	protected void onResume() {
+		super.onResume();
+		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
+			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
+			Locale.setDefault(locale);
+			Configuration config = new Configuration();
+			config.locale = locale;
+			getBaseContext().getResources().updateConfiguration(config,
+					getBaseContext().getResources().getDisplayMetrics());
+		}
+		setContentView(R.layout.send_money);
 
 		detector = new SimpleGestureFilter(this, this);
-
 		tvValidAdress = (TextView) findViewById(R.id.tv_validation_of_adress);
 		tvValidAmount = (TextView) findViewById(R.id.tv_validation_of_amount);
 		tvAvailSpend = (TextView) findViewById(R.id.tv_available_spend_balance);
-
 		tvFeeInfo = (TextView) findViewById(R.id.tv_fee_info);
 		tvFeeInfo.setText(Html.fromHtml(String.format(getString(R.string.transaction_fee_text), "<br /><a href=''>",
 				"</a>")));
@@ -120,22 +131,22 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 
 		etAddress = (EditText) findViewById(R.id.et_address);
 		etSpend = (EditText) findViewById(R.id.et_spend);
-
 		btnQRScan = (Button) findViewById(R.id.btn_qr_scan);
+		btnAddressBook = (Button) findViewById(R.id.btn_address_book);
 		btnSpend = (Button) findViewById(R.id.btn_spend);
 		btnCancel = (Button) findViewById(R.id.btn_spend_cancel);
-
 		etSpend.setOnKeyListener(handleReturn);
-
 		etAddress.addTextChangedListener(btcAddressValidatorOnTextChanged);
 		etSpend.addTextChangedListener(btcBitcoinValidatorOnTextChanged);
-
 		etSpend.setOnFocusChangeListener(btcFocusChangeListenerAddExtend);
-
 		btnQRScan.setOnClickListener(qrScanClickListener);
+		btnAddressBook.setOnClickListener(addressBookClickListener);
 		btnSpend.setOnClickListener(spendMoneyClickListener);
 		btnCancel.setOnClickListener(cancelClickListener);
 
+		// Enable the address book if we have at least one address in it
+		btnAddressBook.setEnabled(AddressBookManager.getInstance().numEntries() > 0);
+		
 		// If an address has been added pre-populate it. This allows for the
 		// Donation feature.
 		Bundle extras = getIntent().getExtras();
@@ -144,21 +155,10 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 			if (address != null) {
 				etAddress.setText(address);
 			}
-		}
-
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-
-		if (!preferences.getString(Consts.LOCALE, "").matches("")) {
-			Locale locale = new Locale(preferences.getString(Consts.LOCALE, "en"));
-			Locale.setDefault(locale);
-			Configuration config = new Configuration();
-			config.locale = locale;
-			getBaseContext().getResources().updateConfiguration(config,
-					getBaseContext().getResources().getDisplayMetrics());
+			long amount = getIntent().getExtras().getLong(Consts.BTC_AMOUNT_KEY);
+			if (amount != 0) {
+				etSpend.setText(CoinUtils.valueString(amount));
+			}
 		}
 
 		long balance = SpinnerContext.getInstance().getAccount().getCachedBalance();
@@ -330,6 +330,16 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 		}
 	};
 
+	private final OnClickListener addressBookClickListener = new OnClickListener() {
+
+		@Override
+		public void onClick(View v) {
+			Intent intent = new Intent();
+			intent.setClass(SendBitcoinsActivity.this, AddressChooserActivity.class);
+			startActivityForResult(intent, REQUEST_CODE_ADDRESS_BOOK);
+		}
+	};
+	
 	private final OnClickListener spendMoneyClickListener = new OnClickListener() {
 
 		@Override
@@ -384,6 +394,9 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 					}
 				}
 			}
+		} else if(requestCode == REQUEST_CODE_ADDRESS_BOOK && resultCode == RESULT_OK ){
+			String address = intent.getStringExtra(AddressChooserActivity.ADDRESS_RESULT_NAME);
+			etAddress.setText(address);
 		}
 	}
 
@@ -456,7 +469,6 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 		} else {
 			finish();
 		}
-
 	}
 
 	private String getReceivingAddress() {
@@ -486,10 +498,10 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 	@Override
 	public void onSwipe(int direction) {
 		switch (direction) {
-
-		case SimpleGestureFilter.SWIPE_RIGHT:
-			finish();
-			break;
+		// Swiping disabled for now, not sure I like it here
+//		case SimpleGestureFilter.SWIPE_RIGHT:
+//			finish();
+//			break;
 		}
 	}
 

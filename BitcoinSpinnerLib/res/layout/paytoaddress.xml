@@ -2,43 +2,20 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/payToAddress"
     android:layout_width="fill_parent"
-    android:layout_height="wrap_content" >
-
+    android:layout_height="wrap_content"
+    android:background="@drawable/infobox" >
+    
+    
     <TextView
         android:id="@+id/tv_pay_to"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_alignParentTop="true"
+        android:layout_marginLeft="5dp"
+        android:layout_marginTop="5dp"
+        android:textColor="@color/Black"
         android:text="@string/pay_to"
-        android:textColor="@color/White" />
-
-    <EditText
-        android:id="@+id/et_address"
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/tv_pay_to"
-        android:layout_below="@+id/tv_pay_to"
-        android:layout_marginRight="70dp"
-        android:gravity="top"
-        android:hint="@string/address"
-        android:lines="3"
-        android:textColor="@color/Black" >
-
-        <requestFocus >
-        </requestFocus>
-    </EditText>
-
-    <Button
-        android:id="@+id/btn_qr_scan"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
-        android:layout_alignParentRight="true"
-        android:layout_alignTop="@id/et_address"
-        android:layout_marginRight="15dp"
-        android:layout_marginTop="15dp"
-        android:padding="2dp"
-        android:text="QR"
         android:textSize="20dp" />
 
     <TextView
@@ -51,5 +28,48 @@
         android:layout_toRightOf="@+id/tv_pay_to"
         android:text=""
         android:textColor="@color/Red" />
+
+    <EditText
+        android:id="@+id/et_address"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/tv_pay_to"
+        android:layout_below="@+id/tv_pay_to"
+        android:layout_marginRight="5dp"
+        android:gravity="top"
+        android:hint="@string/address"
+        android:lines="1"
+        android:textColor="@color/Black"
+        android:typeface="monospace"
+        android:singleLine="true"
+        >
+
+        <requestFocus >
+        </requestFocus>
+    </EditText>
+
+    <Button
+        android:id="@+id/btn_qr_scan"
+        style="@android:style/Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@id/et_address"
+        android:text="Scan QR-code" 
+        android:textSize="20dp"        
+        android:layout_marginLeft="5dp" />
+        
+    <Button
+        android:id="@+id/btn_address_book"
+        style="@android:style/Widget.Button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/et_address"
+        android:layout_alignBaseline="@id/btn_qr_scan"
+        android:layout_alignBottom="@id/btn_qr_scan"
+        android:layout_toRightOf="@id/btn_qr_scan"
+        android:text="Address Book"
+        android:textSize="20dp"        
+        android:layout_marginLeft="5dp" />
 
 </RelativeLayout>
