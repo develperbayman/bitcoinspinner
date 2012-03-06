@@ -3,23 +3,23 @@
     <!-- Name, about, credits and versioning -->
     <string name="app_name">BitcoinSpinner</string>
     <string name="about_title">Om BitcoinSpinner</string>
-    <string name="about_text">V.: %1$s\nBitcoinSpinner er en letvægts, sikker, og bruger venlig Bitcoin client til Android, som er bygget ovenpå BCCAPI.\nBitcoinSpinner er ikke en Bitcoin bank. Alle dine midler er sikret af private nøgler i, for app\'en, privat hukommelse på din Android enhed.\n\Bemærk at dette er en beta udgave, og brug er under eget ansvar.</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner er en letvægts-, sikker og brugervenlig Bitcoin-pung til Android, som er bygget ovenpå BCCAPI.\nBitcoinSpinner er ikke en Bitcoin bank. Alle dine midler er sikret af private nøgler i, for app\'en, privat hukommelse på din Android enhed.\n\nNotér venligst at dette er en beta udgave, og at brug er under eget ansvar.</string>
     <string name="credits_text">Tak til:\n - Jan(bccapi)\n - Kevin(Fr. overs.)\n - Mats Henricson(Sv. overs.)\n - Gerhard(De. overs.)\n - Manuel Polo(Es. overs.)\n - Troels(Da. overs.)</string>
     <!-- Menu -->
     <string name="about_menu">Om BS</string>
     <string name="credits_menu">Tak til</string>
-    <string name="settings_menu">Instillinger</string>
+    <string name="settings_menu">Indstillinger</string>
     <!-- Startup -->
     <string name="startup_dialog_text">Vent venligst...</string>
     <!-- Backup and Restore -->
-    <string name="backup_dialog_text">Du vil om lidt blive få vist en QR kode der kan bruges til at gendanne din pung på en anden enhed.\n\nTag et billede af det og/eller print det ud på papir.\n\nAdvarsel, denne QR kode gør det muligt for alle der scanner den at overtage alle midler holdt på denne enhed.\n\nVil du fortsætte?</string>
+    <string name="backup_dialog_text">Du vil om lidt få vist en QR-kode, der kan bruges til at gendanne din pung på en anden enhed.\n\nTag et billede af den og/eller print det ud på papir.\n\nAdvarsel: Denne QR kode gør det muligt for alle, der scanner den, at overtage alle midler opbevaret på denne enhed.\n\nVil du fortsætte?</string>
     <string name="restore_complete_dialog_text">Gendannelse færdig</string>
-    <string name="restore_dialog_coins">Du kan ikke gendanne en backup da din pung indeholder midler.\n\nSend venligst dine midler andetsteds før du fortsætter.</string>
-    <string name="restore_dialog_no_coins">Du skal til at gendanne din pung fra en backup.\n\nDette gøres ved at scanne en tidligere genereret backup QR kode.\n\nVil du fortsætte?</string>
+    <string name="restore_dialog_coins">Du kan ikke gendanne en backup, da din pung indeholder midler.\n\nSend venligst dine midler andetsteds før du fortsætter.</string>
+    <string name="restore_dialog_no_coins">Du skal til at gendanne din pung fra en backup.\n\nDette gøres ved at scanne en tidligere genereret backup QR-kode.\n\nVil du fortsætte?</string>
     <string name="restore_dialog_title">Gendanner</string>
     <!-- Preferences -->
-    <string name="pref_network_fee">Transactionsafgift</string>
-    <string name="prefs_backup_title">Sikkerhedskopier pung</string>
+    <string name="pref_network_fee">Transaktionsgebyr</string>
+    <string name="prefs_backup_title">Lav backup af pung</string>
     <string name="prefs_category_backupandrestore">Backup og gendannelse</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner indstillinger</string>
     <string name="prefs_restore_title">Gendan pung</string>
@@ -28,7 +28,7 @@
     <string name="received_from">Modtaget fra:</string>
     <string name="sent_to">Sendt til:</string>
     <string name="sent_to_yourself">Sendt til dig selv:</string>
-    <string name="transaction_history">Transaktions historie</string>
+    <string name="transaction_history">Tidligere transaktioner</string>
     <!-- Common -->
     <string name="no">Nej</string>
     <string name="yes">Ja</string>
@@ -36,19 +36,19 @@
     <string name="please_wait">Vent venligst...</string>
     <string name="try_again">Prøv igen?</string>
     <!-- Calculation and sending of bitcoins -->
-    <string name="calculating_fee">Beregner transactionsafgift</string>
-    <string name="calculating_fee_wait">Vent venligst mens transactionsafgiften beregnes...</string>
-    <string name="calculating_fee_done">Transactionsafgiften er blevet udregnet til %s BTC.\n\nFortsæt?</string>
+    <string name="calculating_fee">Beregner transaktionsgebyr</string>
+    <string name="calculating_fee_wait">Vent venligst mens transaktionsgebyret beregnes...</string>
+    <string name="calculating_fee_done">Transaktionsafgiften er blevet beregnet til %s BTC.\n\nFortsæt?</string>
     <string name="send_bitcoins">Send Bitcoins</string>
     <string name="sending_bitcoins">Sender Bitcoins</string>
     <string name="sending_bitcoins_wait">Vent venligst mens Bitcoins bliver sendt</string>
     <!-- Sharing -->
     <string name="share_bitcoin_address">Del din Bitcoin adresse...</string>
     <!-- Info -->
-    <string name="transaction_fee_text">En Bitcoin transactionsafgift på 0.0005 BTC bliver automatist tilføjet til din transaktion.%1$sinformation...%2$s</string>
-    <string name="transaction_fee_text_info">Ved at tilføje en lille transactionsafgift sikres det at din transaktion forplanter sig ud gennem netværket og at den bliver accepteret af Bitcoin minører. Størrelsen på din transactionsafgift er typisk 0.0005 BTC, men kan blive større hvis din transaction er større end 1000 bytes. Hvis din trasaktion behøver en større afgift end 0.0005 BTC vil du blive bedt om at godkende transaktionen.</string>
-    <string name="your_balance">Din balance:</string>
-    <string name="your_bitcoin_address">Din Bitcoin adresse:</string>
+    <string name="transaction_fee_text">Et Bitcoin transaktionsgebyr på 0.0005 BTC bliver automatist tilføjet til din transaktion.%1$sinformation...%2$s</string>
+    <string name="transaction_fee_text_info">Ved at tilføje en lille transaktionsafgift sikres det, at din transaktion forplanter sig i netværket, og at den bliver accepteret af Bitcoin-minører. Størrelsen på din transaktionsafgift er typisk 0.0005 BTC, men kan blive større hvis din transaktion er større end 1000 bytes. Hvis din trasaktion behøver en større afgift end 0.0005 BTC, vil du blive bedt om at godkende transaktionen.</string>
+    <string name="your_balance">Din saldo:</string>
+    <string name="your_bitcoin_address">Din Bitcoin-adresse:</string>
     <!-- Warnings -->
     <string name="install_qr_scanner">Installér venligst ZXing QR-code scanner eller Goggles!</string>
     <string name="need_connection">Du skal være forbundet til internettet.</string>
@@ -57,35 +57,35 @@
     <string name="invalid_address_for_prodnet">Ugyldig adresse</string>
     <string name="restore_invalid_qr_code">Ugyldig QR-kode!</string>
     <!-- NEW STRINGS -->
-    <string name="prefs_choose_default_locale">Vælg standart sprog</string>
+    <string name="prefs_choose_default_locale">Vælg standardsprog</string>
     <string name="pay_to">Betal til:</string>
     <string name="address">Adresse</string>
     <string name="amount_to_pay">Beløb:</string>
     <string name="prefs_category_advanced">Avanceret</string>
-    <string name="prefs_transaction_history_size">Tansaktionshistoriens størrelse</string>
+    <string name="prefs_transaction_history_size">Transaktionshistorikkens størrelse</string>
     <string name="pref_export_private_key_title">Eksporter den private nøgle</string>
-    <string name="export_private_key_dialog_text">Advarsel. Du skal til at eksportere din private nøgle der holder alle bitcoins i BitcoinSpinner.\n\nAlle der får adgang til denne nøgle kan overtage alle bitcoins den holder.</string>
+    <string name="export_private_key_dialog_text">Advarsel: Du skal til at eksportere din private nøgle, der opbevarer alle Bitcoins i BitcoinSpinner.\n\nAlle, der får adgang til denne nøgle, kan overtage alle Bitcoins den opbevarer.</string>
     <string name="cancel">Afbryd</string>
     <string name="bitcoinspinner_backup">BitcoinSpinner Backup</string>
-    <string name="bitcoin_address">Bitcoin Adresse</string>
+    <string name="bitcoin_address">Bitcoin-adresse</string>
     <string name="unknown">Ukendt</string>
-    <string name="usd_value">værdi omkring %s USD</string>
+    <string name="usd_value">Værdi ca. %s USD</string>
     <string name="no_network">Ingen netværksforbindelse</string>
     <string name="beta_warning">Dette er en beta. Brug under eget ansvar.</string>
-    <string name="unexpected_error">En uventet fejl opstod. Prøv venlight igen.</string>
+    <string name="unexpected_error">En uventet fejl opstod. Prøv venligst igen.</string>
     <string name="donate_menu">Doner</string>
     <string name="coins_on_their_way">Bitcoins på vej til dig:</string>
-    <string name="private_key">Privat Nøgle</string>
-    <string name="donations_appreciated">BitcoinSpinner og de servere den afhænger af er stillet gratis til rådighed.\n\nHjælp os med at forbedre en fantastisk gratis Bitcoin pung.\n\nVil du give en lille donation?</string>
-    <string name="initializing_bitcoinspinner">Initialisererer BitcoinSpinner</string>
-    <string name="unconfirmed_from">Modtager fra (ukonfirmeret):</string>
-    <string name="unconfirmed_to">Sender til (ukonfimeret):</string>
+    <string name="private_key">Privat nøgle</string>
+    <string name="donations_appreciated">BitcoinSpinner, og de servere den afhænger af, er stillet gratis til rådighed.\n\nHjælp os med at forbedre en fantastisk gratis Bitcoin-pung.\n\nVil du give en lille donation?</string>
+    <string name="initializing_bitcoinspinner">Indlæser BitcoinSpinner</string>
+    <string name="unconfirmed_from">Modtaget fra (ubekræftet):</string>
+    <string name="unconfirmed_to">Sender til (ubekræftet):</string>
     <string name="address_book_menu">Adresse Bog</string>
     <string name="copied_to_clipboard">Kopieret til udklipsholder</string>
     <string name="address_book">Adresse Bog</string>
     <string name="address_book_empty">Din adressebog er tom.</string>
     <string name="amount_too_large">Beløb for stort</string>
-    <string name="unconfirmed_received_with">Modtager med (ukonfirmeret)</string>
+    <string name="unconfirmed_received_with">Modtager med (ubekræftet)</string>
     <string name="none">Ingen</string>
     <string name="recent_receivers">Seneste Modtagere</string>
     <string name="add_address">Tilføj Adresse</string>
