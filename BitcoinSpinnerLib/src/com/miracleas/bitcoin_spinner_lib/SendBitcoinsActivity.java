@@ -86,6 +86,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		setContentView(R.layout.send_money);
 		mContext = this;
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		if (!SpinnerContext.isInitialized()) {
@@ -105,7 +106,6 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 			getBaseContext().getResources().updateConfiguration(config,
 					getBaseContext().getResources().getDisplayMetrics());
 		}
-		setContentView(R.layout.send_money);
 
 		detector = new SimpleGestureFilter(this, this);
 		tvValidAdress = (TextView) findViewById(R.id.tv_validation_of_adress);
