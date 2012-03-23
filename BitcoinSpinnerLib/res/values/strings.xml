@@ -58,7 +58,7 @@
     <string name="invalid_address_for_prodnet">Invalid address</string>
     <string name="restore_invalid_qr_code">Invalid QR-code!</string>
     <!-- NEW STRINGS -->
-    <string name="prefs_choose_default_locale">Choose default language</string>
+    <string name="prefs_choose_default_locale">Language</string>
     <string name="pay_to">Pay to:</string>
     <string name="address">Address</string>
     <string name="private_key">Private Key</string>
@@ -74,7 +74,6 @@
     <string name="unexpected_error">An unexpected error occurred. Please try again.</string>
     <string name="unknown">Unknown</string>
     <string name="donations_appreciated">BitcoinSpinner and the servers it depends on are provided for free.\n\nPlease help us continue improving a great free Bitcoin wallet.\n\nDo you want to give a small donation?</string>
-    <string name="usd_value">worth about %s USD</string>
     <string name="coins_on_their_way">Coins on their way to you:</string>
     <string name="donate_menu">Donate</string>
     <string name="initializing_bitcoinspinner">Initializing BitcoinSpinner</string>
@@ -103,4 +102,6 @@
     <string name="edit_address">Edit Address</string>
     <string name="copy_to_clipboard">Copy to clipboard	</string>
     <string name="scan_qr_code">Scan QR-code</string>
+    <string name="worth_about">worth about %s</string>
+    <string name="prefs_currency">Local currency</string>
 </resources>

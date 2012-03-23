@@ -40,6 +40,7 @@ public class SettingsActivity extends PreferenceActivity {
 			ExportPrivateKeyPref;
 	private EditTextPreference transactionHistorySizePref;
 	private ListPreference useLocalePref;
+	private ListPreference usedCurrencyPref;
 
 	private ProgressDialog restoreDialog;
 	
@@ -64,6 +65,12 @@ public class SettingsActivity extends PreferenceActivity {
 		useLocalePref = (ListPreference) findPreference("useLocale");
 		useLocalePref.setTitle(R.string.prefs_choose_default_locale);
 		useLocalePref.setOnPreferenceChangeListener(useLocalChangeListener);
+
+		usedCurrencyPref = (ListPreference) findPreference("usedCurrency");
+		String localCurrency = preferences.getString(Consts.LOCAL_CURRENCY, Consts.DEFAULT_CURRENCY);
+		usedCurrencyPref.setValue(localCurrency);
+		usedCurrencyPref.setTitle(R.string.prefs_currency);
+		usedCurrencyPref.setOnPreferenceChangeListener(usedCurrency);
 
 		transactionHistorySizePref = (EditTextPreference) findPreference("transactionHistorySize");
 		int transactionSize = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE,
@@ -111,6 +118,16 @@ public class SettingsActivity extends PreferenceActivity {
 		}
 	};
 
+	private final OnPreferenceChangeListener usedCurrency = new OnPreferenceChangeListener() {
+
+		@Override
+		public boolean onPreferenceChange(Preference preference, Object newValue) {
+			editor.putString(Consts.LOCAL_CURRENCY, (String) newValue);
+			editor.commit();
+			return true;
+		}
+	};
+	
 	private final OnPreferenceChangeListener TransactionHistorySizeChangeListener = new OnPreferenceChangeListener() {
 
 		@Override

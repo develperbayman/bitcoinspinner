@@ -2,6 +2,8 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 	<ListPreference android:key="useLocale"
 		android:entryValues="@array/laguagesValues" android:entries="@array/languages" />
+	<ListPreference android:key="usedCurrency"
+		android:entryValues="@array/currencies" android:entries="@array/currencies" />
 	<EditTextPreference android:key="transactionHistorySize"
 		android:title="@string/prefs_transaction_history_size" />
 	<PreferenceCategory android:title="@string/prefs_category_backupandrestore">

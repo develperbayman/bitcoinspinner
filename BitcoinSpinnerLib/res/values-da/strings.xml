@@ -57,7 +57,7 @@
     <string name="invalid_address_for_prodnet">Ugyldig adresse</string>
     <string name="restore_invalid_qr_code">Ugyldig QR-kode!</string>
     <!-- NEW STRINGS -->
-    <string name="prefs_choose_default_locale">Vælg standardsprog</string>
+    <string name="prefs_choose_default_locale">Sprog</string>
     <string name="pay_to">Betal til:</string>
     <string name="address">Adresse</string>
     <string name="amount_to_pay">Beløb:</string>
@@ -69,7 +69,6 @@
     <string name="bitcoinspinner_backup">BitcoinSpinner Backup</string>
     <string name="bitcoin_address">Bitcoin-adresse</string>
     <string name="unknown">Ukendt</string>
-    <string name="usd_value">Værdi ca. %s USD</string>
     <string name="no_network">Ingen netværksforbindelse</string>
     <string name="beta_warning">Dette er en beta. Brug under eget ansvar.</string>
     <string name="unexpected_error">En uventet fejl opstod. Prøv venligst igen.</string>
@@ -103,4 +102,6 @@
     <string name="edit_address">Editer Adresse</string>
     <string name="copy_to_clipboard">Kopier til udklipsholder</string>
     <string name="scan_qr_code">Scan QR-kode</string>
+    <string name="worth_about">Værdi ca. %s</string>
+    <string name="prefs_currency">Lokal valuta</string>
 </resources>

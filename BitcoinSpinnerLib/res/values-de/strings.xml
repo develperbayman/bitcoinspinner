@@ -57,4 +57,5 @@
     <string name="invalid_address_for_prodnet">Ungültige Adresse</string>
     <string name="restore_invalid_qr_code">Ungültiger QR-code!</string>
     <!-- NEW STRINGS -->
+    <string name="prefs_choose_default_locale">Sprache</string>
 </resources>

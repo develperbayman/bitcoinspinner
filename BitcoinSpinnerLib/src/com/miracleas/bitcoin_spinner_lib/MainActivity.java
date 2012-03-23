@@ -34,11 +34,11 @@ import com.bccapi.core.CoinUtils;
 import com.bccapi.core.Asynchronous.AccountTask;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
 import com.bccapi.core.Asynchronous.GetAccountInfoCallbackHandler;
+import com.miracleas.bitcoin_spinner_lib.MultiTicker.TickerCallbackHandler;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
-import com.miracleas.bitcoin_spinner_lib.Ticker.BtcToUsdCallbackHandler;
 
 public class MainActivity extends Activity implements SimpleGestureListener,
-		GetAccountInfoCallbackHandler, BtcToUsdCallbackHandler {
+		GetAccountInfoCallbackHandler, TickerCallbackHandler {
 
 	private Context mContext;
 	private TextView tvAddress, tvBalance, tvUsdValue, tvEstimatedOnTheWay;
@@ -63,6 +63,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 	private SharedPreferences preferences;
 	private ConnectionWatcher mConnectionWatcher;
+	private long mLatestBalance;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -88,7 +89,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 					getBaseContext().getResources().getDisplayMetrics());
 		}
 		setContentView(R.layout.main);
-
+		mLatestBalance = -1;
 		detector = new SimpleGestureFilter(this, this);
 		mConnectionWatcher = new ConnectionWatcher(mContext);
 		new Thread(mConnectionWatcher).start();
@@ -440,9 +441,11 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	}
 
 	private void updateBalances(long balance, long onTheWayToMe) {
+		mLatestBalance = balance;
 		if (balance >= 0) {
 			tvBalance.setText(CoinUtils.valueString(balance) + " BTC");
-			Ticker.requestBtcToUsd(balance, this);
+			String localCurrency = preferences.getString(Consts.LOCAL_CURRENCY, Consts.DEFAULT_CURRENCY);
+			MultiTicker.requestTicker(localCurrency, this);
 		} else {
 			tvBalance.setText(R.string.unknown);
 			tvUsdValue.setText("");
@@ -456,21 +459,21 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	}
 
 	@Override
-	public void handleBtcToUsdCallback(Double usdValue) {
-		if(usdValue == null){
+	public void handleTickerCallback(String currency, Double value) {
+		if (value != null) {
+			Double btc = new Double(mLatestBalance) / Consts.SATOSHIS_PER_BITCOIN;
+			Double converted = btc * value;
+			String text = String.format("%1s %2$.2f", currency, converted); 
+			tvUsdValue.setText(getResources().getString(R.string.worth_about, text));
+		} else {
 			tvUsdValue.setText("");
-		}else{
-			String value = String.format("%1$.2f", usdValue); 
-			tvUsdValue.setText(getResources().getString(R.string.usd_value, value));
 		}
 	}
-
+	
 	private void updateAddress() {
 		String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
 		tvAddress.setText(address);
 		ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(SpinnerContext.getInstance().getAccount()));
 	}
-
-
 
 }
