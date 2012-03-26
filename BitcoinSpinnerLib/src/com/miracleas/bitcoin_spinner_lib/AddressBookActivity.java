@@ -130,7 +130,7 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 
 	private void doShowQrCode() {
 		Bitmap qrCode = Utils.getLargeQRCodeBitmap("bitcoin:" + mSelectedAddress);
-		Utils.showQrCode(mContext, R.string.bitcoin_address, qrCode);
+		Utils.showQrCode(mContext, R.string.bitcoin_address, qrCode, mSelectedAddress);
 	}
 
 	private void doDeleteEntry() {

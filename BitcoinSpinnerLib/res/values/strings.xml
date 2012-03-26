@@ -85,7 +85,7 @@
     <string name="unconfirmed_received_with">Receiving with (uncomfirmed):</string>
     <string name="received_with">Received with:</string>
     <string name="address_book_menu">Address Book</string>
-    <string name="select_recipient">an</string>
+    <string name="select_recipient">Select Recipient</string>
     <string name="add_address_title">Add Address to Address Book</string>
     <string name="add_address_description">Select a recent receiver from the list below or scan a Bitcoin address QR-code.</string>
     <string name="add_address">Add Address</string>

@@ -55,7 +55,7 @@
         android:layout_height="wrap_content"
         android:layout_alignParentLeft="true"
         android:layout_below="@id/et_address"
-        android:text="Scan QR-code" 
+        android:text="@string/scan_qr_code" 
         android:textSize="20dp"        
         android:layout_marginLeft="5dp" />
         
@@ -68,7 +68,7 @@
         android:layout_alignBaseline="@id/btn_qr_scan"
         android:layout_alignBottom="@id/btn_qr_scan"
         android:layout_toRightOf="@id/btn_qr_scan"
-        android:text="Address Book"
+        android:text="@string/address_book"
         android:textSize="20dp"        
         android:layout_marginLeft="5dp" />
 

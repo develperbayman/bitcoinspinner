@@ -12,7 +12,6 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -41,7 +40,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		GetAccountInfoCallbackHandler, TickerCallbackHandler {
 
 	private Context mContext;
-	private TextView tvAddress, tvBalance, tvUsdValue, tvEstimatedOnTheWay;
+	private TextView tvAddress, tvBalance, tvCurrencyValue, tvEstimatedOnTheWay;
 	private ImageView ivAddress;
 	private Button btnSendMoney, btnTransactionHistory;
 	private RelativeLayout rlBalance;
@@ -97,7 +96,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		tvAddress = (TextView) findViewById(R.id.tv_address);
 		ivAddress = (ImageView) findViewById(R.id.iv_address);
 		tvBalance = (TextView) findViewById(R.id.tv_balance);
-		tvUsdValue = (TextView) findViewById(R.id.tv_usd_value);
+		tvCurrencyValue = (TextView) findViewById(R.id.tv_usd_value);
 		tvEstimatedOnTheWay = (TextView) findViewById(R.id.tv_estimated_on_the_way);
 		btnSendMoney = (Button) findViewById(R.id.btn_send_money);
 		btnTransactionHistory = (Button) findViewById(R.id.btn_transaction_history);
@@ -196,8 +195,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 		@Override
 		public void onClick(View v) {
-			Bitmap qrCode = Utils.getPrimaryAddressAsLargeQrCode(SpinnerContext.getInstance().getAccount());
-			Utils.showQrCode(mContext, R.string.bitcoin_address, qrCode);
+			Utils.showPrimaryAddressQrCode(mContext, SpinnerContext.getInstance().getAccount());
 		}
 	};
 
@@ -448,7 +446,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			MultiTicker.requestTicker(localCurrency, this);
 		} else {
 			tvBalance.setText(R.string.unknown);
-			tvUsdValue.setText("");
+			tvCurrencyValue.setText("");
 		}
 		if (onTheWayToMe >= 0) {
 			tvEstimatedOnTheWay.setText(CoinUtils.valueString(onTheWayToMe)
@@ -463,10 +461,10 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		if (value != null) {
 			Double btc = new Double(mLatestBalance) / Consts.SATOSHIS_PER_BITCOIN;
 			Double converted = btc * value;
-			String text = String.format("%1s %2$.2f", currency, converted); 
-			tvUsdValue.setText(getResources().getString(R.string.worth_about, text));
+			String text = String.format(Locale.US, "%1$.2f %2$s", converted, currency); 
+			tvCurrencyValue.setText(getResources().getString(R.string.worth_about, text));
 		} else {
-			tvUsdValue.setText("");
+			tvCurrencyValue.setText("");
 		}
 	}
 	

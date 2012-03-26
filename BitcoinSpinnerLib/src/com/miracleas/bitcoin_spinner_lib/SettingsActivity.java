@@ -162,7 +162,7 @@ public class SettingsActivity extends PreferenceActivity {
 									final BackupInfo info = new BackupInfo(Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(),net),net);
 									info.getBackupUrl();
 									Bitmap qrCode = Utils.getLargeQRCodeBitmap(info.getBackupUrl());
-									Utils.showQrCode(mContext, R.string.bitcoinspinner_backup, qrCode);
+									Utils.showQrCode(mContext, R.string.bitcoinspinner_backup, qrCode, info.getBackupUrl());
 								}
 							})
 					.setNegativeButton(R.string.no,
@@ -241,7 +241,7 @@ public class SettingsActivity extends PreferenceActivity {
 							keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(
 									SpinnerContext.getInstance().getNetwork());
 							Bitmap qrCode = Utils.getLargeQRCodeBitmap(keyString);
-							Utils.showQrCode(mContext, R.string.private_key, qrCode);
+							Utils.showQrCode(mContext, R.string.private_key, qrCode, keyString);
 						}
 					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
 						public void onClick(DialogInterface dialog, int id) {

@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <!-- Name, about, credits and versioning -->
+    <string name="app_name">BitcoinSpinner</string>
+    <string name="about_title">Tietoja BitcoinSpinner</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner on ultrakevyt, turvallinen, ja käyttäjäystävällinen Bitcoin asiakasohjelma Androidille, joka on rakennettu BCCAPIn päälle.\nBitcoinSpinner ei ole Bitcoin pankki. Kaikki talletuksesi on turvattu yksityisavaimilla, app-private varastossa Android-laitteellasi.\n\nOta huomioon että tämä on beta-julkaisu, käytä omalla vastuullasi.</string>
+    <string name="credits_text">Kiitokset:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)\n - Tomi(Fi. trans.)</string>
+    <!-- Menu -->
+    <string name="about_menu">Tietoja BS</string>
+    <string name="credits_menu">Tekijät</string>
+    <string name="settings_menu">Asetukset</string>
+    <!-- Startup -->
+    <string name="startup_dialog_text">Odota...</string>
+    <!-- Backup and Restore -->
+    <string name="backup_dialog_text">Olet näyttämässä QR-koodia mitä voi käyttää lompakkosi palauttamiseen eri laitteessa.\n\nOta siitä kuva ja/tai tulosta se paperille.\n\nVaroitus, tämä koodi mahdollistaa sen, että jokainen joka skannaa sen, voi ottaa haltuunsa tämän laitteen talletukset.\n\nHaluatko jatkaa?</string>
+    <string name="restore_complete_dialog_text">Palautus valmis</string>
+    <string name="restore_dialog_coins">Sinun ei tulisi palauttaa varmuuskopiota jos lompakossasi on talletuksia.\n\nLähetä talletuksesi jonnekkin muualle ennen suoritusta.\n\nHaluatko palauttaa varmuuskopion kaikesta huolimatta?</string>
+    <string name="restore_dialog_no_coins">Olet palauttamassa lompakkoasi varmuuskopiosta.\n\nTämä tehdään skannaamalla aikaisemmin tuotettu QR-koodi.\n\nHaluatko jatkaa?</string>
+    <string name="restore_dialog_title">Palautetaan</string>
+    <!-- Preferences -->
+    <string name="pref_network_fee">Rahansiirtopalkkio</string>
+    <string name="prefs_backup_title">Varmuuskopioi lompakko</string>
+    <string name="prefs_category_backupandrestore">Varmuuskopioi ja palauta</string>
+    <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner asetukset</string>
+    <string name="prefs_restore_title">Palauta lompakko</string>
+    <!-- Transaction -->
+    <string name="no_transactions">Ei rahansiirtoja</string>
+    <string name="received_from">Vastaanotettu:</string>
+    <string name="sent_to">Saaja:</string>
+    <string name="sent_to_yourself">Lähetä itsellesi:</string>
+    <string name="transaction_history">Rahansiirron historia</string>
+    <!-- Common -->
+    <string name="no">Ei</string>
+    <string name="yes">Kyllä</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Peru</string>
+    <string name="please_wait">Odota...</string>
+    <string name="try_again">Yritä uudelleen?</string>
+    <!-- Calculation and sending of bitcoins -->
+    <string name="calculating_fee">Lasketaan siirtopalkkiota</string>
+    <string name="calculating_fee_wait">Odota kunnes siirtopalkkion määrä on laskettu...</string>
+    <string name="calculating_fee_done">Siirtopalkkioksi on laskettu %s BTC.\n\nSuoritetaanko?</string>
+    <string name="send_bitcoins">Lähetä Bitcoineja</string>
+    <string name="sending_bitcoins">Lähetetään Bitcoineja</string>
+    <string name="sending_bitcoins_wait">Odota hetki, bitcoineja lähetetään</string>
+    <!-- Sharing -->
+    <string name="share_bitcoin_address">Jaa Bitcoin-osoitteesi...</string>
+    <!-- Info -->
+    <string name="transaction_fee_text">Bitcoin siirtopalkkio on 0.0005 BTC on automaattisesti lisätty rahansiirtoosi.%1$sinfo...%2$s</string>
+    <string name="transaction_fee_text_info">Lisäämällä pienen rahansiirtopalkkion omaan siirtoosi, varmistetaan että se välitetään verkon kautta ja hyväksytään Bitcoin-minereilla. Siirtopalkkion koko on tyypillisesti 0.0005 BTC, mutta se voi olla suurempi jos rahansiirtosi on suurempi kuin 1000 tavua. Jos rahansiirtosi palkkio on suurempi kuin 0.0005 BTC tulet saamaan kehoituksen vahvistaa haluatko lähettää sen.</string>
+    <string name="your_balance">Saldosi:</string>
+    <string name="your_bitcoin_address">Bitcoin-osoitteesi:</string>
+    <!-- Warnings -->
+    <string name="install_qr_scanner">Ole hyvä ja asenna ZXing QR-koodi skanneri tai Goggles!</string>
+    <string name="need_connection">Sinun täytyy olla yhteydessä internettiin.</string>
+    <!-- Errors -->
+    <string name="invalid_address_for_testnet">Väärä osoite testiverkolle</string>
+    <string name="invalid_address_for_prodnet">Väärä osoite</string>
+    <string name="restore_invalid_qr_code">Väärä QR-koodi!</string>
+    <!-- NEW STRINGS -->
+    <string name="prefs_choose_default_locale">Kieli</string>
+    <string name="pay_to">Maksun saaja:</string>
+    <string name="address">Osoite</string>
+    <string name="private_key">Yksityisavain</string>
+    <string name="bitcoinspinner_backup">BitcoinSpinner varmuuskopio</string>
+    <string name="bitcoin_address">Bitcoin osoite</string>
+    <string name="amount_to_pay">Maksettava määrä:</string>
+    <string name="prefs_category_advanced">Edistyneet asetukset</string>
+    <string name="prefs_transaction_history_size">Rahansiirtohistorian koko</string>
+    <string name="pref_export_private_key_title">Vie yksityisavain</string>
+    <string name="export_private_key_dialog_text">Varoitus. Olet viemässä yksityisavainta mikä kontrolloi kaikkia BitcoinSpinnerin hallitsemia bitcoineja.\n\nKuka tahansa joka saa haltuunsa tämän avaimen, voi ottaa bitcoinien kontrollin.\n\nHaluatko jatkaa?</string>
+    <string name="beta_warning">Tämä on beta-julkaisu. Käytä omalla vastuullasi.</string>
+    <string name="no_network">Ei yhteyttä verkkoon.</string>
+    <string name="unexpected_error">Odoittamaton virhe. Ole hyvä ja yritä uudelleen.</string>
+    <string name="unknown">Tuntematon</string>
+    <string name="donations_appreciated">BitcoinSpinner ja siihen liittyvät palvelimet tarjotaan ilmaiseksi.\n\nAuta meitä parantamaan edelleen erinomaista ja ilmaista Bitcoin-lompakkoa.\n\nHaluatko antaa pienen lahjoituksen?</string>
+    <string name="coins_on_their_way">Bitcoinenja on tulossa sinulle:</string>
+    <string name="donate_menu">Lahjoita</string>
+    <string name="initializing_bitcoinspinner">Alustetaan BitcoinSpinner</string>
+    <string name="unconfirmed_from">Vastaanotettu (vahvistamaton):</string>
+    <string name="unconfirmed_to">Vastaanottaja (vahvistamaton):</string>
+    <string name="invalid_amount">Virheellinen määrä </string>
+    <string name="amount_too_large">Määrä on liian suuri</string>
+    <string name="address_book">Osoitekirja</string>
+    <string name="unconfirmed_received_with">Vastaanotettu (vahvistamaton):</string>
+    <string name="received_with">Vastaanotettu:</string>
+    <string name="address_book_menu">Osoitekirja</string>
+    <string name="select_recipient">Valitse vastaanottaja</string>
+    <string name="add_address_title">Lisää osoite osoitekirjaan</string>
+    <string name="add_address_description">Valitse viimeisin vastaanottaja alla olevalta listalta tai skannaa QR-koodi Bitcoin-osoite.</string>
+    <string name="add_address">Lisää osoite</string>
+    <string name="recent_receivers">Viimeisimmät vastaanottaja</string>
+    <string name="none">Ei mitään</string>
+    <string name="name">Nimi</string>
+    <string name="set_name_title">Anna osoite nimi</string>
+    <string name="delete_address_confirmation">Oletko varma että haluat poistaa tämän osoitteen osoitekirjastasi?</string>
+    <string name="copied_to_clipboard">Kopioitu leikepöydälle</string>
+    <string name="address_book_empty">Osoitekirjasi on tyhjä.</string>
+    <string name="invalid_value">Virheellinen arvo</string>
+    <string name="delete_address">Poista osoite</string>
+    <string name="show_qr_code">Näytä QR-koodi</string>
+    <string name="edit_address">Muokkaa osoitetta</string>
+    <string name="copy_to_clipboard">Kopioi leikepöydälle	</string>
+    <string name="scan_qr_code">Skannaa QR-koodi</string>
+    <string name="worth_about">arvo on noin %s</string>
+    <string name="prefs_currency">Paikallinen valuutta</string>
+</resources>

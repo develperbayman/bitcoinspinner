@@ -100,16 +100,6 @@ public class Utils {
 	private static String _lastQrAddressStringLarge;
 	private static Bitmap _lastQrAddressBitmapLarge;
 
-	public static synchronized Bitmap getPrimaryAddressAsLargeQrCode(AsynchronousAccount account) {
-		String address = account.getPrimaryBitcoinAddress();
-		if (address.equals(_lastQrAddressStringLarge)) {
-			return _lastQrAddressBitmapLarge;
-		}
-		_lastQrAddressStringLarge = address;
-		_lastQrAddressBitmapLarge = getLargeQRCodeBitmap("bitcoin:" + address);
-		return _lastQrAddressBitmapLarge;
-	}
-
 	public static Bitmap getLargeQRCodeBitmap(final String url) {
 		// make size 85% of display size
 		SpinnerContext sc = SpinnerContext.getInstance();
@@ -237,7 +227,20 @@ public class Utils {
 		}
 	}
 
-	public static AlertDialog showQrCode(final Context context, int titleMessageId, Bitmap qrCode) {
+	public static AlertDialog showPrimaryAddressQrCode(final Context context, AsynchronousAccount account) {
+
+		String address = account.getPrimaryBitcoinAddress();
+		Bitmap qrCode = _lastQrAddressBitmapLarge;
+		if (!address.equals(_lastQrAddressStringLarge)) {
+			_lastQrAddressStringLarge = address;
+			_lastQrAddressBitmapLarge = getLargeQRCodeBitmap("bitcoin:" + address);
+			qrCode = _lastQrAddressBitmapLarge;
+		}
+		return showQrCode(context, R.string.bitcoin_address, qrCode, address);
+
+	}
+
+	public static AlertDialog showQrCode(final Context context, int titleMessageId, Bitmap qrCode, final String value) {
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		View layout = inflater.inflate(R.layout.dialog_qr_address, null);
 		AlertDialog.Builder builder = new AlertDialog.Builder(context).setView(layout);
@@ -262,7 +265,7 @@ public class Utils {
 			@Override
 			public void onClick(View v) {
 				ClipboardManager clipboard = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
-				clipboard.setText(SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
+				clipboard.setText(value);
 				Toast.makeText(context, R.string.copied_to_clipboard, Toast.LENGTH_SHORT).show();
 			}
 		});
