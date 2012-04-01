@@ -2,6 +2,18 @@ package com.miracleas.bitcoin_spinner_lib;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.SSLSocketFactory;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 
 import android.os.Handler;
 
@@ -15,11 +27,56 @@ public class MultiTicker {
 
 	private static final int MTGOX_RETRIES = 3;
 	private static final long MTGOX_CACHE_INTERVAL = Consts.MINUTE_IN_NANOSECONDS * 5;
+	private static final HostnameVerifier HOST_NAME_VERIFIER;
+	private static final SSLSocketFactory SSL_SOCKET_FACTORY;
 
 	private static Double _cachedValue;
 	private static long _cacheTime;
 	private static String _cachedCurrency;
 	private static boolean _blockerOn;
+
+	static {
+
+		// There is a problem with the mtgox.com SSL certificate, and it no longer validates on Android devices.
+		// This is not a big issue as we only use their APIs to obtain a BTC ticker.
+		HOST_NAME_VERIFIER = new HostnameVerifier() {
+			@Override
+			public boolean verify(String hostname, SSLSession session) {
+				return hostname.equals("mtgox.com");
+			}
+		};
+
+		// There is a problem with the mtgox.com SSL certificate, and it no longer validates on Android devices.
+		// This is not a big issue as we only use their APIs to obtain a BTC ticker.
+		// Make a trust manager that trusts any certificate
+		TrustManager[] trustOneCert = new TrustManager[] { new X509TrustManager() {
+			public X509Certificate[] getAcceptedIssuers() {
+				return null;
+			}
+
+			public void checkClientTrusted(X509Certificate[] certs, String authType)
+					throws java.security.cert.CertificateException {
+				// We do not use a client side certificate
+				throw new CertificateException();
+			}
+
+			public void checkServerTrusted(X509Certificate[] certs, String authType)
+					throws java.security.cert.CertificateException {
+				return;
+			}
+		} };
+
+		// Create an SSL socket factory that trusts any server certificate
+		try {
+			SSLContext sc = SSLContext.getInstance("TLS");
+			sc.init(null, trustOneCert, null);
+			SSL_SOCKET_FACTORY = sc.getSocketFactory();
+		} catch (NoSuchAlgorithmException e) {
+			throw new RuntimeException(e);
+		} catch (KeyManagementException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
 	public interface TickerCallbackHandler {
 		public void handleTickerCallback(String currency, Double value);
@@ -70,8 +127,10 @@ public class MultiTicker {
 		private static Double getLastMtGoxTrade(String currency) {
 			try {
 				URL url = new URL("https://mtgox.com/api/1/BTC" + currency + "/public/ticker");
-				HttpURLConnection connection;
-				connection = (HttpURLConnection) url.openConnection();
+				HttpsURLConnection connection;
+				connection = (HttpsURLConnection) url.openConnection();
+				connection.setHostnameVerifier(HOST_NAME_VERIFIER);
+				connection.setSSLSocketFactory(SSL_SOCKET_FACTORY);
 				connection.setReadTimeout(60000);
 				connection.setRequestMethod("GET");
 				connection.connect();
