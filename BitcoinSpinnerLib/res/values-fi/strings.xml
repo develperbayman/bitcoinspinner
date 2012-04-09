@@ -46,7 +46,7 @@
     <!-- Sharing -->
     <string name="share_bitcoin_address">Jaa Bitcoin-osoitteesi...</string>
     <!-- Info -->
-    <string name="transaction_fee_text">Bitcoin siirtopalkkio on 0.0005 BTC on automaattisesti lisätty rahansiirtoosi.%1$sinfo...%2$s</string>
+    <string name="transaction_fee_text">Bitcoin siirtopalkkio 0.0005 BTC on automaattisesti lisätty rahansiirtoosi.%1$sinfo...%2$s</string>
     <string name="transaction_fee_text_info">Lisäämällä pienen rahansiirtopalkkion omaan siirtoosi, varmistetaan että se välitetään verkon kautta ja hyväksytään Bitcoin-minereilla. Siirtopalkkion koko on tyypillisesti 0.0005 BTC, mutta se voi olla suurempi jos rahansiirtosi on suurempi kuin 1000 tavua. Jos rahansiirtosi palkkio on suurempi kuin 0.0005 BTC tulet saamaan kehoituksen vahvistaa haluatko lähettää sen.</string>
     <string name="your_balance">Saldosi:</string>
     <string name="your_bitcoin_address">Bitcoin-osoitteesi:</string>
@@ -63,7 +63,7 @@
     <string name="address">Osoite</string>
     <string name="private_key">Yksityisavain</string>
     <string name="bitcoinspinner_backup">BitcoinSpinner varmuuskopio</string>
-    <string name="bitcoin_address">Bitcoin osoite</string>
+    <string name="bitcoin_address">Bitcoin-osoite</string>
     <string name="amount_to_pay">Maksettava määrä:</string>
     <string name="prefs_category_advanced">Edistyneet asetukset</string>
     <string name="prefs_transaction_history_size">Rahansiirtohistorian koko</string>
@@ -71,10 +71,10 @@
     <string name="export_private_key_dialog_text">Varoitus. Olet viemässä yksityisavainta mikä kontrolloi kaikkia BitcoinSpinnerin hallitsemia bitcoineja.\n\nKuka tahansa joka saa haltuunsa tämän avaimen, voi ottaa bitcoinien kontrollin.\n\nHaluatko jatkaa?</string>
     <string name="beta_warning">Tämä on beta-julkaisu. Käytä omalla vastuullasi.</string>
     <string name="no_network">Ei yhteyttä verkkoon.</string>
-    <string name="unexpected_error">Odoittamaton virhe. Ole hyvä ja yritä uudelleen.</string>
+    <string name="unexpected_error">Odottamaton virhe. Ole hyvä ja yritä uudelleen.</string>
     <string name="unknown">Tuntematon</string>
     <string name="donations_appreciated">BitcoinSpinner ja siihen liittyvät palvelimet tarjotaan ilmaiseksi.\n\nAuta meitä parantamaan edelleen erinomaista ja ilmaista Bitcoin-lompakkoa.\n\nHaluatko antaa pienen lahjoituksen?</string>
-    <string name="coins_on_their_way">Bitcoinenja on tulossa sinulle:</string>
+    <string name="coins_on_their_way">Bitcoineja tulossa sinulle:</string>
     <string name="donate_menu">Lahjoita</string>
     <string name="initializing_bitcoinspinner">Alustetaan BitcoinSpinner</string>
     <string name="unconfirmed_from">Vastaanotettu (vahvistamaton):</string>
