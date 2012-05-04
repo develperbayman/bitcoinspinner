@@ -102,6 +102,7 @@
     <string name="edit_address">Edit Address</string>
     <string name="copy_to_clipboard">Copy to clipboard	</string>
     <string name="scan_qr_code">Scan QR-code</string>
-    <string name="worth_about">worth about %s</string>
+    <string name="worth_about">worth about %s (MtGox)</string>
     <string name="prefs_currency">Local currency</string>
+    <string name="buy_coins_menu">Buy Coins</string>
 </resources>

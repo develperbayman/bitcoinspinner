@@ -17,7 +17,6 @@ import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
@@ -194,9 +193,12 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
 				address = contents;
 			} else {
 				try {
-					Uri uri = Uri.parse(contents);
-					final Uri u = Uri.parse("bitcoin://" + uri.getSchemeSpecificPart());
-					address = u.getHost();
+					BitcoinUri b = BitcoinUri.parse(contents);
+					if(b == null) {
+						address = "";
+					} else {
+						address = b.getAddress();
+					}
 				} catch (Exception e) {
 					address = "";
 				}

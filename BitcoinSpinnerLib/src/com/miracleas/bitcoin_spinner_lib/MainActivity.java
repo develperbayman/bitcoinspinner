@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.Menu;
@@ -316,11 +317,21 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		} else if (item.getItemId() == R.id.donate) {
 			showDialog(DONATE_DIALOG);
 			return true;
+		} else if (item.getItemId() == R.id.buy_coins){
+			startBuyCoins();
+			return true;
 		} else {
 			return super.onOptionsItemSelected(item);
 		}
 	}
 
+	private void startBuyCoins() {
+		String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
+		Uri uri = Uri.parse("https://www.bitinstant.com/mobile_deposit?addr="+address);
+		Intent myIntent = new Intent(Intent.ACTION_VIEW, uri);
+		startActivity(myIntent);
+	}
+	
 	@Override
 	protected Dialog onCreateDialog(int id) {
 		final Dialog dialog;

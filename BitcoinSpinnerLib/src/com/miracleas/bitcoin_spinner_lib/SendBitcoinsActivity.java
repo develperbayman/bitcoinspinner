@@ -4,8 +4,6 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -63,8 +61,6 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 
 	private ProgressDialog mCalcFeeProgressDialog;
 	private ProgressDialog mSendCoinsProgressDialog;
-
-	private static final Pattern P_AMOUNT = Pattern.compile("([\\d.]+)(?:X(\\d+))?");
 
 	private SimpleGestureFilter detector;
 
@@ -240,8 +236,9 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 			} else if (!AddressUtil.validateAddress(tempString, network)) {
 				if (network.equals(Network.testNetwork)) {
 					tvValidAdress.setText(R.string.invalid_address_for_testnet);
-				} else if (network.equals(Network.productionNetwork))
+				} else if (network.equals(Network.productionNetwork)) {
 					tvValidAdress.setText(R.string.invalid_address_for_prodnet);
+				}
 				mValidAdress = false;
 				tvValidAdress.setError("");
 			} else {
@@ -378,21 +375,14 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 			if (contents.matches("[a-zA-Z0-9]*")) {
 				etAddress.setText(contents);
 			} else {
-				Uri uri = Uri.parse(contents);
-				final Uri u = Uri.parse("bitcoin://" + uri.getSchemeSpecificPart());
-
-				etAddress.setText(u.getHost());
-
-				final String amountStr = u.getQueryParameter("amount");
-				if (amountStr != null) {
-					final Matcher m = P_AMOUNT.matcher(amountStr);
-					if (m.matches()) {
-						etSpend.setText(CoinUtils.valueString(new BigDecimal(m.group(1)).movePointRight(8)
-								.toBigIntegerExact()));
-						if (m.group(2) != null)
-							;
-					}
+				BitcoinUri b = BitcoinUri.parse(contents);
+				if(b == null){
+					// not a bitcoin URI
+					tvValidAdress.setText(R.string.invalid_address_for_prodnet);
+					return;
 				}
+				etAddress.setText(b.getAddress());
+				etSpend.setText(CoinUtils.valueString(b.getAmount()));
 			}
 		} else if(requestCode == REQUEST_CODE_ADDRESS_BOOK && resultCode == RESULT_OK ){
 			String address = intent.getStringExtra(AddressChooserActivity.ADDRESS_RESULT_NAME);

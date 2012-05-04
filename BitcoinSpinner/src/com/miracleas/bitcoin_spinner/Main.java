@@ -25,6 +25,9 @@ public class Main extends Activity {
         final String scheme = intentUri != null ? intentUri.getScheme() : null;
         if (Intent.ACTION_VIEW.equals(action) && intentUri != null && "bitcoin".equals(scheme)) {
         	BitcoinUri b = BitcoinUri.parse(intentUri.toString());
+        	if(b == null){
+        		finish();
+        	}
             Intent i = new Intent(this, SendBitcoinsActivity.class);
             i.putExtra(Consts.BTC_ADDRESS_KEY, b.getAddress());
             i.putExtra(Consts.BTC_AMOUNT_KEY, b.getAmount());

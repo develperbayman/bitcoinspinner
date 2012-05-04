@@ -21,4 +21,9 @@
         android:icon="@drawable/tab_info_dark"
         android:title="@string/donate_menu"/>
 
+    <item
+        android:id="@+id/buy_coins"
+        android:icon="@drawable/tab_info_dark"
+        android:title="@string/buy_coins_menu"/>
+
 </menu>

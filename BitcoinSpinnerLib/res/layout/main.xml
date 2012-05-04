@@ -31,12 +31,12 @@
         android:id="@+id/btn_send_money"
         style="@style/SendMoneyButton"
         android:layout_width="fill_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:layout_below="@id/rl_balance_ref"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="13dp"
         android:text="@string/send_bitcoins"
         true="" />
 
@@ -44,15 +44,15 @@
         android:id="@+id/btn_transaction_history"
         style="@style/SendMoneyButton"
         android:layout_width="fill_parent"
-        android:layout_height="70dp"
+        android:layout_height="60dp"
         android:layout_below="@id/btn_send_money"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"
         android:layout_marginRight="5dp"
-        android:layout_marginTop="15dp"
+        android:layout_marginTop="10dp"
         android:text="@string/transaction_history"
         true="" />
-
+<!-- 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -61,5 +61,5 @@
         android:layout_marginBottom="2dp"
         android:text="@string/beta_warning"
         android:textColor="@color/White" />
-
+ -->
 </RelativeLayout>
