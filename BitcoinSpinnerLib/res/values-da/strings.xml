@@ -45,8 +45,8 @@
     <!-- Sharing -->
     <string name="share_bitcoin_address">Del din Bitcoin adresse...</string>
     <!-- Info -->
-    <string name="transaction_fee_text">Et Bitcoin transaktionsgebyr på 0.0005 BTC bliver automatist tilføjet til din transaktion.%1$sinformation...%2$s</string>
-    <string name="transaction_fee_text_info">Ved at tilføje en lille transaktionsafgift sikres det, at din transaktion forplanter sig i netværket, og at den bliver accepteret af Bitcoin-minører. Størrelsen på din transaktionsafgift er typisk 0.0005 BTC, men kan blive større hvis din transaktion er større end 1000 bytes. Hvis din trasaktion behøver en større afgift end 0.0005 BTC, vil du blive bedt om at godkende transaktionen.</string>
+    <string name="transaction_fee_text">Et Bitcoin transaktionsgebyr på 0.0005 BTC bliver automatisk tilføjet til din transaktion.%1$sinformation...%2$s</string>
+    <string name="transaction_fee_text_info">Ved at tilføje en lille transaktionsafgift sikres det, at din transaktion forplanter sig i netværket, og at den bliver accepteret af Bitcoin-minører. Størrelsen på din transaktionsafgift er typisk 0.0005 BTC, men kan blive større hvis din transaktion er større end 1000 bytes. Hvis din transaktion behøver en større afgift end 0.0005 BTC, vil du blive bedt om at godkende transaktionen.</string>
     <string name="your_balance">Din saldo:</string>
     <string name="your_bitcoin_address">Din Bitcoin-adresse:</string>
     <!-- Warnings -->
@@ -104,4 +104,5 @@
     <string name="scan_qr_code">Scan QR-kode</string>
     <string name="worth_about">Værdi ca. %s</string>
     <string name="prefs_currency">Lokal valuta</string>
+    <string name="buy_coins_menu">Køb Coins</string>
 </resources>
