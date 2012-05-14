@@ -327,7 +327,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 	private void startBuyCoins() {
 		String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
-		Uri uri = Uri.parse("https://www.bitinstant.com/mobile_deposit?addr="+address);
+		Uri uri = Uri.parse("http://www.bitinstant.com/mobile_deposit?addr="+address);
 		Intent myIntent = new Intent(Intent.ACTION_VIEW, uri);
 		startActivity(myIntent);
 	}

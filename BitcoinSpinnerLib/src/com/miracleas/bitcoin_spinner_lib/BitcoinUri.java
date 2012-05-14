@@ -26,7 +26,7 @@ public class BitcoinUri {
 		try {
 			Uri u = Uri.parse(uri);
 			String scheme = u.getScheme();
-			if(!scheme.equals("bitcoin")) {
+			if(!scheme.equalsIgnoreCase("bitcoin")) {
 				// not a bitcoin URI
 				return null;
 			}

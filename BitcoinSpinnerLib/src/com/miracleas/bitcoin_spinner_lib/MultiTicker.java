@@ -1,6 +1,5 @@
 package com.miracleas.bitcoin_spinner_lib;
 
-import java.net.HttpURLConnection;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
