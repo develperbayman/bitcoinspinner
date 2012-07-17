@@ -53,7 +53,7 @@ public class CoinUtils {
          value = value.negate();
       BigInteger coins = value.divide(BTC);
       BigInteger cents = value.remainder(BTC);
-      return String.format("%s%d.%05d", negative ? "-" : "", coins.intValue(), cents.intValue() / 1000);
+      return String.format("%s%d.%08d", negative ? "-" : "", coins.intValue(), cents.intValue());
    }
 
 }
