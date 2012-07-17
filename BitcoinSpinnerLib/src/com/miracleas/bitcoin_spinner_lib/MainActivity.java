@@ -27,6 +27,7 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bccapi.api.AccountInfo;
 import com.bccapi.api.Network;
@@ -49,6 +50,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	private View vBalanceUpdateView;
 	private View vBalanceNoConnView;
 	private AccountTask mGetInfoTask;
+	private CharSequence mRawAppName;
 
 	private AlertDialog qrCodeDialog;
 
@@ -69,6 +71,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		mRawAppName = this.getTitle();
 		mContext = this;
 		preferences = getSharedPreferences(Consts.PREFS_NAME, MODE_PRIVATE);
 		if(!SpinnerContext.isInitialized()){
@@ -224,7 +227,6 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	};
 
 	private final OnClickListener transactionHistoryClickListener = new OnClickListener() {
-
 		@Override
 		public void onClick(View v) {
 			Intent intent = new Intent();
@@ -474,8 +476,12 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			Double converted = btc * value;
 			String text = String.format(Locale.US, "%1$.2f %2$s", converted, currency); 
 			tvCurrencyValue.setText(getResources().getString(R.string.worth_about, text));
+			// Add the local currency value to the title
+			String title = String.format(Locale.US, " (1 BTC=%1$.2f %2$s)", value, currency); 
+			this.setTitle(mRawAppName + title);
 		} else {
 			tvCurrencyValue.setText("");
+			this.setTitle(mRawAppName);
 		}
 	}
 	

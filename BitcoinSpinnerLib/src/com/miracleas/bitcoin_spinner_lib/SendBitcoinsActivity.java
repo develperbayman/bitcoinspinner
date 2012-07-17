@@ -7,6 +7,7 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -16,6 +17,7 @@ import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.Html;
 import android.text.TextWatcher;
@@ -306,8 +308,9 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 
 		@Override
 		public void onFocusChange(View v, boolean hasFocus) {
-			if (hasFocus)
+			if (hasFocus) {
 				getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_VISIBLE);
+			}
 		}
 	};
 
@@ -338,10 +341,16 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 	};
 	
 	private final OnClickListener spendMoneyClickListener = new OnClickListener() {
-
 		@Override
 		public void onClick(View v) {
-			requestSendCoinForm();
+			// Make sure that we do not show the keyboard if the PIN is wrong
+			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+			Utils.runPinProtectedFunction(mContext, new Runnable() {
+				@Override
+				public void run() {
+					requestSendCoinForm();
+				}
+			});
 		}
 	};
 
@@ -382,7 +391,11 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 					return;
 				}
 				etAddress.setText(b.getAddress());
-				etSpend.setText(CoinUtils.valueString(b.getAmount()));
+				if (b.getAmount() > 0) {
+					etSpend.setText(CoinUtils.valueString(b.getAmount()));
+				} else {
+					etSpend.setText("");
+				}
 			}
 		} else if(requestCode == REQUEST_CODE_ADDRESS_BOOK && resultCode == RESULT_OK ){
 			String address = intent.getStringExtra(AddressChooserActivity.ADDRESS_RESULT_NAME);

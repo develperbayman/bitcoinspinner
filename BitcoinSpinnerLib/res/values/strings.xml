@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <!-- Name, about, credits and versioning -->
-    <string name="app_name">BitcoinSpinner</string>
     <string name="about_title">About BitcoinSpinner</string>
     <string name="about_text">V.: %1$s\nBitcoinSpinner is a light-weight, secure, and user friendly Bitcoin client for Android, which is built on top of the BCCAPI.\nBitcoinSpinner is not a Bitcoin bank. All your funds are secured by private keys in app-private storage on your Android device.\n\nPlease note that this is a beta release, use at your own risk.</string>
     <string name="credits_text">Thanks  to:\n - Jan(bccapi)\n - Kevin(Fr. trans.)\n - Mats Henricson(Sv. trans.)\n - Gerhard(De. trans.)\n - Manuel Polo(Es. trans.)\n - Troels(Da. trans.)</string>
@@ -105,4 +104,14 @@
     <string name="worth_about">worth about %s (MtGox)</string>
     <string name="prefs_currency">Local currency</string>
     <string name="buy_coins_menu">Buy Coins</string>
+    <string name="prefs_category_pin">PIN Settings</string>
+    <string name="pref_clear_pin">Clear PIN code</string>
+    <string name="pref_set_pin">Set PIN Code</string>
+    <string name="pin_invalid_pin">Invalid PIN code</string>
+    <string name="pin_enter_pin">Enter PIN Code</string>
+    <string name="pin_cleared">PIN code cleared</string>
+    <string name="pin_enter_new_pin">Enter new PIN Code</string>
+    <string name="pin_codes_dont_match">The two PIN codes do not match</string>
+    <string name="pin_set">PIN code set</string>
+    <string name="pin_confirm_pin">Confirm PIN Code</string>
 </resources>

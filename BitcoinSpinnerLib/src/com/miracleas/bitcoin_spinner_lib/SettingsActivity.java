@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -36,8 +37,11 @@ public class SettingsActivity extends PreferenceActivity {
 
 	private Context mContext;
 
-	private Preference backupWalletPref, restoreWalletPref,
-			ExportPrivateKeyPref;
+	private Preference backupWalletPref;
+	private Preference restoreWalletPref;
+	private Preference exportPrivateKeyPref;
+	private Preference clearPinPref;
+	private Preference setPinPref;
 	private EditTextPreference transactionHistorySizePref;
 	private ListPreference useLocalePref;
 	private ListPreference usedCurrencyPref;
@@ -87,9 +91,13 @@ public class SettingsActivity extends PreferenceActivity {
 		restoreWalletPref
 				.setOnPreferenceClickListener(restoreWalletClickListener);
 
-		ExportPrivateKeyPref = (Preference) findPreference("exportPrivateKey");
-		ExportPrivateKeyPref
+		exportPrivateKeyPref = (Preference) findPreference("exportPrivateKey");
+		exportPrivateKeyPref
 				.setOnPreferenceClickListener(exportPrivateKeyClickListener);
+		setPinPref = (Preference) findPreference("setPin");
+		setPinPref.setOnPreferenceClickListener(setPinClickListener);
+		clearPinPref = (Preference) findPreference("clearPin");
+		clearPinPref.setOnPreferenceClickListener(clearPinClickListener);
 
 	}
 
@@ -149,34 +157,48 @@ public class SettingsActivity extends PreferenceActivity {
 	private final OnPreferenceClickListener backupWalletClickListener = new OnPreferenceClickListener() {
 
 		public boolean onPreferenceClick(Preference preference) {
-			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setMessage(R.string.backup_dialog_text)
-					.setCancelable(false)
-					.setPositiveButton(R.string.yes,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									dialog.cancel();
-
-									Network net = SpinnerContext.getInstance().getNetwork();
-									final BackupInfo info = new BackupInfo(Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(),net),net);
-									info.getBackupUrl();
-									Bitmap qrCode = Utils.getLargeQRCodeBitmap(info.getBackupUrl());
-									Utils.showQrCode(mContext, R.string.bitcoinspinner_backup, qrCode, info.getBackupUrl());
-								}
-							})
-					.setNegativeButton(R.string.no,
-							new DialogInterface.OnClickListener() {
-								public void onClick(DialogInterface dialog,
-										int id) {
-									// do nothing
-								}
-							});
-			AlertDialog alertDialog = builder.create();
-			alertDialog.show();
+			Utils.runPinProtectedFunction(mContext, new Runnable() {
+				@Override
+				public void run() {
+					backupWallet();
+				}
+			});
 			return true;
 		}
 	};
+	
+	private void backupWallet() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setMessage(R.string.backup_dialog_text)
+				.setCancelable(false)
+				.setPositiveButton(R.string.yes,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								dialog.cancel();
+
+								Network net = SpinnerContext.getInstance()
+										.getNetwork();
+								final BackupInfo info = new BackupInfo(Utils
+										.readSeed(SpinnerContext.getInstance()
+												.getApplicationContext(), net),
+										net);
+								info.getBackupUrl();
+								Bitmap qrCode = Utils.getLargeQRCodeBitmap(info
+										.getBackupUrl());
+								Utils.showQrCode(mContext,
+										R.string.bitcoinspinner_backup, qrCode,
+										info.getBackupUrl());
+							}
+						})
+				.setNegativeButton(R.string.no,
+						new DialogInterface.OnClickListener() {
+							public void onClick(DialogInterface dialog, int id) {
+								// do nothing
+							}
+						});
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
+	}
 
 	private final OnPreferenceClickListener restoreWalletClickListener = new OnPreferenceClickListener() {
 
@@ -250,6 +272,56 @@ public class SettingsActivity extends PreferenceActivity {
 					});
 			AlertDialog alertDialog = builder.create();
 			alertDialog.show();
+			return true;
+		}
+	};
+
+	private final OnPreferenceClickListener setPinClickListener = new OnPreferenceClickListener() {
+		public boolean onPreferenceClick(Preference preference) {
+			Utils.runPinProtectedFunction(mContext, new Runnable() {
+				@Override
+				public void run() {
+					setPin();
+				}
+			});
+			return true;
+		}
+	};
+	
+	private void setPin() {
+		Dialog d = new PinDialog(mContext, false, new PinDialog.OnPinEntered() {
+			private String newPin = null;
+
+			@Override
+			public void pinEntered(PinDialog dialog, String pin) {
+				if (newPin == null) {
+					newPin = pin;
+					dialog.setTitle(R.string.pin_confirm_pin);
+				} else if (newPin.equals(pin)) {
+					SpinnerContext.getInstance().setPin(pin);
+					Toast.makeText(mContext, R.string.pin_set, Toast.LENGTH_LONG)
+							.show();
+					dialog.dismiss();
+				} else {
+					Toast.makeText(mContext, R.string.pin_codes_dont_match,
+							Toast.LENGTH_LONG).show();
+					dialog.dismiss();
+				}
+			}
+		});
+		d.setTitle(R.string.pin_enter_new_pin);
+		d.show();
+	}
+
+	private final OnPreferenceClickListener clearPinClickListener = new OnPreferenceClickListener() {
+		public boolean onPreferenceClick(Preference preference) {
+			Utils.runPinProtectedFunction(mContext, new Runnable() {
+				@Override
+				public void run() {
+					SpinnerContext.getInstance().setPin("");
+					Toast.makeText(mContext, R.string.pin_cleared, Toast.LENGTH_LONG).show();
+				}
+			});
 			return true;
 		}
 	};

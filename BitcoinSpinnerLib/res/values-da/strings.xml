@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <resources>
     <!-- Name, about, credits and versioning -->
-    <string name="app_name">BitcoinSpinner</string>
     <string name="about_title">Om BitcoinSpinner</string>
     <string name="about_text">V.: %1$s\nBitcoinSpinner er en letvægts-, sikker og brugervenlig Bitcoin-pung til Android, som er bygget ovenpå BCCAPI.\nBitcoinSpinner er ikke en Bitcoin bank. Alle dine midler er sikret af private nøgler i, for app\'en, privat hukommelse på din Android enhed.\n\nNotér venligst at dette er en beta udgave, og at brug er under eget ansvar.</string>
     <string name="credits_text">Tak til:\n - Jan(bccapi)\n - Kevin(Fr. overs.)\n - Mats Henricson(Sv. overs.)\n - Gerhard(De. overs.)\n - Manuel Polo(Es. overs.)\n - Troels(Da. overs.)</string>
@@ -19,10 +18,10 @@
     <string name="restore_dialog_title">Gendanner</string>
     <!-- Preferences -->
     <string name="pref_network_fee">Transaktionsgebyr</string>
-    <string name="prefs_backup_title">Lav backup af pung</string>
+    <string name="prefs_backup_title">Backup</string>
     <string name="prefs_category_backupandrestore">Backup og gendannelse</string>
     <string name="prefs_category_bitcoinwalletprefs">BitcoinSpinner indstillinger</string>
-    <string name="prefs_restore_title">Gendan pung</string>
+    <string name="prefs_restore_title">Gendan</string>
     <!-- Transaction -->
     <string name="no_transactions">Ingen transaktioner</string>
     <string name="received_from">Modtaget fra:</string>
@@ -105,4 +104,14 @@
     <string name="worth_about">Værdi ca. %s</string>
     <string name="prefs_currency">Lokal valuta</string>
     <string name="buy_coins_menu">Køb Coins</string>
+    <string name="prefs_category_pin">PIN Indstillinger</string>
+    <string name="pref_clear_pin">Slet PIN kode</string>
+    <string name="pref_set_pin">Konfigurer PIN kode</string>
+    <string name="pin_invalid_pin">Ugyldig PIN kode</string>
+    <string name="pin_enter_pin">Indtast PIN Kode</string>
+    <string name="pin_cleared">PIN kode slettet</string>
+    <string name="pin_enter_new_pin">Indtast ny PIN kode</string>
+    <string name="pin_codes_dont_match">De to PIN koder er ikke ens</string>
+    <string name="pin_set">PIN kode konfigureret</string>
+    <string name="pin_confirm_pin">Bekræft PIN Kode</string>
 </resources>

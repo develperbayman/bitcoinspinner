@@ -8,6 +8,7 @@ import java.util.Hashtable;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -273,4 +274,31 @@ public class Utils {
 		qrCodeDialog.show();
 		return qrCodeDialog;
 	}
+	
+	public static void runPinProtectedFunction(final Context context,
+			final Runnable fun) {
+		if (SpinnerContext.getInstance().isPinProtected()) {
+			Dialog d = new PinDialog(context, true,
+					new PinDialog.OnPinEntered() {
+
+						@Override
+						public void pinEntered(PinDialog dialog, String pin) {
+							if (pin.equals(SpinnerContext.getInstance()
+									.getPin())) {
+								dialog.dismiss();
+								fun.run();
+							} else {
+								Toast.makeText(context, R.string.pin_invalid_pin,
+										Toast.LENGTH_LONG).show();
+								dialog.dismiss();
+							}
+						}
+					});
+			d.setTitle(R.string.pin_enter_pin);
+			d.show();
+		} else {
+			fun.run();
+		}
+	}
+
 }

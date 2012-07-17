@@ -12,7 +12,13 @@
 
 		<Preference android:key="restoreSeed" android:title="@string/prefs_restore_title" />
 	</PreferenceCategory>
-	<PreferenceScreen android:title="@string/prefs_category_advanced">
+	<PreferenceScreen android:title="@string/prefs_category_pin">
+		<PreferenceCategory android:title="@string/prefs_category_pin">
+			<Preference android:title="@string/pref_clear_pin" android:key="clearPin" />
+			<Preference android:title="@string/pref_set_pin" android:key="setPin" />
+		</PreferenceCategory>
+	</PreferenceScreen>
+		<PreferenceScreen android:title="@string/prefs_category_advanced">
 		<PreferenceCategory android:title="@string/prefs_category_advanced">
 			<Preference android:title="@string/pref_export_private_key_title"
 				android:key="exportPrivateKey" />
