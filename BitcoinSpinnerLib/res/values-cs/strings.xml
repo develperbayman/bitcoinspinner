@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <!-- Name, about, credits and versioning -->
+    <string name="about_title">O BitcoinSpinneru</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner je lehký, bezpečný a uživatelsky přívětivý Bitcoin klient pro Android, vybudovaný nad BCCAPI.\nBitcoinSpinner není Bitcoinová banka. Všechna Tvá hotovost je zabezpečena privátním klíčem uloženým ve chráněném uložišti Tvého Android zařízení.\n\nNezapomeň prosím, že toto je beta verze, kterou používáš na své vlastní nebezpečí.</string>
+    <string name="credits_text">Poděkování:\n - Jan(bccapi)\n - Kevin(Fr. překlad)\n - Mats Henricson(Švéd. překlad)\n - Gerhard(Něm. překlad)\n - Manuel Polo(Šp. překlad)\n - Troels(Dán. překlad.)\n - Slush(Čs. překlad)</string>
+    <!-- Menu -->
+    <string name="about_menu">O BS</string>
+    <string name="credits_menu">Poděkování</string>
+    <string name="settings_menu">Nastavení</string>
+    <!-- Startup -->
+    <string name="startup_dialog_text">Čekej prosím...</string>
+    <!-- Backup and Restore -->
+    <string name="backup_dialog_text">Chystáš se zobrazit QR kód, který může být použit pro obnovení Tvé peněženky na jiném zařízení.\n\nPořiď jeho fotku a/nebo ho vytiskni na papír.\n\nPozor, naskenováním tohoto QR kódu může získat přístup k Tvé hotovosti uložené na tomto zařízení kdokoliv.\n\nOpravdu si přeješ zobrazit QR kód?</string>
+    <string name="restore_complete_dialog_text">Obnova dokončena</string>
+    <string name="restore_dialog_coins">Neměl bys obnovovat zálohu, pokud Tvoje současná peněženka obsahuje nějakou hotovost.\n\nPřed obnovou prosím přepošli veškerou hotovost do jiné peněženky.\n\nOpravdu si přeješ obnovit zálohu?</string>
+    <string name="restore_dialog_no_coins">Chystáš se obnovit Tvou peněženku ze zálohy.\n\nTo se provádí nafocením dříve vygenerovaného QR kódu.\n\nPřeješ si pokračovat?</string>
+    <string name="restore_dialog_title">Obnovuji</string>
+    <!-- Preferences -->
+    <string name="pref_network_fee">Transakční poplatek</string>
+    <string name="prefs_backup_title">Zálohovat peněženku</string>
+    <string name="prefs_category_backupandrestore">Záloha a obnovení</string>
+    <string name="prefs_category_bitcoinwalletprefs">Nastavení BitcoinSpinneru</string>
+    <string name="prefs_restore_title">Obnovení peněženky</string>
+    <!-- Transaction -->
+    <string name="no_transactions">Žádné transakce</string>
+    <string name="received_from">Přijato od:</string>
+    <string name="sent_to">Odesláno komu:</string>
+    <string name="sent_to_yourself">Odesláno sobě:</string>
+    <string name="transaction_history">Historie transakcí</string>
+    <!-- Common -->
+    <string name="no">Ne</string>
+    <string name="yes">Ano</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Storno</string>
+    <string name="please_wait">Čekej prosím...</string>
+    <string name="try_again">Zkusit znovu?</string>
+    <!-- Calculation and sending of bitcoins -->
+    <string name="calculating_fee">Počítám poplatky síti</string>
+    <string name="calculating_fee_wait">Čekej prosím, než se spočítají poplatky pro síť...</string>
+    <string name="calculating_fee_done">Poplatek síti byl vypočítán na %s BTC.\n\nPokračovat?</string>
+    <string name="send_bitcoins">Poslat bitcoiny</string>
+    <string name="sending_bitcoins">Posílání bitcoinů</string>
+    <string name="sending_bitcoins_wait">Čekej prosím, než se bitcoiny odešlou</string>
+    <!-- Sharing -->
+    <string name="share_bitcoin_address">Sdílej svou bitcoin adresu...</string>
+    <!-- Info -->
+    <string name="transaction_fee_text">Do Tvé transakce se automaticky připočítává transakční poplatek výši 0.0005 BTC.%1$sinfo...%2$s</string>
+    <string name="transaction_fee_text_info">Nabídnutím malého transakčního poplatku bitcoinovým těžařům se zrychlí provedení transakce v síti Bitcoin. Hodnota transakčního poplatku je typicky 0.0005 BTC, ale může být vyšší, pokud datová velikost Tvé transakce přesáhne 1000 bytů. Pokud bude transakce vyžadovat poplatek větší než 0.0005 BTC, zeptám se Tě, jestli si přeješ vyšší poplatek akceptovat.</string>
+    <string name="your_balance">Tvůj zůstatek:</string>
+    <string name="your_bitcoin_address">Tvá Bitcoinová adresa:</string>
+    <!-- Warnings -->
+    <string name="install_qr_scanner">Nainstaluj prosím ZXing QR-code scanner nebo Goggles!</string>
+    <string name="need_connection">Potřebuji připojení k Internetu.</string>
+    <!-- Errors -->
+    <string name="invalid_address_for_testnet">Neplatná adresa pro testnet.</string>
+    <string name="invalid_address_for_prodnet">Neplatná adresa</string>
+    <string name="restore_invalid_qr_code">Neplatný QR-code!</string>
+    <!-- NEW STRINGS -->
+    <string name="prefs_choose_default_locale">Jazyk</string>
+    <string name="pay_to">Komu:</string>
+    <string name="address">Adresa</string>
+    <string name="private_key">Privátní klíč</string>
+    <string name="bitcoinspinner_backup">Záloha BitcoinSpinneru</string>
+    <string name="bitcoin_address">Bitcoin adresa</string>
+    <string name="amount_to_pay">Částka platby:</string>
+    <string name="prefs_category_advanced">Pokročilé nastavení</string>
+    <string name="prefs_transaction_history_size">Délka historie transakcí</string>
+    <string name="pref_export_private_key_title">Export privátního klíče</string>
+    <string name="export_private_key_dialog_text">Pozor. Chystáš se exportovat privátní klíč, který kontroluje všechny Tvé bitcoiny spravované BitcoinSpinnerem.\n\nKdokoliv kdo získá přístup k tomuto klíči může kontrolovat veškeré bitcoiny.\n\nOpravdu si přeješ pokračovat?</string>
+    <string name="beta_warning">Toto je beta verze. Použití je na vlastní riziko.</string>
+    <string name="no_network">Žádné připojení k Internetu.</string>
+    <string name="unexpected_error">Vyskytla se neočekávaná chyba. Zkus to prosím později.</string>
+    <string name="unknown">Neznámý</string>
+    <string name="donations_appreciated">BitcoinSpinner a všechny servery, které používá, jsou nabízeny zdarma.\n\nPomož nám prosím v neustálém zlepšování této skvělé Bitcoin peněženky.\n\nPošles nám malý příspěvek?</string>
+    <string name="coins_on_their_way">Peníze na cestě k Tobě:</string>
+    <string name="donate_menu">Přispěj</string>
+    <string name="initializing_bitcoinspinner">Startuji BitcoinSpinner</string>
+    <string name="unconfirmed_from">Přijímám od (nepotvrzeno):</string>
+    <string name="unconfirmed_to">Posílám komu (nepotvrzeno):</string>
+    <string name="invalid_amount">Neplatná částka </string>
+    <string name="amount_too_large">Příliš vysoká částka</string>
+    <string name="address_book">Adresář</string>
+    <string name="unconfirmed_received_with">Přijato přes (nepotvrzeno):</string>
+    <string name="received_with">Přijato přes:</string>
+    <string name="address_book_menu">Adresář</string>
+    <string name="select_recipient">Vyber příjemce</string>
+    <string name="add_address_title">Přidat adresu do Adresáře</string>
+    <string name="add_address_description">Vyber nedávného přijemce ze seznamu níže nebo naskenuj QR kód obsahující Bitcoin adresu.</string>
+    <string name="add_address">Přidat adresu</string>
+    <string name="recent_receivers">Nedávní příjemci</string>
+    <string name="none">Žádný</string>
+    <string name="name">Jméno</string>
+    <string name="set_name_title">Zadej popisek</string>
+    <string name="delete_address_confirmation">Jsi si jistý, že chceš smazat tuto adresu z Adresáře?</string>
+    <string name="copied_to_clipboard">Zkopírováno do schránky</string>
+    <string name="address_book_empty">Tvůj Adresář je prázdný.</string>
+    <string name="invalid_value">Neplatná hodnota</string>
+    <string name="delete_address">Smazat adresu</string>
+    <string name="show_qr_code">Zobraz QR kód</string>
+    <string name="edit_address">Upravit adresu</string>
+    <string name="copy_to_clipboard">Kopírovat do schránky	</string>
+    <string name="scan_qr_code">Skenovat QR kód</string>
+    <string name="worth_about">v hodnotě kolem %s (MtGox)</string>
+    <string name="prefs_currency">Místní měna</string>
+    <string name="buy_coins_menu">Nakup mince</string>
+    <string name="prefs_category_pin">Nastavení PIN</string>
+    <string name="pref_clear_pin">Vymaž PIN kód</string>
+    <string name="pref_set_pin">Nastav PIN kód</string>
+    <string name="pin_invalid_pin">Neplatný PIN kód</string>
+    <string name="pin_enter_pin">Zadej PIN kód</string>
+    <string name="pin_cleared">PIN kód vymazán</string>
+    <string name="pin_enter_new_pin">Zadej nový PIN kód</string>
+    <string name="pin_codes_dont_match">PIN kódy nejsou stejné</string>
+    <string name="pin_set">PIN kód nastaven</string>
+    <string name="pin_confirm_pin">Potvrď PIN kód</string>
+</resources>

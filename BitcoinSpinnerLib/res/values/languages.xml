@@ -8,6 +8,7 @@
 		<item>Swedish</item>
 		<item>Danish</item>
 		<item>Finnish</item>
+		<item>Chezk</item>
 	</string-array>
 	<string-array name="laguagesValues">
 		<item>en</item>
@@ -17,5 +18,6 @@
 		<item>sv</item>
 		<item>da</item>
 		<item>fi</item>
+		<item>cs</item>
 	</string-array>
 </resources>
