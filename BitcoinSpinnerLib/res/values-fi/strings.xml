@@ -101,6 +101,7 @@
     <string name="edit_address">Muokkaa osoitetta</string>
     <string name="copy_to_clipboard">Kopioi leikepöydälle	</string>
     <string name="scan_qr_code">Skannaa QR-koodi</string>
-    <string name="worth_about">arvo on noin %s</string>
+    <string name="worth_about">arvo on noin %s (MtGox)</string>
     <string name="prefs_currency">Paikallinen valuutta</string>
+    <string name="buy_coins_menu">Osta kolikoita</string>
 </resources>
