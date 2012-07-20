@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<resources>
+    <!-- Name, about, credits and versioning -->
+    <string name="about_title">O приложении BitcoinSpinner</string>
+    <string name="about_text">V.: %1$s\nBitcoinSpinner простой, надёжный и приятный в использовании Биткойн клиент для устройств с программным обеспечением Android, созданный на основе BCCAPI.\nBitcoinSpinner не являетя Биткойн банком. Все Ваши деньги находятся под охраной приватного ключа, сохраненного в защищённом хранилище Вашего Android устройства.\n\nНапоминаем Вам, что это бета-версия, и Вы используете её на свой страх и риск.</string>
+    <string name="credits_text">Благодарность:\n - Jan(bccapi)\n - Kevin(Французский перевод)\n - Mats Henricson(Шведский перевод)\n - Gerhard(Немецкий перевод)\n - Manuel Polo(Испанский перевод)\n - Troels(Датский перевод)\n - Slush(Чешский перевод)\n - Olga Rembish(Русский перевод)</string>
+    <!-- Menu -->
+    <string name="about_menu">О приложении BitcoinSpinner</string>
+    <string name="credits_menu">Благодарность</string>
+    <string name="settings_menu">Настройки</string>
+    <!-- Startup -->
+    <string name="startup_dialog_text">Пожалуйста, подождите...</string>
+    <!-- Backup and Restore -->
+    <string name="backup_dialog_text">Вы собираетесь показать QR код, который может быть использован для восстановления Вашего кошелька на чужом устройстве\n\nСфотографируйте его и/или распечатайте его на бумаге.\n\nВнимание, данный QR код позволяет любому, кто его отсканирует, завладеть средствами, находящимися на данном устройстве.\n\nДействительно хотите показать QR код?</string>
+    <string name="restore_complete_dialog_text">Восстановление завершено</string>
+    <string name="restore_dialog_coins">В случае, если в Вашем текущем кошельке лежит какая-либо сумма денег, мы советуем Вам не восстанавливать резервную копию.\n\nПеред восстановлением, пожалуйста, отправьте все Ваши деньги в другой кошелёк.\n\nДействительно хотите восстановить резервную копию?</string>
+    <string name="restore_dialog_no_coins">Вы собираетесь восстановить свой кошелёк из резервной копии.\n\nДля этого необходимо сфотографировать ранее сгенерированный QR код.\n\nДействительно хотите продолжить?</string>
+    <string name="restore_dialog_title">Восстановление</string>
+    <!-- Preferences -->
+    <string name="pref_network_fee">Комиссия за трансакцию</string>
+    <string name="prefs_backup_title">Произвести резервное копирование кошелька</string>
+    <string name="prefs_category_backupandrestore">Резервное копирование и обновление</string>
+    <string name="prefs_category_bitcoinwalletprefs">Настройки приложения BitcoinSpinner</string>
+    <string name="prefs_restore_title">Обновление кошелька</string>
+    <!-- Transaction -->
+    <string name="no_transactions">Трансакции отсутствуют</string>
+    <string name="received_from">Получено от:</string>
+    <string name="sent_to">Оправлено кому:</string>
+    <string name="sent_to_yourself">Отправлено самому себе:</string>
+    <string name="transaction_history">История трансакций</string>
+    <!-- Common -->
+    <string name="no">Нет</string>
+    <string name="yes">Да</string>
+    <string name="ok">ОК</string>
+    <string name="cancel">Отмена</string>
+    <string name="please_wait">Пожалуйста, подождите...</string>
+    <string name="try_again">Попробовать ещё раз?</string>
+    <!-- Calculation and sending of bitcoins -->
+    <string name="calculating_fee">Расчёт сетевой комиссии</string>
+    <string name="calculating_fee_wait">Пожалуйста, подождите, происходит расчёт сетевая комиссия...</string>
+    <string name="calculating_fee_done">Сетевая комиссия была расчитана в размере %s БТК.\n\nПродолжить?</string>
+    <string name="send_bitcoins">Отправить Биткойны</string>
+    <string name="sending_bitcoins">Отправление Биткойнов</string>
+    <string name="sending_bitcoins_wait">Подождите, пожалуйста, пока Ваши Биткойны будут отправлены</string>
+    <!-- Sharing -->
+    <string name="share_bitcoin_address">Поделитесь своим Биткойн адресом...</string>
+    <!-- Info -->
+    <string name="transaction_fee_text">К Вашей трансакции автоматически добавляется комиссия в размере 0.0005 BTC.%1$sinfo...%2$s</string>
+    <string name="transaction_fee_text_info">С добавлением небольшой комиссии за трансакции биткойн майнерам гарантированно увеличится скорость реализации трансакций в сети Биткойн. Размер данной комиссии, как правило, составляет 0,0005 БТК, однако, он может увеличиться, в случае, если размер данных Вашей трансакции превысит 1000 байтов. Если для проведения Вашей трансакции потребуется комиссия в размере большем, чем 0,0005 БТК, Вы получите запрос о соглашении с более высокой комиссией.</string>
+    <string name="your_balance">Остаток на Вашем счёте:</string>
+    <string name="your_bitcoin_address">Ваш Биткойн адрес:</string>
+    <!-- Warnings -->
+    <string name="install_qr_scanner">Пожалуйста, установите сканнер QR кодов ZXing QR-code scanner или Goggles!</string>
+    <string name="need_connection">Необходимо соединение с интернетом.</string>
+    <!-- Errors -->
+    <string name="invalid_address_for_testnet">Недействительный адрес для testnet.</string>
+    <string name="invalid_address_for_prodnet">Недействительный адрес</string>
+    <string name="restore_invalid_qr_code">Недействительный QR код!</string>
+    <!-- NEW STRINGS -->
+    <string name="prefs_choose_default_locale">Язык</string>
+    <string name="pay_to">Кому:</string>
+    <string name="address">Адрес</string>
+    <string name="private_key">Приватный ключ</string>
+    <string name="bitcoinspinner_backup">Резервное копирование BitcoinSpinner</string>
+    <string name="bitcoin_address">Биткойн адрес</string>
+    <string name="amount_to_pay">Сумма платежа:</string>
+    <string name="prefs_category_advanced">Расширенные настройки</string>
+    <string name="prefs_transaction_history_size">Размер истории трансакций</string>
+    <string name="pref_export_private_key_title">Экспортировать приватный ключ</string>
+    <string name="export_private_key_dialog_text">Внимание. Вы пытаетесь отправить приватный ключ, контролирующий все Ваши Биткойны, регулируемые приложением BitcoinSpinner.\n\nКаждый, кто получит доступ к этому ключу, сможет контролировать все Ваши Биткойны.\n\nВы действительно хотите продолжить?</string>
+    <string name="beta_warning">Это бета-версия. Вы используете её на свой страх и риск.</string>
+    <string name="no_network">Отсутствует соединение с интернетом.</string>
+    <string name="unexpected_error">Произошла неожиданная ошибка. Поробуйте, пожалуйста, позже.</string>
+    <string name="unknown">Неизвестный</string>
+    <string name="donations_appreciated">Приложение BitcoinSpinner и все используемые им серверы, предоставляются бесплатно.\n\nВ случае заинтересованности Вы можете помочь нам в улучшении этого замечательного Биткойн кошелька.\n\nДля этого Вы можете отправить нам небольшой денежный взнос.</string>
+    <string name="coins_on_their_way">Деньги уже на пути к Вам:</string>
+    <string name="donate_menu">Отправить денежный взнос </string>
+    <string name="initializing_bitcoinspinner">Запуск приложения BitcoinSpinner</string>
+    <string name="unconfirmed_from">Получаю от кого (неподтверждено):</string>
+    <string name="unconfirmed_to">Отправляю кому (неподтверждено):</string>
+    <string name="invalid_amount">Недействительная сумма</string>
+    <string name="amount_too_large">Слишком большая сумма</string>
+    <string name="address_book">Адресная книга</string>
+    <string name="unconfirmed_received_with">Получено с помощью (неподтверждено):</string>
+    <string name="received_with">Получено с помощью:</string>
+    <string name="address_book_menu">Меню адресной книги</string>
+    <string name="select_recipient">Выбрать получателя</string>
+    <string name="add_address_title">Добавить адрес в адресную книгу</string>
+    <string name="add_address_description">Выбрать недавнего получателя из ниже указанного списка или насканировать QR код, содержащий Биткойн адрес.</string>
+    <string name="add_address">Добавить адрес</string>
+    <string name="recent_receivers">Недавние получатели</string>
+    <string name="none">Никакой</string>
+    <string name="name">Имя</string>
+    <string name="set_name_title">Введите описание адреса</string>
+    <string name="delete_address_confirmation">Вы уверены, что хотите удалить этот адрес из Вашей адресной книги?</string>
+    <string name="copied_to_clipboard">Скопировано в буфера обмена</string>
+    <string name="address_book_empty">Ваша адресная книга пуста.</string>
+    <string name="invalid_value">Недействительное значение</string>
+    <string name="delete_address">Удалить адрес</string>
+    <string name="show_qr_code">Показать QR код</string>
+    <string name="edit_address">Изменить адрес</string>
+    <string name="copy_to_clipboard">Скопировать в буфер обмена</string>
+    <string name="scan_qr_code">Сканировать QR код</string>
+    <string name="worth_about">в размере около %s (MtGox)</string>
+    <string name="prefs_currency">Местная валюта</string>
+    <string name="buy_coins_menu">Покупка монет</string>
+    <string name="prefs_category_pin">Настройки ПИН кода</string>
+    <string name="pref_clear_pin">Удалите ПИН код</string>
+    <string name="pref_set_pin">Введите ПИН код</string>
+    <string name="pin_invalid_pin">Недействительный ПИН код</string>
+    <string name="pin_enter_pin">Введите ПИН код</string>
+    <string name="pin_cleared">ПИН код удалён</string>
+    <string name="pin_enter_new_pin">Введите новый ПИН код</string>
+    <string name="pin_codes_dont_match">ПИН коды не совпадают</string>
+    <string name="pin_set">ПИН код установлен</string>
+    <string name="pin_confirm_pin">Подтвердите ПИН код</string>
+</resources>
