@@ -6,7 +6,6 @@ import android.os.Handler;
 import android.os.Message;
 import android.view.View;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class PinDialog extends Dialog {
@@ -15,7 +14,6 @@ public class PinDialog extends Dialog {
 		void pinEntered(PinDialog dialog, String pin);
 	}
 
-	private LinearLayout _pinButtons;
 	private Button _b0;
 	private Button _b1;
 	private Button _b2;
@@ -41,7 +39,6 @@ public class PinDialog extends Dialog {
 		setContentView(R.layout.dialog_enter_pin);
 		_hidden = hidden;
 		_onPinValid = onPinEntered;
-		_pinButtons = (LinearLayout) findViewById(R.id.pin_buttons);
 		_d1 = (TextView) findViewById(R.id.pin_char_1);
 		_d2 = (TextView) findViewById(R.id.pin_char_2);
 		_d3 = (TextView) findViewById(R.id.pin_char_3);

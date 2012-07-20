@@ -249,32 +249,39 @@ public class SettingsActivity extends PreferenceActivity {
 	private final OnPreferenceClickListener exportPrivateKeyClickListener = new OnPreferenceClickListener() {
 
 		public boolean onPreferenceClick(Preference preference) {
-
-			AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-			builder.setMessage(R.string.export_private_key_dialog_text).setCancelable(false)
-					.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							dialog.cancel();
-
-							Network net = SpinnerContext.getInstance().getNetwork();
-							byte[] seed = Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(), net);
-							DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
-							final String keyString;
-							keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(
-									SpinnerContext.getInstance().getNetwork());
-							Bitmap qrCode = Utils.getLargeQRCodeBitmap(keyString);
-							Utils.showQrCode(mContext, R.string.private_key, qrCode, keyString);
-						}
-					}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-						public void onClick(DialogInterface dialog, int id) {
-							// put your code here
-						}
-					});
-			AlertDialog alertDialog = builder.create();
-			alertDialog.show();
+			Utils.runPinProtectedFunction(mContext, new Runnable() {
+				@Override
+				public void run() {
+					exportPrivateKey();
+				}
+			});
 			return true;
 		}
 	};
+
+	private void exportPrivateKey() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
+		builder.setMessage(R.string.export_private_key_dialog_text).setCancelable(false)
+				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+						dialog.cancel();
+
+						Network net = SpinnerContext.getInstance().getNetwork();
+						byte[] seed = Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(), net);
+						DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
+						final String keyString;
+						keyString = exporter.getPrivateKeyExporter(1).getBase58EncodedKey(
+								SpinnerContext.getInstance().getNetwork());
+						Bitmap qrCode = Utils.getLargeQRCodeBitmap(keyString);
+						Utils.showQrCode(mContext, R.string.private_key, qrCode, keyString);
+					}
+				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
+					public void onClick(DialogInterface dialog, int id) {
+					}
+				});
+		AlertDialog alertDialog = builder.create();
+		alertDialog.show();
+	}
 
 	private final OnPreferenceClickListener setPinClickListener = new OnPreferenceClickListener() {
 		public boolean onPreferenceClick(Preference preference) {
