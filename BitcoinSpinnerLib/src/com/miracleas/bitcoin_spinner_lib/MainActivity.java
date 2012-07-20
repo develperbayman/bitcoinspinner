@@ -476,7 +476,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			String text = String.format(Locale.US, "%1$.2f %2$s", converted, currency); 
 			tvCurrencyValue.setText(getResources().getString(R.string.worth_about, text));
 			// Add the local currency value to the title
-			String title = String.format(Locale.US, " (1 BTC=%1$.2f %2$s)", value, currency); 
+			String title = String.format(Locale.US, "        %1$.2f %2$s", value, currency); 
 			this.setTitle(mRawAppName + title);
 		} else {
 			tvCurrencyValue.setText("");
