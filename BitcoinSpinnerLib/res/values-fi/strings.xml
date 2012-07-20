@@ -104,4 +104,14 @@
     <string name="worth_about">arvo on noin %s (MtGox)</string>
     <string name="prefs_currency">Paikallinen valuutta</string>
     <string name="buy_coins_menu">Osta kolikoita</string>
+    <string name="prefs_category_pin">PIN-asetukset</string>
+    <string name="pref_clear_pin">Tyhjennä PIN-koodi</string>
+    <string name="pref_set_pin">Aseta PIN-koodi</string>
+    <string name="pin_invalid_pin">Virheellinen PIN-koodi</string>
+    <string name="pin_enter_pin">Anna PIN-koodi</string>
+    <string name="pin_cleared">PIN-koodi tyhjennetty</string>
+    <string name="pin_enter_new_pin">Anna uusi PIN-koodi</string>
+    <string name="pin_codes_dont_match">Kaksi PIN-koodia ei täsmää</string>
+    <string name="pin_set">PIN-koodi asetettu</string>
+    <string name="pin_confirm_pin">Vahvista PIN-koodi</string>
 </resources>
