@@ -149,7 +149,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 		if (extras != null) {
 			String address = getIntent().getExtras().getString(Consts.BTC_ADDRESS_KEY);
 			if (address != null) {
-				etAddress.setText(address);
+				etAddress.setText(address.trim());
 			}
 			long amount = getIntent().getExtras().getLong(Consts.BTC_AMOUNT_KEY);
 			if (amount != 0) {
@@ -380,7 +380,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 				&& "QR_CODE".equals(intent.getStringExtra("SCAN_RESULT_FORMAT"))) {
 			final String contents = intent.getStringExtra("SCAN_RESULT");
 			if (contents.matches("[a-zA-Z0-9]*")) {
-				etAddress.setText(contents);
+				etAddress.setText(contents.trim());
 			} else {
 				BitcoinUri b = BitcoinUri.parse(contents);
 				if(b == null){
@@ -388,7 +388,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 					tvValidAdress.setText(R.string.invalid_address_for_prodnet);
 					return;
 				}
-				etAddress.setText(b.getAddress());
+				etAddress.setText(b.getAddress().trim());
 				if (b.getAmount() > 0) {
 					etSpend.setText(CoinUtils.valueString(b.getAmount()));
 				} else {
@@ -397,7 +397,9 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 			}
 		} else if(requestCode == REQUEST_CODE_ADDRESS_BOOK && resultCode == RESULT_OK ){
 			String address = intent.getStringExtra(AddressChooserActivity.ADDRESS_RESULT_NAME);
-			etAddress.setText(address);
+			if (address != null) {
+				etAddress.setText(address.trim());
+			}
 		}
 	}
 
