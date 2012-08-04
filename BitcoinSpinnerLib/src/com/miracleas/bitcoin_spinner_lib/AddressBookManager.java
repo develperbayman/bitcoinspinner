@@ -82,12 +82,18 @@ public class AddressBookManager {
 	}
 
 	public synchronized void addEntry(String address, String name) {
+		if (address == null || name == null) {
+			return;
+		}
 		addEntryInt(address, name);
 		Collections.sort(_entries);
 		save();
 	}
 
 	public synchronized void deleteEntry(String address) {
+		if (address == null) {
+			return;
+		}
 		address = address.trim();
 		Entry entry = _addressMap.get(address);
 		if (entry == null) {
