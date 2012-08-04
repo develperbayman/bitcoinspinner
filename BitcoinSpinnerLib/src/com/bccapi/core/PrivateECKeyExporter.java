@@ -47,7 +47,7 @@ public class PrivateECKeyExporter extends PrivateECKey {
    public String getBase58EncodedKey(Network network) {
       byte[] toEncode = new byte[1 + 32 + 4];
       // Set network
-      toEncode[0] = network == Network.productionNetwork ? (byte) 0x80 : (byte) 0xEF;
+      toEncode[0] = network.equals(Network.productionNetwork) ? (byte) 0x80 : (byte) 0xEF;
       // Set key bytes
       byte[] keyBytes = getPrivateKeyBytes();
       System.arraycopy(keyBytes, 0, toEncode, 1, keyBytes.length);
