@@ -9,7 +9,6 @@ import android.app.Dialog;
 import android.app.ListActivity;
 import android.content.Context;
 import android.content.DialogInterface;
-import android.content.DialogInterface.OnShowListener;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
@@ -36,8 +35,6 @@ import com.miracleas.bitcoin_spinner_lib.AddressBookManager.Entry;
 import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListener;
 
 public class AddressBookActivity extends ListActivity implements SimpleGestureListener {
-
-	private static final int SET_NAME_DIALOG = 1001;
 
 	private Activity mActivity;
 	private SharedPreferences preferences;
@@ -75,13 +72,13 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 		if (entries.isEmpty()) {
 			// Show a toast and open options menu
 			Toast.makeText(this, R.string.address_book_empty, Toast.LENGTH_SHORT).show();
-			new Handler().postDelayed(new Runnable() {
-				public void run() {
-					openOptionsMenu();
-				}
-			}, 100);
-
 		}
+		// Always show the Add Address option when resuming the activity
+		new Handler().postDelayed(new Runnable() {
+			public void run() {
+				openOptionsMenu();
+			}
+		}, 100);
 		setListAdapter(new AddressBookAdapter(this, R.layout.address_book_row, entries));
 
 	}
@@ -119,7 +116,37 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 	}
 
 	private void doEditEntry() {
-		showDialog(SET_NAME_DIALOG);
+		final Dialog dialog = new Dialog(mContext);
+		dialog.setTitle(R.string.set_name_title);
+		dialog.setContentView(R.layout.dialog_address_name);
+		final EditText et = (EditText) dialog.findViewById(R.id.et_name);
+		dialog.findViewById(R.id.btn_ok).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				EditText et = (EditText) dialog.findViewById(R.id.et_name);
+				String name = et.getText().toString();
+				dialog.dismiss();
+				AddressBookManager addressBook = AddressBookManager.getInstance();
+				addressBook.addEntry(mSelectedAddress, name);
+				List<Entry> entries = addressBook.getEntries();
+				setListAdapter(new AddressBookAdapter(mContext, R.layout.address_book_row, entries));
+			}
+		});
+		dialog.findViewById(R.id.btn_cancel).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+		String name = AddressBookManager.getInstance().getNameByAddress(mSelectedAddress);
+		name = name == null ? "" : name;
+		et.setText(name);
+		et.selectAll();
+		InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
+		dialog.show();
 	}
 
 	private void doSendBitcoins() {
@@ -150,52 +177,6 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 				});
 		AlertDialog alertDialog = builder.create();
 		alertDialog.show();
-	}
-
-	@Override
-	protected Dialog onCreateDialog(int id) {
-		final Dialog dialog;
-		switch (id) {
-		case SET_NAME_DIALOG:
-			dialog = new Dialog(mContext);
-			dialog.setTitle(R.string.set_name_title);
-			dialog.setContentView(R.layout.dialog_address_name);
-			final EditText et = (EditText) dialog.findViewById(R.id.et_name);
-			dialog.setOnShowListener(new OnShowListener() {
-
-				@Override
-				public void onShow(DialogInterface dialog) {
-					String name = AddressBookManager.getInstance().getNameByAddress(mSelectedAddress);
-					name = name == null ? "" : name;
-					et.setText(name);
-					et.selectAll();
-					InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-					imm.showSoftInput(et, InputMethodManager.SHOW_IMPLICIT);
-				}
-			});
-			dialog.findViewById(R.id.btn_ok).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					EditText et = (EditText) dialog.findViewById(R.id.et_name);
-					String name = et.getText().toString();
-					dialog.dismiss();
-					AddressBookManager addressBook = AddressBookManager.getInstance();
-					addressBook.addEntry(mSelectedAddress, name);
-				}
-			});
-			dialog.findViewById(R.id.btn_cancel).setOnClickListener(new OnClickListener() {
-
-				@Override
-				public void onClick(View v) {
-					dialog.dismiss();
-				}
-			});
-			break;
-		default:
-			dialog = null;
-		}
-		return dialog;
 	}
 
 	@Override
