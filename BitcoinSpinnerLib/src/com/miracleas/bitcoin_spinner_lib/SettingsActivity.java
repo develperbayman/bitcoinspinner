@@ -21,6 +21,10 @@ import android.preference.Preference;
 import android.preference.Preference.OnPreferenceChangeListener;
 import android.preference.Preference.OnPreferenceClickListener;
 import android.preference.PreferenceActivity;
+import android.text.ClipboardManager;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.RadioButton;
 import android.widget.Toast;
 
 import com.bccapi.api.Network;
@@ -231,19 +235,36 @@ public class SettingsActivity extends PreferenceActivity {
 	
 	private void ShowRestoreWalletAlert(){
 		final Activity myself = this;
-		AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-		builder.setMessage(R.string.restore_dialog_no_coins).setCancelable(false)
-				.setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						Utils.startScannerActivity(myself, REQUEST_CODE_SCAN);
+		final Dialog dialog = new Dialog(mContext);
+		dialog.setTitle(R.string.restore_method);
+		dialog.setContentView(R.layout.dialog_restore_method);
+		dialog.findViewById(R.id.btn_ok).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				RadioButton rbQrCode = (RadioButton) dialog.findViewById(R.id.rb_qr_code);
+				if (rbQrCode.isChecked()) {
+					Utils.startScannerActivity(myself,
+							REQUEST_CODE_SCAN);
+				} else {
+					ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+					String backupCode = "";
+					if(clipboard.hasText()){
+						backupCode = clipboard.getText().toString().trim();
 					}
-				}).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
-					public void onClick(DialogInterface dialog, int id) {
-						dialog.cancel();
-					}
-				});
-		AlertDialog alertDialog = builder.create();
-		alertDialog.show();
+					doRestore(backupCode);
+				}
+				dialog.dismiss();
+			}
+		});
+		dialog.findViewById(R.id.btn_cancel).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				dialog.dismiss();
+			}
+		});
+		dialog.show();
 	}
 
 	private final OnPreferenceClickListener exportPrivateKeyClickListener = new OnPreferenceClickListener() {
@@ -340,12 +361,18 @@ public class SettingsActivity extends PreferenceActivity {
 			return;
 		}
 		String contents = intent.getStringExtra("SCAN_RESULT");
-		BackupInfo info = BackupInfo.fromString(contents);
-		if (info == null || !info.getNetwork().equals(SpinnerContext.getInstance().getNetwork())) {
+		doRestore(contents);
+	}
+	
+	private void doRestore(String backupCode) {
+		BackupInfo info = BackupInfo.fromString(backupCode);
+		if (info == null ||
+		    !info.getNetwork().equals(SpinnerContext.getInstance().getNetwork())) {
 			Utils.showAlert(this, R.string.restore_invalid_qr_code);
 			return;
 		}
-		restoreDialog = ProgressDialog.show(this, getString(R.string.restore_dialog_title),
+		restoreDialog = ProgressDialog.show(this,
+				getString(R.string.restore_dialog_title),
 				getString(R.string.please_wait), true);
 		new AsyncInit().execute(info);
 	}

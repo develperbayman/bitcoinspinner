@@ -14,7 +14,7 @@
     <string name="backup_dialog_text">You are about to display a QR code which can be used to restore your wallet on a different device.\n\nTake a picture of it and/or print it out on Paper.\n\nWarning, this QR code enables anyone who scans it to take possession of the funds controlled by this device.\n\nDo you want to proceed?</string>
     <string name="restore_complete_dialog_text">Restore complete</string>
     <string name="restore_dialog_coins">You should not restore a backup as your wallet contains funds.\n\nPlease send your funds elsewhere before proceeding.\n\nDo you want to restore a backup anyway?</string>
-    <string name="restore_dialog_no_coins">You are about to restore your wallet from a backup.\n\nThis is done by scanning a previously generated backup QR code.\n\nDo you want to continue?</string>
+    <string name="restore_dialog_no_coins">You are about to restore your wallet from a backup.\n\nThis is done by scanning a previously generated backup QR code or from a backup code on your clipboard.</string>
     <string name="restore_dialog_title">Restoring</string>
     <!-- Preferences -->
     <string name="pref_network_fee">Transaction fee</string>
@@ -114,4 +114,9 @@
     <string name="pin_codes_dont_match">The two PIN codes do not match</string>
     <string name="pin_set">PIN code set</string>
     <string name="pin_confirm_pin">Confirm PIN Code</string>
+    <string name="no_server_connection">Server not responding</string>
+    <string name="initializing">Initializing</string>
+    <string name="restore_from_qr_code">Restore from QR-code</string>
+    <string name="restore_from_clipboard">Restore from clipboard</string>
+    <string name="restore_method">Choose Restore Method</string>
 </resources>

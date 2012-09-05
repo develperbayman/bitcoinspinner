@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/RelativeLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:padding="5dp" 
+        android:text="@string/restore_dialog_no_coins"/>
+
+    <RadioGroup
+        android:id="@+id/rg_method"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content" 
+        android:layout_below="@+id/tv_text"
+        >
+ 
+        <RadioButton
+            android:id="@+id/rb_qr_code"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restore_from_qr_code" 
+            android:checked="true" />
+ 
+        <RadioButton
+            android:id="@+id/rb_clipboard"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/restore_from_clipboard" />
+ 
+    </RadioGroup>
+    
+	
+	<LinearLayout
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_below="@+id/rg_method"
+		android:layout_marginLeft="0dp"
+		android:layout_marginBottom="10dp"
+		android:layout_marginTop="20dp" >
+        
+	<Button
+		android:id="@+id/btn_ok"
+		style="@android:style/Widget.Button"
+		android:layout_width="100dp"
+		android:layout_height="wrap_content"
+		android:text="@string/ok" />
+
+    <Button
+        android:id="@+id/btn_cancel"
+        style="@android:style/Widget.Button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:text="@string/cancel" />
+    </LinearLayout>
+
+</RelativeLayout>

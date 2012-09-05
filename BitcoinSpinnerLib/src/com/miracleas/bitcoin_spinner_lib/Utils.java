@@ -71,8 +71,13 @@ public class Utils {
 	}
 
 	public static void showNoNetworkTip(Context context) {
-		Toast.makeText(context, R.string.no_network, Toast.LENGTH_SHORT).show();
+		Toast.makeText(context, R.string.no_network, Toast.LENGTH_LONG).show();
 	}
+
+	public static void showNoServerConnectivityTip(Context context) {
+		Toast.makeText(context, R.string.no_server_connection, Toast.LENGTH_LONG).show();
+	}
+
 
 	public static boolean isConnected(Context context) {
 		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);

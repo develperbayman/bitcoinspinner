@@ -13,8 +13,8 @@
     <!-- Backup and Restore -->
     <string name="backup_dialog_text">Du vil om lidt få vist en QR-kode, der kan bruges til at gendanne din pung på en anden enhed.\n\nTag et billede af den og/eller print det ud på papir.\n\nAdvarsel: Denne QR kode gør det muligt for alle, der scanner den, at overtage alle midler opbevaret på denne enhed.\n\nVil du fortsætte?</string>
     <string name="restore_complete_dialog_text">Gendannelse færdig</string>
-    <string name="restore_dialog_coins">Du kan ikke gendanne en backup, da din pung indeholder midler.\n\nSend venligst dine midler andetsteds før du fortsætter.</string>
-    <string name="restore_dialog_no_coins">Du skal til at gendanne din pung fra en backup.\n\nDette gøres ved at scanne en tidligere genereret backup QR-kode.\n\nVil du fortsætte?</string>
+    <string name="restore_dialog_coins">Du bør ikke gendanne en backup, da din pung indeholder midler.\n\nSend venligst dine midler andetsteds før du fortsætter.</string>
+    <string name="restore_dialog_no_coins">Du skal til at gendanne din pung fra en backup.\n\nDette gøres ved at scanne en tidligere genereret backup QR-kode eller en backup kode fra udklipsholderen.</string>
     <string name="restore_dialog_title">Gendanner</string>
     <!-- Preferences -->
     <string name="pref_network_fee">Transaktionsgebyr</string>
@@ -114,4 +114,8 @@
     <string name="pin_codes_dont_match">De to PIN koder er ikke ens</string>
     <string name="pin_set">PIN kode konfigureret</string>
     <string name="pin_confirm_pin">Bekræft PIN Kode</string>
+    <string name="no_server_connection">Serveren svarer ikke</string>
+    <string name="initializing">Initialiserer</string>
+    <string name="restore_from_qr_code">Gendan fra QR-kode</string>
+    <string name="restore_from_clipboard">Gendan fra udklipsholder</string>
 </resources>

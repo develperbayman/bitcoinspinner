@@ -24,6 +24,7 @@ import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -122,7 +123,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		if (preferences.getBoolean("ShowQrCode", false)) {
 			ivAddress.performClick();
 		}
-		UpdateInfo();
+		updateInfo();
 		updateAddress();
 	}
 
@@ -175,7 +176,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 								if (_quit) {
 									return;
 								}
-								UpdateInfo();
+								updateInfo();
 							}
 						});
 					}
@@ -238,7 +239,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 		@Override
 		public boolean onLongClick(View v) {
-			UpdateInfo();
+			updateInfo();
 			return true;
 		}
 	};
@@ -247,7 +248,7 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 
 		@Override
 		public void onClick(View v) {
-			UpdateInfo();
+			updateInfo();
 		}
 	};
 
@@ -414,19 +415,19 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		return dialog;
 	}
 
-	private void UpdateInfo() {
+	private void updateInfo() {
 		// first update from cache
 		AsynchronousAccount account = SpinnerContext.getInstance().getAccount();
 		updateBalances(account.getCachedBalance(),
 				account.getCachedCoinsOnTheWay());
-		if (mGetInfoTask != null) {
-			// we already have a task for getting account info in progress
-			return;
-		}
 		btnSendMoney.setEnabled(false);
 		btnTransactionHistory.setEnabled(false);
 		pbBalanceUpdateProgress.setVisibility(View.VISIBLE);
 		vBalanceUpdateView.setVisibility(View.VISIBLE);
+		if (mGetInfoTask != null) {
+			// we already have a task for getting account info in progress
+			return;
+		}
 		mGetInfoTask = account.requestAccountInfo(this);
 	}
 
@@ -435,13 +436,25 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 			String errorMessage) {
 		mGetInfoTask = null;
 		pbBalanceUpdateProgress.setVisibility(View.INVISIBLE);
-		vBalanceUpdateView.setVisibility(View.INVISIBLE);
 		if (info == null) {
-			vBalanceNoConnView.setVisibility(View.VISIBLE);
 			if (!Utils.isConnected(this)) {
 				Utils.showNoNetworkTip(this);
+			} else {
+				Utils.showNoServerConnectivityTip(this);
+				// This may also be because we cannot do first time login
+				// due to account creation disabled on server side
 			}
 		} else {
+			// We have had contact with the server, so we know our public key
+			// has been registered
+			if (!SpinnerContext.getInstance().isPublicKeyRegistered()) {
+				// This is the first time this installation has had server
+				// contact. The server now observes our public key
+				SpinnerContext.getInstance().markPublicKeyRegistered();
+				// Now we are ready to show our bitcoin address
+				updateAddress();
+			}
+			vBalanceUpdateView.setVisibility(View.INVISIBLE);
 			updateBalances(info.getAvailableBalance(),
 					info.getEstimatedBalance() - info.getAvailableBalance());
 			vBalanceNoConnView.setVisibility(View.INVISIBLE);
@@ -485,9 +498,19 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	}
 	
 	private void updateAddress() {
+		if(!SpinnerContext.getInstance().isPublicKeyRegistered()){
+			// We do not wish to show our bitcoin address until the public key
+			// has been registered with the server. This may happen if the
+			// server is down or account creation is temporarily disabled.
+			ivAddress.setVisibility(View.INVISIBLE);
+			tvAddress.setText(R.string.initializing);
+			return;
+		}
 		String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
 		tvAddress.setText(address);
+		ivAddress.setScaleType(ScaleType.CENTER_CROP);
 		ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(SpinnerContext.getInstance().getAccount()));
+		ivAddress.setVisibility(View.VISIBLE);
 	}
 
 }

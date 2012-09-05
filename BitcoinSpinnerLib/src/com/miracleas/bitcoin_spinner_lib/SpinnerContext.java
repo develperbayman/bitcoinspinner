@@ -16,6 +16,7 @@ public class SpinnerContext {
 
 	private static final String NETWORK_USED = "network used";
 	private static final String PIN = "pin";
+	private static final String PUBLIC_KEY_REGISTERED = "pub key registered";
 
 	private static SpinnerContext _spinnerContext;
 
@@ -94,6 +95,20 @@ public class SpinnerContext {
 		return getPin().length() > 0;
 	}
 
+	public boolean isPublicKeyRegistered(){
+		SharedPreferences preferences = getApplicationContext()
+				.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
+		return preferences.getBoolean(PUBLIC_KEY_REGISTERED, false);
+	}
+	
+	public void markPublicKeyRegistered() {
+		SharedPreferences preferences = getApplicationContext()
+				.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
+		if (!preferences.getBoolean(PUBLIC_KEY_REGISTERED, false)) {
+			preferences.edit().putBoolean(PUBLIC_KEY_REGISTERED, true).commit();
+		}
+	}
+	
 	public String getPin() {
 		SharedPreferences preferences = getApplicationContext()
 				.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
