@@ -54,7 +54,7 @@ public class AddressUtil {
     */
    public static String byteAddressToStringAddress(Network network, byte[] bytes) {
       byte[] addressBytes = new byte[1 + 20 + 4];
-      addressBytes[0] = (byte) network.getAddressHeader();
+      addressBytes[0] = (byte) (network.getStandardAddressHeader() & 0xFF);
       System.arraycopy(bytes, 0, addressBytes, 1, 20);
       byte[] checkSum = HashUtils.doubleSha256(addressBytes, 0, 21);
       System.arraycopy(checkSum, 0, addressBytes, 21, 4);
@@ -96,7 +96,8 @@ public class AddressUtil {
       if (tmp == null || tmp.length != 21) {
          return false;
       }
-      return network.getAddressHeader() == tmp[0];
+      return ((byte) (network.getStandardAddressHeader() & 0xFF)) == tmp[0]
+              || ((byte) (network.getMultisigAddressHeader() & 0xFF)) == tmp[0];
    }
 
 }

@@ -35,7 +35,7 @@ public class SpinnerContext {
 		context = context.getApplicationContext();
 		SharedPreferences preferences = context.getSharedPreferences(
 				Consts.PREFS_NAME, Context.MODE_PRIVATE);
-		preferences.edit().putInt(NETWORK_USED, network.getAddressHeader())
+		preferences.edit().putInt(NETWORK_USED, network.getStandardAddressHeader())
 				.commit();
 		_spinnerContext = new SpinnerContext(context, display, network);
 		Utils.getPrimaryAddressAsSmallQrCode(_spinnerContext.getAccount());
@@ -47,9 +47,9 @@ public class SpinnerContext {
 				Consts.PREFS_NAME, Context.MODE_PRIVATE);
 		int net = preferences.getInt(NETWORK_USED, -1);
 		Network network;
-		if (net == Network.productionNetwork.getAddressHeader()) {
+		if (net == Network.productionNetwork.getStandardAddressHeader()) {
 			network = Network.productionNetwork;
-		} else if (net == Network.testNetwork.getAddressHeader()) {
+		} else if (net == Network.testNetwork.getStandardAddressHeader()) {
 			network = Network.testNetwork;
 		} else {
 			throw new RuntimeException("Network never initialized");
