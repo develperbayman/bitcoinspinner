@@ -14,7 +14,7 @@ import com.bccapi.api.Tx;
 import com.bccapi.api.TxInput;
 import com.bccapi.api.TxOutput;
 import com.bccapi.core.AddressUtil;
-import com.bccapi.core.BccScriptInput;
+import com.bccapi.core.BccScriptStandardInput;
 import com.bccapi.core.BitUtils;
 import com.bccapi.core.ECKeyManager;
 import com.bccapi.core.ECSigner;
@@ -419,7 +419,7 @@ public abstract class AsynchronousAccount {
 	 */
 	public String getPrimaryBitcoinAddress() {
 		PublicECKey key = getPrimaryBitcoinPublicKey();
-		return AddressUtil.publicKeyToStringAddress(_api.getNetwork(), key.getPubKeyBytes());
+		return AddressUtil.publicKeyToStandardAddress(_api.getNetwork(), key.getPubKeyBytes());
 	}
 
 	/**
@@ -527,7 +527,7 @@ public abstract class AsynchronousAccount {
 		for (int i = 0; i < inputs.size(); i++) {
 			TxInput input = inputs.get(i);
 			PublicECKey key = signingKeys[i].getPublicKey();
-			BccScriptInput script = new BccScriptInput(signatures[i], key.getPubKeyBytes());
+			BccScriptStandardInput script = new BccScriptStandardInput(signatures[i], key.getPubKeyBytes());
 			input.setScript(script.toByteArray());
 		}
 		return tx;

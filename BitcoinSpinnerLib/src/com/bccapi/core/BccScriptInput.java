@@ -16,45 +16,31 @@
 
 package com.bccapi.core;
 
+import java.util.List;
+
 /**
- * This class handles Transaction input scripts for p2p payments
+ * Base class for handling bitcoin scripts
  */
 public class BccScriptInput extends BccScript {
-   private byte[] _signaure;
-   private byte[] _pubkey;
 
-   public BccScriptInput(byte[] signature, byte[] pubkey) {
-      addChunk(signature);
-      addChunk(pubkey);
-      _signaure = signature;
-      _pubkey = pubkey;
-   }
-
-   public BccScriptInput(byte[] script) throws BccScriptException {
-      super(script);
-      if (_chunks.size() != 2) {
-         throw new BccScriptException("ScriptSig needs two chunks");
+   public static BccScriptInput fromScriptBytes(byte[] script) {
+      List<byte[]> chunks = BccScript.chunksFromScriptBytes(script);
+      if (chunks == null) {
+         return null;
       }
-      _signaure = _chunks.get(0);
-      _pubkey = _chunks.get(1);
+      if (BccScriptStandardInput.isStandardInputScript(chunks)) {
+         return new BccScriptStandardInput(chunks);
+      } else {
+         return new BccScriptInput(chunks);
+      }
+
    }
 
-   /**
-    * Get the signature contained in the script.
-    * 
-    * @return The signature contained in the script.
-    */
-   public byte[] getSignature() {
-      return _signaure;
+   protected BccScriptInput(List<byte[]> chunks) {
+      super(chunks);
    }
 
-   /**
-    * Get the public key contained in the script.
-    * 
-    * @return The public key contained in the script.
-    */
-   public byte[] getPublicKey() {
-      return _pubkey;
+   protected BccScriptInput() {
    }
 
 }

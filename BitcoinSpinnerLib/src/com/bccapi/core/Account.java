@@ -152,7 +152,7 @@ public class Account {
       AccountStatement statement = _api.getRecentTransactionSummary(_sessionId, count);
       return statement;
    }
-   
+
    /**
     * Add a new public key to the BCCAPI server. From the time the server
     * receives the public key it will track new transaction outputs to it and
@@ -219,7 +219,7 @@ public class Account {
             first = false;
             continue;
          }
-         addresses.add(AddressUtil.publicKeyToStringAddress(_api.getNetwork(), key.getPubKeyBytes()));
+         addresses.add(AddressUtil.publicKeyToStandardAddress(_api.getNetwork(), key.getPubKeyBytes()));
       }
       return addresses;
    }
@@ -332,7 +332,7 @@ public class Account {
       for (int i = 0; i < inputs.size(); i++) {
          TxInput input = inputs.get(i);
          PublicECKey key = signingKeys[i].getPublicKey();
-         BccScriptInput script = new BccScriptInput(signatures[i], key.getPubKeyBytes());
+         BccScriptStandardInput script = new BccScriptStandardInput(signatures[i], key.getPubKeyBytes());
          input.setScript(script.toByteArray());
       }
    }

@@ -24,7 +24,7 @@ import java.util.List;
 /**
  * Base class for handling bitcoin scripts
  */
-public abstract class BccScript {
+public class BccScript {
 
    public static class BccScriptException extends Exception {
       private static final long serialVersionUID = 1L;
@@ -44,13 +44,14 @@ public abstract class BccScript {
    public static final int OP_PUSHDATA4 = 78;
    public static final int OP_DUP = 118;
    public static final int OP_HASH160 = 169;
+   public static final int OP_EQUAL = 135;
    public static final int OP_EQUALVERIFY = 136;
    public static final int OP_CHECKSIG = 172;
 
    protected List<byte[]> _chunks;
 
-   public BccScript(byte[] script) throws BccScriptException {
-      _chunks = new ArrayList<byte[]>();
+   public static List<byte[]> chunksFromScriptBytes(byte[] script) {
+      List<byte[]> chunks = new ArrayList<byte[]>();
       StreamReader reader = new StreamReader(new ByteArrayInputStream(script));
       try {
          while (reader.available() > 0) {
@@ -62,24 +63,32 @@ public abstract class BccScript {
             }
 
             if (opcode > 0 && opcode < OP_PUSHDATA1) {
-               _chunks.add(reader.readBytes(opcode));
+               chunks.add(reader.readBytes(opcode));
             } else if (opcode == OP_PUSHDATA1) {
                int size = reader.read();
-               _chunks.add(reader.readBytes(size));
+               chunks.add(reader.readBytes(size));
             } else if (opcode == OP_PUSHDATA2) {
                int size = (int) BitUtils.uint16FromStream(reader);
-               _chunks.add(reader.readBytes(size));
+               chunks.add(reader.readBytes(size));
             } else if (opcode == OP_PUSHDATA4) {
                // We do not support chunks this big
-               throw new BccScriptException("PUSHDATA4 not supported");
+               return null;
             } else {
-               _chunks.add(new byte[] { (byte) opcode });
+               chunks.add(new byte[] { (byte) opcode });
             }
          }
       } catch (IOException e) {
-         throw new BccScriptException("Unable to parse script");
+         return null;
       }
+      return chunks;
+   }
 
+   protected static final boolean isOP(byte[] chunk, int op) {
+      return chunk.length == 1 && (0xFF & (int) chunk[0]) == op;
+   }
+
+   protected BccScript(List<byte[]> chunks) {
+      _chunks = chunks;
    }
 
    public BccScript() {

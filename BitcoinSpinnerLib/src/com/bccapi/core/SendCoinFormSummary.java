@@ -78,14 +78,32 @@ public class SendCoinFormSummary {
       _coinsSentToMe = 0;
       Set<String> addresses = new HashSet<String>(myAddresses);
       for (TxOutput out : form.getFunding()) {
-         BccScriptOutput script = new BccScriptOutput(out.getScript());
-         String address = AddressUtil.byteAddressToStringAddress(network, script.getAddress());
+         BccScriptOutput script = BccScriptOutput.fromScriptBytes(out.getScript());
+         String address;
+         if (script instanceof BccScriptMultisigOutput) {
+            BccScriptStandardOutput s = (BccScriptStandardOutput) script;
+            address = AddressUtil.byteAddressToMultisigAddress(network, s.getAddress());
+         } else if (script instanceof BccScriptStandardOutput) {
+            BccScriptStandardOutput s = (BccScriptStandardOutput) script;
+            address = AddressUtil.byteAddressToStandardAddress(network, s.getAddress());
+         } else {
+            throw new BccScriptException("Invalid output script");
+         }
          _inputs.add(new Element(address, out.getValue()));
          _inCoins += out.getValue();
       }
       for (TxOutput out : form.getTransaction().getOutputs()) {
-         BccScriptOutput script = new BccScriptOutput(out.getScript());
-         String address = AddressUtil.byteAddressToStringAddress(network, script.getAddress());
+         BccScriptOutput script = BccScriptOutput.fromScriptBytes(out.getScript());
+         String address;
+         if (script instanceof BccScriptMultisigOutput) {
+            BccScriptStandardOutput s = (BccScriptStandardOutput) script;
+            address = AddressUtil.byteAddressToMultisigAddress(network, s.getAddress());
+         } else if (script instanceof BccScriptStandardOutput) {
+            BccScriptStandardOutput s = (BccScriptStandardOutput) script;
+            address = AddressUtil.byteAddressToStandardAddress(network, s.getAddress());
+         } else {
+            throw new BccScriptException("Invalid output script");
+         }
          _outputs.add(new Element(address, out.getValue()));
          if (addresses.contains(address)) {
             _coinsSentToMe += out.getValue();

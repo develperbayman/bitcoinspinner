@@ -65,13 +65,6 @@ public class AddressBookManager {
 
 	private AddressBookManager() {
 		List<Entry> entries = loadEntries();
-		if (SpinnerContext.getInstance().getNetwork() == Network.productionNetwork) {
-			// entries.add(new Entry("14VWYvbHd4R7oTFS8kEfoWZFTzbedDgwKg", "Hans Jurgen Manfred Pingel"));
-			// entries.add(new Entry("143SikKpjzwhBy5Z7Qg5knu5nKXWExSqQi", "Alfred Bennel"));
-		} else {
-			// entries.add(new Entry("miGuMc6qtVEKS6Pf1jKddaa81DeHjMzkpB", "Testnet Fauchet"));
-			// entries.add(new Entry("n2ZhcFDxvSbxSxhndbAjBtrkVs8zku955f", "Myself"));
-		}
 		_entries = new ArrayList<Entry>(entries.size());
 		_addressMap = new HashMap<String, Entry>(entries.size());
 		_nameMap = new HashMap<String, Entry>(entries.size());
@@ -187,8 +180,7 @@ public class AddressBookManager {
 			}
 			writer.close();
 		} catch (Exception e) {
-			e.printStackTrace();
-			// ignore
+			throw new RuntimeException(e);
 		}
 
 	}

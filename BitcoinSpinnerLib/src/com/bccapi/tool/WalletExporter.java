@@ -56,7 +56,7 @@ public class WalletExporter {
       for (int i = 1; i < keys; i++) {
          PrivateECKeyExporter keyExporter = exporter.getPrivateKeyExporter(i + 1);
          String keyString = keyExporter.getBase58EncodedKey(network);
-         String address = AddressUtil.publicKeyToStringAddress(network, keyExporter.getPublicKey().getPubKeyBytes());
+         String address = AddressUtil.publicKeyToStandardAddress(network, keyExporter.getPublicKey().getPubKeyBytes());
          // XXX: Change the format once we know the format that the official
          // bitcoin client accepts
          print(keyString + " : " + address);

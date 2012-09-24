@@ -72,10 +72,20 @@ public class SendCoinFormValidator {
          long sentToReceiver = 0;
          // Go through all the outputs of this transaction.
          for (TxOutput out : form.getTransaction().getOutputs()) {
-            BccScriptOutput script = new BccScriptOutput(out.getScript());
-            String address = AddressUtil.byteAddressToStringAddress(network, script.getAddress());
+            BccScriptOutput script = BccScriptOutput.fromScriptBytes(out.getScript());
+            String address;
+            if (script instanceof BccScriptMultisigOutput) {
+               BccScriptMultisigOutput s = (BccScriptMultisigOutput) script;
+               address = AddressUtil.byteAddressToMultisigAddress(network, s.getMultisigAddress());
+            } else if (script instanceof BccScriptStandardOutput) {
+               BccScriptStandardOutput s = (BccScriptStandardOutput) script;
+               address = AddressUtil.byteAddressToStandardAddress(network, s.getAddress());
+            } else {
+               throw new BccScriptException("Invalid output script");
+            }
             if (addressSet.contains(address)) {
-               // Money for me. Either change going back to me or I am sending
+               // Money for me. Either change going back to me or I am
+               // sending
                // to myself
                sentToMe += out.getValue();
             } else if (receiver.equals(address)) {

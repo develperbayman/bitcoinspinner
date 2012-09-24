@@ -16,50 +16,33 @@
 
 package com.bccapi.core;
 
+import java.util.List;
+
 /**
- * This class handles Transaction output scripts for p2p payments
+ * Base class for handling bitcoin scripts
  */
 public class BccScriptOutput extends BccScript {
 
-   private byte[] _address;
+   public static BccScriptOutput fromScriptBytes(byte[] script) {
+      List<byte[]> chunks = BccScript.chunksFromScriptBytes(script);
+      if (chunks == null) {
+         return null;
+      }
+      if (BccScriptStandardOutput.isStandardOutputScript(chunks)) {
+         return new BccScriptStandardOutput(chunks);
+      } else if (BccScriptMultisigOutput.isMultisigScript(chunks)) {
+         return new BccScriptMultisigOutput(chunks);
+      } else {
+         return new BccScriptOutput(chunks);
+      }
 
-   public BccScriptOutput(PublicECKey key) {
-      byte[] address = key.getPublicKeyHash();
-      addOpcode(OP_DUP);
-      addOpcode(OP_HASH160);
-      addChunk(address);
-      addOpcode(OP_EQUALVERIFY);
-      addOpcode(OP_CHECKSIG);
-      _address = address;
    }
 
-   public BccScriptOutput(byte[] script) throws BccScriptException {
-      super(script);
-      if (_chunks.size() != 5) {
-         throw new BccScriptException("ScriptSig needs two chunks");
-      }
-      if (_chunks.get(0).length != 1 && (0xFF & (int) _chunks.get(0)[0]) != OP_DUP) {
-         throw new BccScriptException();
-      }
-      if (_chunks.get(1).length != 1 && (0xFF & (int) _chunks.get(1)[0]) != OP_HASH160) {
-         throw new BccScriptException();
-      }
-      _address = _chunks.get(2);
-      if (_chunks.get(3).length != 1 && (0xFF & (int) _chunks.get(3)[0]) != OP_EQUALVERIFY) {
-         throw new BccScriptException();
-      }
-      if (_chunks.get(4).length != 1 && (0xFF & (int) _chunks.get(4)[0]) != OP_CHECKSIG) {
-         throw new BccScriptException();
-      }
+   protected BccScriptOutput(List<byte[]> chunks) {
+      super(chunks);
    }
 
-   /**
-    * Get the address that this output is for.
-    * 
-    * @return The address that this output is for.
-    */
-   public byte[] getAddress() {
-      return _address;
+   protected BccScriptOutput() {
    }
 
 }

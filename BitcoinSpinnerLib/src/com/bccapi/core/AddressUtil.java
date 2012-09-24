@@ -35,12 +35,12 @@ public class AddressUtil {
     *           The public key bytes
     * @return A Bitcoin address
     */
-   public static String publicKeyToStringAddress(Network network, byte[] publicKey) {
-      return byteAddressToStringAddress(network, HashUtils.addressHash(publicKey));
+   public static String publicKeyToStandardAddress(Network network, byte[] publicKey) {
+      return byteAddressToStandardAddress(network, HashUtils.addressHash(publicKey));
    }
 
    /**
-    * Get the string representation of a bitcoin address from a byte
+    * Get the string representation of a standard bitcoin address from a byte
     * representation of a bitcoin address:
     * 
     * 1 byte (test net or production net) + 20 bytes (public key hash) + 4 bytes
@@ -52,9 +52,31 @@ public class AddressUtil {
     *           The address as an array of bytes
     * @return A Bitcoin address
     */
-   public static String byteAddressToStringAddress(Network network, byte[] bytes) {
+   public static String byteAddressToStandardAddress(Network network, byte[] bytes) {
       byte[] addressBytes = new byte[1 + 20 + 4];
       addressBytes[0] = (byte) (network.getStandardAddressHeader() & 0xFF);
+      System.arraycopy(bytes, 0, addressBytes, 1, 20);
+      byte[] checkSum = HashUtils.doubleSha256(addressBytes, 0, 21);
+      System.arraycopy(checkSum, 0, addressBytes, 21, 4);
+      return Base58.encode(addressBytes);
+   }
+
+   /**
+    * Get the string representation of a standard bitcoin address from a byte
+    * representation of a bitcoin address:
+    * 
+    * 1 byte (test net or production net) + 20 bytes (public key hash) + 4 bytes
+    * (check sum, 4 first bytes of hash of previous bytes)
+    * 
+    * @param network
+    *           The network this address is for.
+    * @param bytes
+    *           The address as an array of bytes
+    * @return A Bitcoin address
+    */
+   public static String byteAddressToMultisigAddress(Network network, byte[] bytes) {
+      byte[] addressBytes = new byte[1 + 20 + 4];
+      addressBytes[0] = (byte) (network.getMultisigAddressHeader() & 0xFF);
       System.arraycopy(bytes, 0, addressBytes, 1, 20);
       byte[] checkSum = HashUtils.doubleSha256(addressBytes, 0, 21);
       System.arraycopy(checkSum, 0, addressBytes, 21, 4);
@@ -97,7 +119,7 @@ public class AddressUtil {
          return false;
       }
       return ((byte) (network.getStandardAddressHeader() & 0xFF)) == tmp[0]
-              || ((byte) (network.getMultisigAddressHeader() & 0xFF)) == tmp[0];
+            || ((byte) (network.getMultisigAddressHeader() & 0xFF)) == tmp[0];
    }
 
 }
