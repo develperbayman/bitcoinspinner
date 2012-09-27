@@ -17,6 +17,7 @@ public class SpinnerContext {
 	private static final String NETWORK_USED = "network used";
 	private static final String PIN = "pin";
 	private static final String PUBLIC_KEY_REGISTERED = "pub key registered";
+	private static final String BACKUP_WARNING_DISABLED = "backup warning disabled";
 
 	private static SpinnerContext _spinnerContext;
 
@@ -109,6 +110,20 @@ public class SpinnerContext {
 		}
 	}
 	
+	public boolean isBackupWarningDisabled(){
+		SharedPreferences preferences = getApplicationContext()
+				.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
+		return preferences.getBoolean(BACKUP_WARNING_DISABLED, false);
+	}
+
+	public void markBackupWarningDisabled() {
+		SharedPreferences preferences = getApplicationContext()
+				.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
+		if (!preferences.getBoolean(BACKUP_WARNING_DISABLED, false)) {
+			preferences.edit().putBoolean(BACKUP_WARNING_DISABLED, true).commit();
+		}
+	}
+
 	public String getPin() {
 		SharedPreferences preferences = getApplicationContext()
 				.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);

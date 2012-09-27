@@ -23,6 +23,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnLongClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.ImageView.ScaleType;
 import android.widget.ProgressBar;
@@ -41,6 +42,12 @@ import com.miracleas.bitcoin_spinner_lib.SimpleGestureFilter.SimpleGestureListen
 public class MainActivity extends Activity implements SimpleGestureListener,
 		GetAccountInfoCallbackHandler, TickerCallbackHandler {
 
+	private static final int REQUEST_CODE_SEND_MONEY = 10001;
+	private static final int REQUEST_CODE_SETTINGS = 10002;
+	private static final int ABOUT_DIALOG = 1001;
+	private static final int THANKS_DIALOG = 1002;
+	private static final int DONATE_DIALOG = 1003;
+
 	private Context mContext;
 	private TextView tvAddress, tvBalance, tvCurrencyValue, tvEstimatedOnTheWay;
 	private ImageView ivAddress;
@@ -51,21 +58,12 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 	private View vBalanceNoConnView;
 	private AccountTask mGetInfoTask;
 	private CharSequence mRawAppName;
-
 	private AlertDialog qrCodeDialog;
-
-	private static final int REQUEST_CODE_SEND_MONEY = 10001;
-	private static final int REQUEST_CODE_SETTINGS = 10002;
-
-	private static final int ABOUT_DIALOG = 1001;
-	private static final int THANKS_DIALOG = 1002;
-	private static final int DONATE_DIALOG = 1003;
-
 	private SimpleGestureFilter detector;
-
 	private SharedPreferences preferences;
 	private ConnectionWatcher mConnectionWatcher;
 	private long mLatestBalance;
+	private boolean mShowBackupWarning;
 	
 	/** Called when the activity is first created. */
 	@Override
@@ -77,6 +75,8 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 		if(!SpinnerContext.isInitialized()){
 			SpinnerContext.initialize(this, getWindowManager().getDefaultDisplay());
 		}
+		// Should we show the backup warning if there are coins in the account?
+		mShowBackupWarning = !SpinnerContext.getInstance().isBackupWarningDisabled();
 	}
 	
 	@Override
@@ -455,12 +455,36 @@ public class MainActivity extends Activity implements SimpleGestureListener,
 				updateAddress();
 			}
 			vBalanceUpdateView.setVisibility(View.INVISIBLE);
+			if (mShowBackupWarning && info.getAvailableBalance() > 0) {
+				mShowBackupWarning = false;
+				showBackupWarning();
+			}
 			updateBalances(info.getAvailableBalance(),
 					info.getEstimatedBalance() - info.getAvailableBalance());
 			vBalanceNoConnView.setVisibility(View.INVISIBLE);
 			btnSendMoney.setEnabled(true);
 			btnTransactionHistory.setEnabled(true);
 		}
+	}
+	
+	private void showBackupWarning() {
+		final Dialog dialog = new Dialog(mContext);
+		dialog.setTitle(R.string.backup_warning_title);
+		dialog.setContentView(R.layout.dialog_message_with_disable);
+		dialog.findViewById(R.id.btn_ok).setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				CheckBox cb = (CheckBox) dialog.findViewById(R.id.cb_disable);
+				if (cb.isChecked()) {
+					SpinnerContext.getInstance().markBackupWarningDisabled();
+				}
+				dialog.dismiss();
+			}
+		});
+		TextView tv = (TextView) dialog.findViewById(R.id.tv_text);
+		tv.setText(R.string.backup_warning);
+		dialog.show();
 	}
 
 	private void updateBalances(long balance, long onTheWayToMe) {

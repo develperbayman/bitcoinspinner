@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/dialog_message_with_disable"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/tv_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:padding="5dp" />
+
+    <CheckBox
+        android:id="@+id/cb_disable"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/tv_text"
+        android:checked="false"
+        android:text="@string/disable_notification" />
+
+    <Button
+        android:id="@+id/btn_ok"
+        style="@android:style/Widget.Button"
+        android:layout_width="100dp"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/cb_disable"
+        android:layout_centerInParent="true"
+        android:text="@string/ok" />
+
+</RelativeLayout>
