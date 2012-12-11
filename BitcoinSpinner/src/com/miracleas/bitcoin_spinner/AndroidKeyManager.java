@@ -17,7 +17,7 @@ import com.bccapi.bitlib.util.BitUtils;
 import com.bccapi.legacy.DeterministicECKeyManager;
 import com.bccapi.legacy.ECKeyManager;
 
-public class NewAndroidKeyManager implements ECKeyManager {
+public class AndroidKeyManager implements ECKeyManager {
 
   private static final String PREFS_NAME = "KeyManagerCache";
   private static final String SEED_NAME = "seed";
@@ -39,7 +39,7 @@ public class NewAndroidKeyManager implements ECKeyManager {
    * @param seed
    *          The seed from which to recover
    */
-  public NewAndroidKeyManager(Context context, NetworkParameters network, byte[] seed) {
+  public AndroidKeyManager(Context context, NetworkParameters network, byte[] seed) {
     mPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     Utils.writeSeed(context, network, seed);
     String seed_string = mPreferences.getString(SEED_NAME, "");
@@ -61,7 +61,7 @@ public class NewAndroidKeyManager implements ECKeyManager {
    * @param network
    *          Network to use
    */
-  public NewAndroidKeyManager(Context context, NetworkParameters network) {
+  public AndroidKeyManager(Context context, NetworkParameters network) {
     mPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
     byte[] seed = Utils.readSeed(context, network);
     if (seed == null) {

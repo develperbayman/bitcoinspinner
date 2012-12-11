@@ -73,7 +73,7 @@ public class SpinnerContext {
     _displayHeight = dm.heightPixels;
     URL url = Utils.getBccapiUrl(_network);
     com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _network);
-    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _network);
+    AndroidKeyManager newKeyManager = new AndroidKeyManager(_applicationContext, _network);
     _publicKeyRing = new PublicKeyRing();
     _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _network);
     _asyncApi = new AndroidAsyncApi(_publicKeyRing, newApi, _applicationContext);
@@ -84,7 +84,7 @@ public class SpinnerContext {
   public void recoverWallet(byte[] seed) {
     URL url = Utils.getBccapiUrl(_network);
     com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _network);
-    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _network, seed);
+    AndroidKeyManager newKeyManager = new AndroidKeyManager(_applicationContext, _network, seed);
     _publicKeyRing = new PublicKeyRing();
     _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _network);
     _asyncApi = new AndroidAsyncApi(_publicKeyRing, newApi, _applicationContext);
