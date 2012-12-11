@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="100"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Hans Jurgen"/>
+        android:text=""/>
 
     <TextView
         android:id="@+id/address_book_address"
@@ -26,6 +26,6 @@
         android:paddingLeft="6dip"
         android:textSize="18sp"
         android:typeface="monospace" 
-        android:text="143SikKpjzwh" />
+        android:text="" />
 
 </LinearLayout>

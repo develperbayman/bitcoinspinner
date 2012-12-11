@@ -189,7 +189,7 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
           address = "";
         }
       }
-      NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+      NetworkParameters network = SpinnerContext.getInstance().getNetwork();
       Address parsedAddress = Address.fromString(address, network);
       if (parsedAddress != null) {
         mAddress = address;

@@ -246,8 +246,7 @@ public class AddressBookActivity extends ListActivity implements SimpleGestureLi
 
   @Override
   public void onSwipe(int direction) {
-    // TODO Auto-generated method stub
-
+    // Not used
   }
 
 }

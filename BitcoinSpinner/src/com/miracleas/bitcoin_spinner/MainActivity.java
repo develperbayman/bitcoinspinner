@@ -51,7 +51,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Tic
   private static final int DONATE_DIALOG = 1003;
 
   private Context mContext;
-  private TextView tvAddress, tvBalance, tvCurrencyValue, tvEstimatedOnTheWay;
+  private TextView tvAddress, tvBalance, tvCurrencyValue, tvEstimatedOnTheWay, tvSending;
   private ImageView ivAddress;
   private Button btnSendMoney, btnTransactionHistory;
   private RelativeLayout rlBalance;
@@ -102,6 +102,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Tic
     tvBalance = (TextView) findViewById(R.id.tv_balance);
     tvCurrencyValue = (TextView) findViewById(R.id.tv_usd_value);
     tvEstimatedOnTheWay = (TextView) findViewById(R.id.tv_estimated_on_the_way);
+    tvSending = (TextView) findViewById(R.id.tv_sending);
     btnSendMoney = (Button) findViewById(R.id.btn_send_money);
     btnTransactionHistory = (Button) findViewById(R.id.btn_transaction_history);
 
@@ -379,7 +380,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Tic
             public void onClick(DialogInterface dialog, int id) {
               Intent i = new Intent();
               i.setClass(MainActivity.this, SendBitcoinsActivity.class);
-              if (SpinnerContext.getInstance().getNewNetwork().isTestnet()) {
+              if (SpinnerContext.getInstance().getNetwork().isTestnet()) {
                 i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.TESTNET_DONATION_ADDRESS);
               } else {
                 i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.DONATION_ADDRESS);
@@ -439,11 +440,13 @@ public class MainActivity extends Activity implements SimpleGestureListener, Tic
     if (balance != null) {
       tvBalance.setText(CoinUtil.valueString(balance.unspent + balance.pendingChange) + " BTC");
       tvEstimatedOnTheWay.setText(CoinUtil.valueString(balance.pendingReceiving) + " BTC");
+      tvSending.setText(CoinUtil.valueString(balance.pendingSending) + " BTC");
       String localCurrency = preferences.getString(Consts.LOCAL_CURRENCY, Consts.DEFAULT_CURRENCY);
       MultiTicker.requestTicker(localCurrency, this);
     } else {
       tvBalance.setText(R.string.unknown);
       tvEstimatedOnTheWay.setText(R.string.unknown);
+      tvSending.setText(R.string.unknown);
       tvCurrencyValue.setText("");
     }
   }
@@ -471,42 +474,6 @@ public class MainActivity extends Activity implements SimpleGestureListener, Tic
     ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(SpinnerContext.getInstance().getAsyncApi()));
     ivAddress.setVisibility(View.VISIBLE);
   }
-
-  // @Override
-  // public void handleGetAccountInfoCallback(AccountInfo info, String
-  // errorMessage) {
-  // mGetInfoTask = null;
-  // pbBalanceUpdateProgress.setVisibility(View.INVISIBLE);
-  // if (info == null) {
-  // if (!Utils.isConnected(this)) {
-  // Utils.showNoNetworkTip(this);
-  // } else {
-  // Utils.showNoServerConnectivityTip(this);
-  // // This may also be because we cannot do first time login
-  // // due to account creation disabled on server side
-  // }
-  // } else {
-  // // We have had contact with the server, so we know our public key
-  // // has been registered
-  // if (!SpinnerContext.getInstance().isPublicKeyRegistered()) {
-  // // This is the first time this installation has had server
-  // // contact. The server now observes our public key
-  // SpinnerContext.getInstance().markPublicKeyRegistered();
-  // // Now we are ready to show our bitcoin address
-  // updateAddress();
-  // }
-  // vBalanceUpdateView.setVisibility(View.INVISIBLE);
-  // if (mShowBackupWarning && info.getAvailableBalance() > 0) {
-  // mShowBackupWarning = false;
-  // showBackupWarning();
-  // }
-  // updateBalances(info.getAvailableBalance(), info.getEstimatedBalance() -
-  // info.getAvailableBalance());
-  // vBalanceNoConnView.setVisibility(View.INVISIBLE);
-  // btnSendMoney.setEnabled(true);
-  // btnTransactionHistory.setEnabled(true);
-  // }
-  // }
 
   @Override
   public void handleCallback(QueryBalanceResponse response, ApiError error) {

@@ -19,7 +19,7 @@
     <include
         android:id="@+id/rl_balance_ref"
         android:layout_width="fill_parent"
-        android:layout_height="110dp"
+        android:layout_height="125dp"
         android:layout_below="@id/rl_address_ref"
         android:layout_centerHorizontal="true"
         android:layout_marginLeft="5dp"

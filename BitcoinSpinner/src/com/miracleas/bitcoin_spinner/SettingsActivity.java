@@ -173,7 +173,7 @@ public class SettingsActivity extends PreferenceActivity {
           public void onClick(DialogInterface dialog, int id) {
             dialog.cancel();
 
-            NetworkParameters net = SpinnerContext.getInstance().getNewNetwork();
+            NetworkParameters net = SpinnerContext.getInstance().getNetwork();
             final BackupInfo info = new BackupInfo(Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(),
                 net), net);
             info.getBackupUrl();
@@ -270,7 +270,7 @@ public class SettingsActivity extends PreferenceActivity {
         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int id) {
             dialog.cancel();
-            NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+            NetworkParameters network = SpinnerContext.getInstance().getNetwork();
             PrivateKeyRing keyRing = SpinnerContext.getInstance().getPrivateKeyRing();
             // Get the single bitcoin address that BitcoinSpinner uses
             Address address = SpinnerContext.getInstance().getAsyncApi().getPrimaryBitcoinAddress();
@@ -353,7 +353,7 @@ public class SettingsActivity extends PreferenceActivity {
 
   private void doRestore(String backupCode) {
     BackupInfo info = BackupInfo.fromString(backupCode);
-    if (info == null || !info.getNetwork().equals(SpinnerContext.getInstance().getNewNetwork())) {
+    if (info == null || !info.getNetwork().equals(SpinnerContext.getInstance().getNetwork())) {
       Utils.showAlert(this, R.string.restore_invalid_qr_code);
       return;
     }

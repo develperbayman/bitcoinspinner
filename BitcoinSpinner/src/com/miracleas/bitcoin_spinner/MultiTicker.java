@@ -1,5 +1,6 @@
 package com.miracleas.bitcoin_spinner;
 
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
@@ -16,8 +17,7 @@ import javax.net.ssl.X509TrustManager;
 
 import android.os.Handler;
 
-import com.bccapi.core.StreamReader;
-import com.miracleas.bitcoin_spinner.Ticker.BtcToUsdCallbackHandler;
+import com.bccapi.bitlib.util.StringUtils;
 
 /**
  * This class lets you obtain USD -> BTC exchange rates from MtGox.
@@ -140,7 +140,8 @@ public class MultiTicker {
         if (status != 200) {
           return null;
         }
-        String ticker = StreamReader.readFully(connection.getInputStream());
+        InputStreamReader reader = new InputStreamReader(connection.getInputStream());
+        String ticker = StringUtils.readFully(reader);
         int index = ticker.indexOf(LAST);
         if (index == -1) {
           return null;

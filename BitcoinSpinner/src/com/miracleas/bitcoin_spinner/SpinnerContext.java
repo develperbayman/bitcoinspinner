@@ -21,7 +21,7 @@ public class SpinnerContext {
 
   private static SpinnerContext _spinnerContext;
 
-  private NetworkParameters _newNetwork;
+  private NetworkParameters _network;
   private Context _applicationContext;
   private AsynchronousApi _asyncApi;
   private PublicKeyRing _publicKeyRing;
@@ -66,34 +66,34 @@ public class SpinnerContext {
 
   private SpinnerContext(Context context, Display display, NetworkParameters network) {
     _applicationContext = context.getApplicationContext();
-    _newNetwork = network;
+    _network = network;
     DisplayMetrics dm = new DisplayMetrics();
     display.getMetrics(dm);
     _displayWidth = dm.widthPixels;
     _displayHeight = dm.heightPixels;
-    URL url = Utils.getBccapiUrl(_newNetwork);
-    com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _newNetwork);
-    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _newNetwork);
+    URL url = Utils.getBccapiUrl(_network);
+    com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _network);
+    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _network);
     _publicKeyRing = new PublicKeyRing();
-    _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _newNetwork);
+    _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _network);
     _asyncApi = new AndroidAsyncApi(_publicKeyRing, newApi, _applicationContext);
     _privateKeyRing = new PrivateKeyRing();
-    _privateKeyRing.addPrivateKey(newKeyManager.getPrivateKey(1), _newNetwork);
+    _privateKeyRing.addPrivateKey(newKeyManager.getPrivateKey(1), _network);
   }
 
   public void recoverWallet(byte[] seed) {
-    URL url = Utils.getBccapiUrl(_newNetwork);
-    com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _newNetwork);
-    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _newNetwork);
+    URL url = Utils.getBccapiUrl(_network);
+    com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _network);
+    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _network, seed);
     _publicKeyRing = new PublicKeyRing();
-    _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _newNetwork);
+    _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _network);
     _asyncApi = new AndroidAsyncApi(_publicKeyRing, newApi, _applicationContext);
     _privateKeyRing = new PrivateKeyRing();
-    _privateKeyRing.addPrivateKey(newKeyManager.getPrivateKey(1), _newNetwork);
+    _privateKeyRing.addPrivateKey(newKeyManager.getPrivateKey(1), _network);
   }
 
-  public NetworkParameters getNewNetwork() {
-    return _newNetwork;
+  public NetworkParameters getNetwork() {
+    return _network;
   }
 
   public boolean isPinProtected() {

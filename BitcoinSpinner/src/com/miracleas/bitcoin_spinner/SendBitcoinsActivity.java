@@ -233,7 +233,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
     @Override
     public void afterTextChanged(Editable e) {
       String tempString = e.toString().trim();
-      NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+      NetworkParameters network = SpinnerContext.getInstance().getNetwork();
       if (tempString.matches("")) {
         tvValidAdress.setText("");
         tvValidAdress.setError(null);
@@ -445,7 +445,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
     }
 
     // Create transaction builder
-    NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+    NetworkParameters network = SpinnerContext.getInstance().getNetwork();
     StandardTransactionBuilder txBuilder = new StandardTransactionBuilder(network);
     txBuilder.addOutput(receivingAddress, satoshisToSend);
 

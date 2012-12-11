@@ -120,4 +120,5 @@
     <string name="restore_from_clipboard">Gendan fra udklipsholder</string>
     <string name="insufficient_funds_for_fee">Denne transaktion indeholder mange små beløb og vil derfor kræve et netværks gebyr på %s BTC, hvilket du ikke har råd til.</string>
     <string name="insufficient_funds">Inklusiv et netværksgebyr på %1$s BTC vil denne transaktion koste %2$s BTC, hvilket du ikke har råd til.</string>
+    <string name="coins_you_are_sending">Bitcoins du er ved at sende:</string>
 </resources>
