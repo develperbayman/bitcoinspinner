@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<project name="bccapi" default="all" basedir=".">
+	<property name="src.dir" location="${basedir}/src" />
+	<property name="build.dir" location="${basedir}/out" />
+	<property name="lib.dir" location="${basedir}/lib" />
+	<property name="jar.dir" location="${build.dir}" />
+	<property name="classes.dir" location="${build.dir}/classes" />
+	<property name="doc.dir" location="${build.dir}/doc" />
+	<property name="bitlib-jar.dir" location="../bitlib/out/" />
+
+	<path id="common.classpath">
+		<pathelement location="${bitlib-jar.dir}/bitlib.jar" />
+	</path>
+
+	<target name="bccapi-jar" depends="bccapi">
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.dir}/bccapi.jar" basedir="${classes.dir}">
+			<fileset dir="${classes.dir}">
+				<include name="**/*.class" />
+			</fileset>
+			<fileset dir="${src.dir}" includes="**/*.java" />
+			<zipfileset excludes="META-INF/**/*" src="${bitlib-jar.dir}/bitlib.jar" />
+            <manifest>
+               <attribute name="Main-Class" value="com.bccapi.ng.example.SimpleClient"/>
+            </manifest>
+		</jar>
+	</target>
+
+	<target name="bccapi">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="common.classpath" debug="on" fork="true" failonerror="true" optimize="true" includeantruntime="false" />
+	</target>
+
+	<target name="javadoc" depends="bccapi">
+		<mkdir dir="${doc.dir}" />
+		<javadoc excludepackagenames="org.test.supercsv.mock" access="public" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="BCCAPI">
+			<fileset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="all" depends="bccapi-jar" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+</project>

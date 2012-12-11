@@ -1,0 +1,43 @@
+<?xml version="1.0"?>
+<project name="bitlib" default="all" basedir=".">
+	<property name="src.dir" location="${basedir}/src" />
+	<property name="build.dir" location="${basedir}/out" />
+	<property name="lib.dir" location="${basedir}/lib" />
+	<property name="jar.dir" location="${build.dir}" />
+	<property name="classes.dir" location="${build.dir}/classes" />
+	<property name="doc.dir" location="${build.dir}/doc" />
+
+	<path id="common.classpath">
+	</path>
+
+	<target name="bitlib-jar" depends="bitlib">
+		<mkdir dir="${jar.dir}" />
+		<jar destfile="${jar.dir}/bitlib.jar" basedir="${classes.dir}">
+			<fileset dir="${classes.dir}">
+				<include name="**/*.class" />
+			</fileset>
+			<fileset dir="${src.dir}" includes="**/*.java" />
+		</jar>
+	</target>
+
+	<target name="bitlib">
+		<mkdir dir="${classes.dir}" />
+		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="common.classpath" debug="on" fork="true" failonerror="true" optimize="true" includeantruntime="false" />
+	</target>
+
+	<target name="javadoc" depends="bitlib">
+		<mkdir dir="${doc.dir}" />
+		<javadoc excludepackagenames="org.test.supercsv.mock" access="public" destdir="${doc.dir}" author="true" version="true" use="true" windowtitle="BITLIB">
+			<fileset dir="${src.dir}" defaultexcludes="yes">
+				<include name="**/*.java" />
+			</fileset>
+		</javadoc>
+	</target>
+
+	<target name="all" depends="bitlib-jar" />
+
+	<target name="clean">
+		<delete dir="${build.dir}" />
+	</target>
+
+</project>

@@ -30,17 +30,19 @@ import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
-import com.bccapi.api.AccountInfo;
-import com.bccapi.api.Network;
-import com.bccapi.core.CoinUtils;
-import com.bccapi.core.Asynchronous.AccountTask;
-import com.bccapi.core.Asynchronous.AsynchronousAccount;
-import com.bccapi.core.Asynchronous.GetAccountInfoCallbackHandler;
+import com.bccapi.bitlib.model.Address;
+import com.bccapi.bitlib.util.CoinUtil;
+import com.bccapi.ng.api.ApiError;
+import com.bccapi.ng.api.Balance;
+import com.bccapi.ng.api.QueryBalanceResponse;
+import com.bccapi.ng.async.AbstractCallbackHandler;
+import com.bccapi.ng.async.AsyncTask;
+import com.bccapi.ng.async.AsynchronousApi;
 import com.miracleas.bitcoin_spinner.MultiTicker.TickerCallbackHandler;
 import com.miracleas.bitcoin_spinner.SimpleGestureFilter.SimpleGestureListener;
 
-public class MainActivity extends Activity implements SimpleGestureListener, GetAccountInfoCallbackHandler,
-    TickerCallbackHandler {
+public class MainActivity extends Activity implements SimpleGestureListener, TickerCallbackHandler,
+    AbstractCallbackHandler<QueryBalanceResponse> {
 
   private static final int REQUEST_CODE_SEND_MONEY = 10001;
   private static final int REQUEST_CODE_SETTINGS = 10002;
@@ -56,13 +58,13 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
   private ProgressBar pbBalanceUpdateProgress;
   private View vBalanceUpdateView;
   private View vBalanceNoConnView;
-  private AccountTask mGetInfoTask;
+  private AsyncTask mGetInfoTask;
   private CharSequence mRawAppName;
   private AlertDialog qrCodeDialog;
   private SimpleGestureFilter detector;
   private SharedPreferences preferences;
   private ConnectionWatcher mConnectionWatcher;
-  private long mLatestBalance;
+  private Balance mLatestBalance;
   private boolean mShowBackupWarning;
 
   /** Called when the activity is first created. */
@@ -90,7 +92,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
       getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
     }
     setContentView(R.layout.main);
-    mLatestBalance = -1;
+    mLatestBalance = null;
     detector = new SimpleGestureFilter(this, this);
     mConnectionWatcher = new ConnectionWatcher(mContext);
     new Thread(mConnectionWatcher).start();
@@ -196,7 +198,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
     @Override
     public void onClick(View v) {
-      Utils.showPrimaryAddressQrCode(mContext, SpinnerContext.getInstance().getAccount());
+      Utils.showPrimaryAddressQrCode(mContext, SpinnerContext.getInstance().getAsyncApi());
     }
   };
 
@@ -207,7 +209,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
       Intent intent = new Intent(Intent.ACTION_SEND);
       intent.setType("text/plain");
       intent.putExtra(Intent.EXTRA_TEXT, "bitcoin:"
-          + SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
+          + SpinnerContext.getInstance().getAsyncApi().getPrimaryBitcoinAddress());
       startActivity(Intent.createChooser(intent, getString(R.string.share_bitcoin_address)));
     }
   };
@@ -321,8 +323,8 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
   }
 
   private void startBuyCoins() {
-    String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
-    Uri uri = Uri.parse("http://www.bitinstant.com/mobile_deposit?addr=" + address);
+    Address address = SpinnerContext.getInstance().getAsyncApi().getPrimaryBitcoinAddress();
+    Uri uri = Uri.parse("http://www.bitinstant.com/mobile_deposit?addr=" + address.toString());
     Intent myIntent = new Intent(Intent.ACTION_VIEW, uri);
     startActivity(myIntent);
   }
@@ -377,7 +379,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
             public void onClick(DialogInterface dialog, int id) {
               Intent i = new Intent();
               i.setClass(MainActivity.this, SendBitcoinsActivity.class);
-              if (SpinnerContext.getInstance().getNetwork().equals(Network.testNetwork)) {
+              if (SpinnerContext.getInstance().getNewNetwork().isTestnet()) {
                 i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.TESTNET_DONATION_ADDRESS);
               } else {
                 i.putExtra(Consts.BTC_ADDRESS_KEY, Consts.DONATION_ADDRESS);
@@ -398,8 +400,9 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
 
   private void updateInfo() {
     // first update from cache
-    AsynchronousAccount account = SpinnerContext.getInstance().getAccount();
-    updateBalances(account.getCachedBalance(), account.getCachedCoinsOnTheWay());
+    AsynchronousApi api = SpinnerContext.getInstance().getAsyncApi();
+    Balance balance = api.getCachedBalance();
+    updateBalances(balance);
     btnSendMoney.setEnabled(false);
     btnTransactionHistory.setEnabled(false);
     pbBalanceUpdateProgress.setVisibility(View.VISIBLE);
@@ -408,41 +411,7 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
       // we already have a task for getting account info in progress
       return;
     }
-    mGetInfoTask = account.requestAccountInfo(this);
-  }
-
-  @Override
-  public void handleGetAccountInfoCallback(AccountInfo info, String errorMessage) {
-    mGetInfoTask = null;
-    pbBalanceUpdateProgress.setVisibility(View.INVISIBLE);
-    if (info == null) {
-      if (!Utils.isConnected(this)) {
-        Utils.showNoNetworkTip(this);
-      } else {
-        Utils.showNoServerConnectivityTip(this);
-        // This may also be because we cannot do first time login
-        // due to account creation disabled on server side
-      }
-    } else {
-      // We have had contact with the server, so we know our public key
-      // has been registered
-      if (!SpinnerContext.getInstance().isPublicKeyRegistered()) {
-        // This is the first time this installation has had server
-        // contact. The server now observes our public key
-        SpinnerContext.getInstance().markPublicKeyRegistered();
-        // Now we are ready to show our bitcoin address
-        updateAddress();
-      }
-      vBalanceUpdateView.setVisibility(View.INVISIBLE);
-      if (mShowBackupWarning && info.getAvailableBalance() > 0) {
-        mShowBackupWarning = false;
-        showBackupWarning();
-      }
-      updateBalances(info.getAvailableBalance(), info.getEstimatedBalance() - info.getAvailableBalance());
-      vBalanceNoConnView.setVisibility(View.INVISIBLE);
-      btnSendMoney.setEnabled(true);
-      btnTransactionHistory.setEnabled(true);
-    }
+    mGetInfoTask = api.queryBalance(this);
   }
 
   private void showBackupWarning() {
@@ -465,27 +434,24 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
     dialog.show();
   }
 
-  private void updateBalances(long balance, long onTheWayToMe) {
+  private void updateBalances(Balance balance) {
     mLatestBalance = balance;
-    if (balance >= 0) {
-      tvBalance.setText(CoinUtils.valueString(balance) + " BTC");
+    if (balance != null) {
+      tvBalance.setText(CoinUtil.valueString(balance.unspent + balance.pendingChange) + " BTC");
+      tvEstimatedOnTheWay.setText(CoinUtil.valueString(balance.pendingReceiving) + " BTC");
       String localCurrency = preferences.getString(Consts.LOCAL_CURRENCY, Consts.DEFAULT_CURRENCY);
       MultiTicker.requestTicker(localCurrency, this);
     } else {
       tvBalance.setText(R.string.unknown);
-      tvCurrencyValue.setText("");
-    }
-    if (onTheWayToMe >= 0) {
-      tvEstimatedOnTheWay.setText(CoinUtils.valueString(onTheWayToMe) + " BTC");
-    } else {
       tvEstimatedOnTheWay.setText(R.string.unknown);
+      tvCurrencyValue.setText("");
     }
   }
 
   @Override
   public void handleTickerCallback(String currency, Double value) {
-    if (value != null) {
-      Double btc = Double.valueOf(mLatestBalance) / Consts.SATOSHIS_PER_BITCOIN;
+    if (value != null && mLatestBalance != null) {
+      Double btc = Double.valueOf(mLatestBalance.unspent + mLatestBalance.pendingChange) / Consts.SATOSHIS_PER_BITCOIN;
       Double converted = btc * value;
       String text = String.format(Locale.US, "%1$.2f %2$s", converted, currency);
       tvCurrencyValue.setText(getResources().getString(R.string.worth_about, text));
@@ -499,19 +465,74 @@ public class MainActivity extends Activity implements SimpleGestureListener, Get
   }
 
   private void updateAddress() {
-    if (!SpinnerContext.getInstance().isPublicKeyRegistered()) {
-      // We do not wish to show our bitcoin address until the public key
-      // has been registered with the server. This may happen if the
-      // server is down or account creation is temporarily disabled.
-      ivAddress.setVisibility(View.INVISIBLE);
-      tvAddress.setText(R.string.initializing);
-      return;
-    }
-    String address = SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress();
-    tvAddress.setText(address);
+    Address address = SpinnerContext.getInstance().getAsyncApi().getPrimaryBitcoinAddress();
+    tvAddress.setText(address.toString());
     ivAddress.setScaleType(ScaleType.CENTER_CROP);
-    ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(SpinnerContext.getInstance().getAccount()));
+    ivAddress.setImageBitmap(Utils.getPrimaryAddressAsSmallQrCode(SpinnerContext.getInstance().getAsyncApi()));
     ivAddress.setVisibility(View.VISIBLE);
+  }
+
+  // @Override
+  // public void handleGetAccountInfoCallback(AccountInfo info, String
+  // errorMessage) {
+  // mGetInfoTask = null;
+  // pbBalanceUpdateProgress.setVisibility(View.INVISIBLE);
+  // if (info == null) {
+  // if (!Utils.isConnected(this)) {
+  // Utils.showNoNetworkTip(this);
+  // } else {
+  // Utils.showNoServerConnectivityTip(this);
+  // // This may also be because we cannot do first time login
+  // // due to account creation disabled on server side
+  // }
+  // } else {
+  // // We have had contact with the server, so we know our public key
+  // // has been registered
+  // if (!SpinnerContext.getInstance().isPublicKeyRegistered()) {
+  // // This is the first time this installation has had server
+  // // contact. The server now observes our public key
+  // SpinnerContext.getInstance().markPublicKeyRegistered();
+  // // Now we are ready to show our bitcoin address
+  // updateAddress();
+  // }
+  // vBalanceUpdateView.setVisibility(View.INVISIBLE);
+  // if (mShowBackupWarning && info.getAvailableBalance() > 0) {
+  // mShowBackupWarning = false;
+  // showBackupWarning();
+  // }
+  // updateBalances(info.getAvailableBalance(), info.getEstimatedBalance() -
+  // info.getAvailableBalance());
+  // vBalanceNoConnView.setVisibility(View.INVISIBLE);
+  // btnSendMoney.setEnabled(true);
+  // btnTransactionHistory.setEnabled(true);
+  // }
+  // }
+
+  @Override
+  public void handleCallback(QueryBalanceResponse response, ApiError error) {
+    mGetInfoTask = null;
+    pbBalanceUpdateProgress.setVisibility(View.INVISIBLE);
+    if (response == null) {
+      if (!Utils.isConnected(this)) {
+        Utils.showNoNetworkTip(this);
+      } else {
+        Utils.showNoServerConnectivityTip(this);
+        // This may also be because we cannot do first time login
+        // due to account creation disabled on server side
+      }
+    } else {
+      Balance balance = response.balance;
+      vBalanceUpdateView.setVisibility(View.INVISIBLE);
+      // Check whether we should show a backup warning
+      if (mShowBackupWarning && balance.unspent + balance.pendingChange > 0) {
+        mShowBackupWarning = false;
+        showBackupWarning();
+      }
+      updateBalances(balance);
+      vBalanceNoConnView.setVisibility(View.INVISIBLE);
+      btnSendMoney.setEnabled(true);
+      btnTransactionHistory.setEnabled(true);
+    }
   }
 
 }

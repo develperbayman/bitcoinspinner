@@ -15,7 +15,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.widget.ProgressBar;
 
-import com.bccapi.api.Network;
+import com.bccapi.bitlib.model.NetworkParameters;
 
 public class StartUpActivity extends Activity {
 
@@ -136,7 +136,7 @@ public class StartUpActivity extends Activity {
     @Override
     protected Long doInBackground(Void... params) {
       Intent i = getIntent();
-      Network network = (Network) i.getExtras().getSerializable(Consts.EXTRA_NETWORK);
+      NetworkParameters network = (NetworkParameters) i.getExtras().getSerializable(Consts.EXTRA_NETWORK);
       SpinnerContext.initialize(mContext, getWindowManager().getDefaultDisplay(), network);
       return null;
     }

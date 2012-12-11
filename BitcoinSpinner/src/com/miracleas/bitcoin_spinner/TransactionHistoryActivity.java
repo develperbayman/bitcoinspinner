@@ -2,10 +2,10 @@ package com.miracleas.bitcoin_spinner;
 
 import java.text.DateFormat;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.ListActivity;
@@ -22,21 +22,32 @@ import android.widget.ArrayAdapter;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bccapi.api.AccountStatement;
-import com.bccapi.api.AccountStatement.Record;
-import com.bccapi.api.AccountStatement.Record.Type;
-import com.bccapi.core.CoinUtils;
-import com.bccapi.core.Asynchronous.AccountTask;
-import com.bccapi.core.Asynchronous.RecentStatementsCallbackHandler;
+import com.bccapi.bitlib.model.Address;
+import com.bccapi.bitlib.util.CoinUtil;
+import com.bccapi.bitlib.util.StringUtils;
+import com.bccapi.ng.api.ApiError;
+import com.bccapi.ng.api.QueryTransactionSummaryResponse;
+import com.bccapi.ng.api.TransactionSummary;
+import com.bccapi.ng.async.AbstractCallbackHandler;
+import com.bccapi.ng.async.AsyncTask;
+import com.bccapi.ng.util.TransactionSummaryUtils;
+import com.bccapi.ng.util.TransactionSummaryUtils.TransactionType;
 import com.miracleas.bitcoin_spinner.SimpleGestureFilter.SimpleGestureListener;
 
 public class TransactionHistoryActivity extends ListActivity implements SimpleGestureListener,
-    RecentStatementsCallbackHandler {
+    AbstractCallbackHandler<QueryTransactionSummaryResponse> {
+
+  private static final int RECEIVED_COLOR = Color.rgb(128, 255, 128);
+  private static final int RECEIVED_COLOR_DIM = Color.rgb(128 / 2, 255 / 2, 128 / 2);
+  private static final int SENT_COLOR = Color.rgb(255, 128, 128);
+  private static final int SENT_COLOR_DIM = Color.rgb(255 / 2, 128 / 2, 128 / 2);
 
   private Activity mActivity;
   private SimpleGestureFilter detector;
   private SharedPreferences preferences;
-  private AccountTask mTask;
+  private AsyncTask mApiTask;
+  private Set<Address> mAddressSet;
+  private int mChainHeight;
 
   /**
    * @see android.app.Activity#onCreate(Bundle)
@@ -52,7 +63,8 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
     mActivity = this;
     detector = new SimpleGestureFilter(this, this);
     int size = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, Consts.DEFAULT_TRANSACTION_HISTORY_SIZE);
-    mTask = SpinnerContext.getInstance().getAccount().requestRecentStatements(size, this);
+    mAddressSet = SpinnerContext.getInstance().getAsyncApi().getBitcoinAddressSet();
+    mApiTask = SpinnerContext.getInstance().getAsyncApi().queryRecentTransactionSummary(size, this);
   }
 
   @Override
@@ -66,12 +78,13 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
       config.locale = locale;
       getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
     }
+    mAddressSet = SpinnerContext.getInstance().getAsyncApi().getBitcoinAddressSet();
   }
 
   @Override
   protected void onDestroy() {
-    if (mTask != null) {
-      mTask.cancel();
+    if (mApiTask != null) {
+      mApiTask.cancel();
     }
     super.onDestroy();
   }
@@ -96,9 +109,16 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
 
   }
 
-  private class transactionHistoryAdapter extends ArrayAdapter<Record> {
+  private static Date getMidnight() {
+    Calendar midnight = Calendar.getInstance();
+    midnight.set(midnight.get(Calendar.YEAR), midnight.get(Calendar.MONTH), midnight.get(Calendar.DAY_OF_MONTH), 0, 0,
+        0);
+    return midnight.getTime();
+  }
 
-    public transactionHistoryAdapter(Context context, int textViewResourceId, List<Record> objects) {
+  private class transactionHistoryAdapter extends ArrayAdapter<TransactionSummary> {
+
+    public transactionHistoryAdapter(Context context, int textViewResourceId, List<TransactionSummary> objects) {
       super(context, textViewResourceId, objects);
     }
 
@@ -114,89 +134,93 @@ public class TransactionHistoryActivity extends ListActivity implements SimpleGe
       TextView tvDate = (TextView) v.findViewById(R.id.tv_date);
       TextView tvAddress = (TextView) v.findViewById(R.id.tv_address);
       TextView tvCredits = (TextView) v.findViewById(R.id.tv_credits);
-      Record r = getItem(position);
+      TransactionSummary r = getItem(position);
       if (r == null) {
-        tvDescription.setText("No Records");
+        tvDescription.setText(R.string.none);
       }
       String description;
-      if (r.getType() == Type.Sent) {
-        if (r.getConfirmations() == 0) {
+      String[] addresses = new String[0];
+      int confirmations = r.calculateConfirmatons(mChainHeight);
+      TransactionSummaryUtils.TransactionType type = TransactionSummaryUtils.getTransactionType(r, mAddressSet);
+      if (type == TransactionType.SentToOthers) {
+        if (confirmations == 0) {
           description = getContext().getString(R.string.unconfirmed_to);
         } else {
           description = getContext().getString(R.string.sent_to);
         }
-      } else if (r.getType() == Type.Received) {
-        if (r.getConfirmations() == 0) {
-          description = getContext().getString(R.string.unconfirmed_received_with);
+        addresses = TransactionSummaryUtils.getReceiversNotMe(r, mAddressSet);
+      } else if (type == TransactionType.ReceivedFromOthers) {
+        if (confirmations == 0) {
+          description = getContext().getString(R.string.unconfirmed_from);
         } else {
-          description = getContext().getString(R.string.received_with);
+          description = getContext().getString(R.string.received_from);
         }
+        addresses = TransactionSummaryUtils.getSenders(r);
       } else {
         description = getContext().getString(R.string.sent_to_yourself);
       }
 
-      String valueString = CoinUtils.valueString(r.getAmount());
+      long value = TransactionSummaryUtils.calculateBalanceChange(r, mAddressSet);
+      String valueString = CoinUtil.valueString(value) + " BTC";
 
       Date midnight = getMidnight();
       DateFormat hourFormat = DateFormat.getDateInstance(DateFormat.SHORT);
       DateFormat dayFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-      Date date = new Date(r.getDate());
+      Date date = new Date(r.time * 1000L);
       DateFormat dateFormat = date.before(midnight) ? hourFormat : dayFormat;
 
       tvDescription.setText(description);
       tvDate.setText(dateFormat.format(date));
 
-      // Determine address text
-      String addressText = r.getAddresses();
-      if (r.getType() == Type.Sent) {
-        String name = AddressBookManager.getInstance().getNameByAddress(r.getAddresses());
+      // Replace known addresses from the address book
+      for (int i = 0; i < addresses.length; i++) {
+        String name = AddressBookManager.getInstance().getNameByAddress(addresses[i]);
         if (name != null && name.length() != 0) {
           // Was sent to one in our address book
-          addressText = name;
+          addresses[i] = name;
         }
       }
+
+      String addressText = StringUtils.join(addresses, ", ");
+
       tvAddress.setText(addressText);
 
       tvCredits.setText(valueString);
-      if (r.getConfirmations() == 0) {
-        tvDescription.setTextColor(Color.GRAY);
-        tvDate.setTextColor(Color.GRAY);
-        tvAddress.setTextColor(Color.GRAY);
-        tvCredits.setTextColor(Color.GRAY);
-      } else if (r.getConfirmations() < 5) {
-        tvDescription.setTextColor(Color.GRAY);
-        tvDate.setTextColor(Color.GRAY);
-        tvAddress.setTextColor(Color.GRAY);
-        tvCredits.setTextColor(Color.GRAY);
+      int color;
+      if (confirmations < 5) {
+        if (value < 0) {
+          color = SENT_COLOR_DIM;
+        } else {
+          color = RECEIVED_COLOR_DIM;
+        }
       } else {
-        tvDescription.setTextColor(Color.WHITE);
-        tvDate.setTextColor(Color.WHITE);
-        tvAddress.setTextColor(Color.WHITE);
-        tvCredits.setTextColor(Color.WHITE);
+        if (value < 0) {
+          color = SENT_COLOR;
+        } else {
+          color = RECEIVED_COLOR;
+        }
       }
+
+      tvDescription.setTextColor(color);
+      tvDate.setTextColor(color);
+      tvAddress.setTextColor(color);
+      tvCredits.setTextColor(color);
+
       return v;
     }
   }
 
-  private static Date getMidnight() {
-    Calendar midnight = Calendar.getInstance();
-    midnight.set(midnight.get(Calendar.YEAR), midnight.get(Calendar.MONTH), midnight.get(Calendar.DAY_OF_MONTH), 0, 0,
-        0);
-    return midnight.getTime();
-  }
-
   @Override
-  public void handleRecentStatementsCallback(AccountStatement statements, String errorMessage) {
-    if (statements == null) {
+  public void handleCallback(QueryTransactionSummaryResponse response, ApiError error) {
+    if (response == null) {
       Utils.showConnectionAlert(this);
       return;
     }
-    if (statements.getRecords().isEmpty()) {
+    mChainHeight = response.chainHeight;
+    if (response.transactions.isEmpty()) {
       Toast.makeText(this, R.string.no_transactions, Toast.LENGTH_SHORT).show();
     } else {
-      List<Record> records = statements.getRecords();
-      Collections.reverse(records);
-      setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, records));
+      setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, response.transactions));
     }
   }
 

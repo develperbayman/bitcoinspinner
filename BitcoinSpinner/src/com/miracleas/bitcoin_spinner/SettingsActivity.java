@@ -27,10 +27,13 @@ import android.view.View.OnClickListener;
 import android.widget.RadioButton;
 import android.widget.Toast;
 
-import com.bccapi.api.Network;
-import com.bccapi.core.Base58;
-import com.bccapi.core.DeterministicECKeyExporter;
-import com.bccapi.core.Asynchronous.AsynchronousAccount;
+import com.bccapi.bitlib.crypto.KeyExporter;
+import com.bccapi.bitlib.crypto.PrivateKeyRing;
+import com.bccapi.bitlib.crypto.PublicKey;
+import com.bccapi.bitlib.model.Address;
+import com.bccapi.bitlib.model.NetworkParameters;
+import com.bccapi.bitlib.util.Base58;
+import com.bccapi.ng.api.Balance;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -170,7 +173,7 @@ public class SettingsActivity extends PreferenceActivity {
           public void onClick(DialogInterface dialog, int id) {
             dialog.cancel();
 
-            Network net = SpinnerContext.getInstance().getNetwork();
+            NetworkParameters net = SpinnerContext.getInstance().getNewNetwork();
             final BackupInfo info = new BackupInfo(Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(),
                 net), net);
             info.getBackupUrl();
@@ -190,8 +193,8 @@ public class SettingsActivity extends PreferenceActivity {
 
     public boolean onPreferenceClick(Preference preference) {
 
-      AsynchronousAccount accountManager = SpinnerContext.getInstance().getAccount();
-      if (accountManager.getCachedBalance() > 0 || accountManager.getCachedCoinsOnTheWay() > 0) {
+      Balance balance = SpinnerContext.getInstance().getAsyncApi().getCachedBalance();
+      if (balance != null && balance.unspent + balance.pendingChange > 0) {
         AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
         builder.setMessage(R.string.restore_dialog_coins).setCancelable(false)
             .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
@@ -267,15 +270,20 @@ public class SettingsActivity extends PreferenceActivity {
         .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int id) {
             dialog.cancel();
-
-            Network net = SpinnerContext.getInstance().getNetwork();
-            byte[] seed = Utils.readSeed(SpinnerContext.getInstance().getApplicationContext(), net);
-            DeterministicECKeyExporter exporter = new DeterministicECKeyExporter(seed);
-            final String keyString;
-            keyString = exporter.getPrivateKeyExporter(1)
-                .getBase58EncodedKey(SpinnerContext.getInstance().getNetwork());
-            Bitmap qrCode = Utils.getLargeQRCodeBitmap(keyString);
-            Utils.showQrCode(mContext, R.string.private_key, qrCode, keyString);
+            NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+            PrivateKeyRing keyRing = SpinnerContext.getInstance().getPrivateKeyRing();
+            // Get the single bitcoin address that BitcoinSpinner uses
+            Address address = SpinnerContext.getInstance().getAsyncApi().getPrimaryBitcoinAddress();
+            // Locate the corresponding public key
+            PublicKey publicKey = keyRing.findPublicKeyByAddress(address);
+            // Get the key exporter from the public key reference 
+            KeyExporter exporter = keyRing.findKeyExporterByPublicKey(publicKey);
+            // Export the private key
+            String exportedPrivateKey = exporter.getBase58EncodedPrivateKey(network);
+            // Turn it into a QR code
+            Bitmap qrCode = Utils.getLargeQRCodeBitmap(exportedPrivateKey);
+            // Show
+            Utils.showQrCode(mContext, R.string.private_key, qrCode, exportedPrivateKey);
           }
         }).setNegativeButton(R.string.no, new DialogInterface.OnClickListener() {
           public void onClick(DialogInterface dialog, int id) {
@@ -345,7 +353,7 @@ public class SettingsActivity extends PreferenceActivity {
 
   private void doRestore(String backupCode) {
     BackupInfo info = BackupInfo.fromString(backupCode);
-    if (info == null || !info.getNetwork().equals(SpinnerContext.getInstance().getNetwork())) {
+    if (info == null || !info.getNetwork().equals(SpinnerContext.getInstance().getNewNetwork())) {
       Utils.showAlert(this, R.string.restore_invalid_qr_code);
       return;
     }
@@ -371,18 +379,18 @@ public class SettingsActivity extends PreferenceActivity {
 
   public static class BackupInfo {
     private byte[] _seed;
-    private Network _network;
+    private NetworkParameters _network;
 
     public static BackupInfo fromString(String string) {
       try {
         Uri temp = Uri.parse(string);
         final Uri uri = Uri.parse("bsb://" + temp.getSchemeSpecificPart());
         int netId = Integer.parseInt(uri.getQueryParameter("net"));
-        Network network;
+        NetworkParameters network;
         if (netId == 0) {
-          network = Network.productionNetwork;
+          network = NetworkParameters.productionNetwork;
         } else if (netId == 1) {
-          network = Network.testNetwork;
+          network = NetworkParameters.testNetwork;
         } else {
           return null;
         }
@@ -397,7 +405,7 @@ public class SettingsActivity extends PreferenceActivity {
       return null;
     }
 
-    public BackupInfo(byte[] seed, Network network) {
+    public BackupInfo(byte[] seed, NetworkParameters network) {
       _seed = seed;
       _network = network;
     }
@@ -406,7 +414,7 @@ public class SettingsActivity extends PreferenceActivity {
       return _seed;
     }
 
-    public Network getNetwork() {
+    public NetworkParameters getNetwork() {
       return _network;
     }
 
@@ -415,7 +423,7 @@ public class SettingsActivity extends PreferenceActivity {
       sb.append("bsb:");
       sb.append(Base58.encode(_seed));
       sb.append("?net=");
-      sb.append(_network.equals(Network.productionNetwork) ? 0 : 1);
+      sb.append(_network.isProdnet() ? 0 : 1);
       return sb.toString();
     }
   }

@@ -1,12 +1,12 @@
 package com.miracleas.bitcoin_spinner;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -31,17 +31,21 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bccapi.api.AccountStatement;
-import com.bccapi.api.AccountStatement.Record;
-import com.bccapi.api.AccountStatement.Record.Type;
-import com.bccapi.api.Network;
-import com.bccapi.core.AddressUtil;
-import com.bccapi.core.CoinUtils;
-import com.bccapi.core.Asynchronous.AccountTask;
-import com.bccapi.core.Asynchronous.RecentStatementsCallbackHandler;
+import com.bccapi.bitlib.model.Address;
+import com.bccapi.bitlib.model.NetworkParameters;
+import com.bccapi.bitlib.util.CoinUtil;
+import com.bccapi.bitlib.util.StringUtils;
+import com.bccapi.ng.api.ApiError;
+import com.bccapi.ng.api.QueryTransactionSummaryResponse;
+import com.bccapi.ng.api.TransactionSummary;
+import com.bccapi.ng.async.AbstractCallbackHandler;
+import com.bccapi.ng.async.AsyncTask;
+import com.bccapi.ng.util.TransactionSummaryUtils;
+import com.bccapi.ng.util.TransactionSummaryUtils.TransactionType;
 import com.miracleas.bitcoin_spinner.SimpleGestureFilter.SimpleGestureListener;
 
-public class AddAddressActivity extends ListActivity implements SimpleGestureListener, RecentStatementsCallbackHandler {
+public class AddAddressActivity extends ListActivity implements SimpleGestureListener,
+    AbstractCallbackHandler<QueryTransactionSummaryResponse> {
 
   public static final String ADD_ADDRESS_RESULT = "address";
   public static final String ADD_NAME_RESULT = "NAME";
@@ -50,11 +54,13 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
   private Activity mActivity;
   private SimpleGestureFilter detector;
   private SharedPreferences preferences;
-  private AccountTask mTask;
   private ListView lvAdressList;
   private Context mContext;
   private String mAddress;
   private Button btnQRScan;
+  private AsyncTask mApiTask;
+  private Set<Address> mAddressSet;
+  private int mChainHeight;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +74,8 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
     mActivity = this;
     detector = new SimpleGestureFilter(this, this);
     int size = preferences.getInt(Consts.TRANSACTION_HISTORY_SIZE, 15);
-    mTask = SpinnerContext.getInstance().getAccount().requestRecentStatements(size, this);
-
+    mAddressSet = SpinnerContext.getInstance().getAsyncApi().getBitcoinAddressSet();
+    mApiTask = SpinnerContext.getInstance().getAsyncApi().queryRecentTransactionSummary(size, this);
     btnQRScan = (Button) findViewById(R.id.btn_qr_scan);
     btnQRScan.setOnClickListener(qrScanClickListener);
     lvAdressList = (ListView) findViewById(android.R.id.list);
@@ -79,7 +85,6 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
       public void onItemClick(AdapterView<?> arg0, View view, int position, long id) {
         mAddress = (String) view.getTag();
         showSetNameDialog();
-        // showDialog(SET_NAME_DIALOG);
       }
     });
 
@@ -130,12 +135,13 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
       config.locale = locale;
       getBaseContext().getResources().updateConfiguration(config, getBaseContext().getResources().getDisplayMetrics());
     }
+    mAddressSet = SpinnerContext.getInstance().getAsyncApi().getBitcoinAddressSet();
   }
 
   @Override
   protected void onDestroy() {
-    if (mTask != null) {
-      mTask.cancel();
+    if (mApiTask != null) {
+      mApiTask.cancel();
     }
     super.onDestroy();
   }
@@ -183,14 +189,15 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
           address = "";
         }
       }
-      Network network = SpinnerContext.getInstance().getNetwork();
-      if (AddressUtil.validateAddress(address, network)) {
+      NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+      Address parsedAddress = Address.fromString(address, network);
+      if (parsedAddress != null) {
         mAddress = address;
         showSetNameDialog();
       } else {
-        if (network.equals(Network.testNetwork)) {
+        if (network.isTestnet()) {
           Toast.makeText(mContext, getString(R.string.invalid_address_for_testnet), Toast.LENGTH_LONG).show();
-        } else if (network.equals(Network.productionNetwork)) {
+        } else if (network.isProdnet()) {
           Toast.makeText(mContext, getString(R.string.invalid_address_for_prodnet), Toast.LENGTH_LONG).show();
         }
       }
@@ -202,9 +209,16 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
 
   }
 
-  private class transactionHistoryAdapter extends ArrayAdapter<Record> {
+  private static Date getMidnight() {
+    Calendar midnight = Calendar.getInstance();
+    midnight.set(midnight.get(Calendar.YEAR), midnight.get(Calendar.MONTH), midnight.get(Calendar.DAY_OF_MONTH), 0, 0,
+        0);
+    return midnight.getTime();
+  }
 
-    public transactionHistoryAdapter(Context context, int textViewResourceId, List<Record> objects) {
+  private class transactionHistoryAdapter2 extends ArrayAdapter<TransactionSummary> {
+
+    public transactionHistoryAdapter2(Context context, int textViewResourceId, List<TransactionSummary> objects) {
       super(context, textViewResourceId, objects);
     }
 
@@ -220,80 +234,87 @@ public class AddAddressActivity extends ListActivity implements SimpleGestureLis
       TextView tvDate = (TextView) v.findViewById(R.id.tv_date);
       TextView tvAddress = (TextView) v.findViewById(R.id.tv_address);
       TextView tvCredits = (TextView) v.findViewById(R.id.tv_credits);
-      Record r = getItem(position);
+      TransactionSummary r = getItem(position);
       if (r == null) {
         tvDescription.setText(R.string.none);
       }
       String description;
-      if (r.getType() == Type.Sent) {
-        if (r.getConfirmations() == 0) {
+      String[] addresses = new String[0];
+      int confirmations = r.calculateConfirmatons(mChainHeight);
+      TransactionSummaryUtils.TransactionType type = TransactionSummaryUtils.getTransactionType(r, mAddressSet);
+      if (type == TransactionType.SentToOthers) {
+        if (confirmations == 0) {
           description = getContext().getString(R.string.unconfirmed_to);
         } else {
           description = getContext().getString(R.string.sent_to);
         }
-      } else if (r.getType() == Type.Received) {
-        if (r.getConfirmations() == 0) {
-          description = getContext().getString(R.string.unconfirmed_received_with);
+        addresses = TransactionSummaryUtils.getReceiversNotMe(r, mAddressSet);
+      } else if (type == TransactionType.ReceivedFromOthers) {
+        if (confirmations == 0) {
+          description = getContext().getString(R.string.unconfirmed_from);
         } else {
-          description = getContext().getString(R.string.received_with);
+          description = getContext().getString(R.string.received_from);
         }
+        addresses = TransactionSummaryUtils.getSenders(r);
       } else {
         description = getContext().getString(R.string.sent_to_yourself);
       }
 
-      String valueString = CoinUtils.valueString(r.getAmount());
+      long value = TransactionSummaryUtils.calculateBalanceChange(r, mAddressSet);
+      String valueString = CoinUtil.valueString(value) + " BTC";
 
       Date midnight = getMidnight();
       DateFormat hourFormat = DateFormat.getDateInstance(DateFormat.SHORT);
       DateFormat dayFormat = DateFormat.getTimeInstance(DateFormat.SHORT);
-      Date date = new Date(r.getDate());
+      Date date = new Date(r.time * 1000L);
       DateFormat dateFormat = date.before(midnight) ? hourFormat : dayFormat;
 
       tvDescription.setText(description);
       tvDate.setText(dateFormat.format(date));
-      tvAddress.setText(r.getAddresses());
+
+      // It may happen that this record was sent to two addresses, we ignore
+      // anything but the first address as this only happens if the key was
+      // exported to a more advanced wallet.
+      if (addresses.length > 0) {
+        v.setTag(addresses[0]);
+      }
+
+      // Replace known addresses from the address book
+      for (int i = 0; i < addresses.length; i++) {
+        String name = AddressBookManager.getInstance().getNameByAddress(addresses[i]);
+        if (name != null && name.length() != 0) {
+          // Was sent to one in our address book
+          addresses[i] = name;
+        }
+      }
+
+      String addressText = StringUtils.join(addresses, ", ");
+
+      tvAddress.setText(addressText);
+
       tvCredits.setText(valueString);
-      // There will only ever be one address, as we only
-      String address = getfirstAddress(r.getAddresses());
-      v.setTag(address);
       return v;
     }
   }
 
-  private String getfirstAddress(String addresses) {
-    int commaIndex = addresses.indexOf(',');
-    if (commaIndex == -1) {
-      return addresses;
-    } else {
-      return addresses.substring(0, commaIndex - 1);
-    }
-  }
-
-  private static Date getMidnight() {
-    Calendar midnight = Calendar.getInstance();
-    midnight.set(midnight.get(Calendar.YEAR), midnight.get(Calendar.MONTH), midnight.get(Calendar.DAY_OF_MONTH), 0, 0,
-        0);
-    return midnight.getTime();
-  }
-
   @Override
-  public void handleRecentStatementsCallback(AccountStatement statements, String errorMessage) {
-    if (statements == null) {
+  public void handleCallback(QueryTransactionSummaryResponse response, ApiError error) {
+    if (response == null) {
       Utils.showConnectionAlert(this);
       return;
     }
-    if (statements.getRecords().isEmpty()) {
+    mChainHeight = response.chainHeight;
+
+    if (response.transactions.isEmpty()) {
       Toast.makeText(this, R.string.no_transactions, Toast.LENGTH_SHORT).show();
     } else {
-      List<Record> records = statements.getRecords();
-      List<Record> sending = new ArrayList<Record>(records.size());
-      for (Record r : records) {
-        if (r.getType() == Type.Sent) {
-          sending.add(r);
+      List<TransactionSummary> sending = new LinkedList<TransactionSummary>();
+      for (TransactionSummary item : response.transactions) {
+        if (TransactionSummaryUtils.getTransactionType(item, mAddressSet) == TransactionType.SentToOthers) {
+          sending.add(item);
         }
       }
-      Collections.reverse(sending);
-      setListAdapter(new transactionHistoryAdapter(this, R.layout.transaction_history_row, sending));
+      setListAdapter(new transactionHistoryAdapter2(this, R.layout.transaction_history_row, sending));
     }
   }
 

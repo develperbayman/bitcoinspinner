@@ -7,10 +7,10 @@ import android.content.SharedPreferences;
 import android.util.DisplayMetrics;
 import android.view.Display;
 
-import com.bccapi.api.Network;
-import com.bccapi.core.BitcoinClientApiImpl;
-import com.bccapi.core.ECKeyManager;
-import com.bccapi.core.Asynchronous.AsynchronousAccount;
+import com.bccapi.bitlib.crypto.PrivateKeyRing;
+import com.bccapi.bitlib.crypto.PublicKeyRing;
+import com.bccapi.bitlib.model.NetworkParameters;
+import com.bccapi.ng.async.AsynchronousApi;
 
 public class SpinnerContext {
 
@@ -21,9 +21,11 @@ public class SpinnerContext {
 
   private static SpinnerContext _spinnerContext;
 
-  private Network _network;
+  private NetworkParameters _newNetwork;
   private Context _applicationContext;
-  private AsynchronousAccount _account;
+  private AsynchronousApi _asyncApi;
+  private PublicKeyRing _publicKeyRing;
+  private PrivateKeyRing _privateKeyRing;
   private int _displayWidth; // Total width of the device display in pixels
   private int _displayHeight; // Total height of the device display in pixels
 
@@ -31,28 +33,28 @@ public class SpinnerContext {
     return _spinnerContext != null;
   }
 
-  public static void initialize(Context context, Display display, Network network) {
+  public static void initialize(Context context, Display display, NetworkParameters network) {
     context = context.getApplicationContext();
     SharedPreferences preferences = context.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
     preferences.edit().putInt(NETWORK_USED, network.getStandardAddressHeader()).commit();
     _spinnerContext = new SpinnerContext(context, display, network);
-    Utils.getPrimaryAddressAsSmallQrCode(_spinnerContext.getAccount());
+    Utils.getPrimaryAddressAsSmallQrCode(_spinnerContext.getAsyncApi());
   }
 
   public static void initialize(Context context, Display display) {
     context = context.getApplicationContext();
     SharedPreferences preferences = context.getSharedPreferences(Consts.PREFS_NAME, Context.MODE_PRIVATE);
     int net = preferences.getInt(NETWORK_USED, -1);
-    Network network;
-    if (net == Network.productionNetwork.getStandardAddressHeader()) {
-      network = Network.productionNetwork;
-    } else if (net == Network.testNetwork.getStandardAddressHeader()) {
-      network = Network.testNetwork;
+    NetworkParameters network;
+    if (net == NetworkParameters.productionNetwork.getStandardAddressHeader()) {
+      network = NetworkParameters.productionNetwork;
+    } else if (net == NetworkParameters.testNetwork.getStandardAddressHeader()) {
+      network = NetworkParameters.testNetwork;
     } else {
       throw new RuntimeException("Network never initialized");
     }
     _spinnerContext = new SpinnerContext(context, display, network);
-    Utils.getPrimaryAddressAsSmallQrCode(_spinnerContext.getAccount());
+    Utils.getPrimaryAddressAsSmallQrCode(_spinnerContext.getAsyncApi());
   }
 
   public static SpinnerContext getInstance() {
@@ -62,28 +64,36 @@ public class SpinnerContext {
     return _spinnerContext;
   }
 
-  private SpinnerContext(Context context, Display display, Network network) {
+  private SpinnerContext(Context context, Display display, NetworkParameters network) {
     _applicationContext = context.getApplicationContext();
-    _network = network;
+    _newNetwork = network;
     DisplayMetrics dm = new DisplayMetrics();
     display.getMetrics(dm);
     _displayWidth = dm.widthPixels;
     _displayHeight = dm.heightPixels;
-    URL url = Utils.getBccapiUrl(_network);
-    ECKeyManager keyManager = new AndroidKeyManager(_applicationContext, _network);
-    BitcoinClientApiImpl api = new BitcoinClientApiImpl(url, _network);
-    _account = new AndroidAccount(keyManager, api, _applicationContext);
+    URL url = Utils.getBccapiUrl(_newNetwork);
+    com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _newNetwork);
+    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _newNetwork);
+    _publicKeyRing = new PublicKeyRing();
+    _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _newNetwork);
+    _asyncApi = new AndroidAsyncApi(_publicKeyRing, newApi, _applicationContext);
+    _privateKeyRing = new PrivateKeyRing();
+    _privateKeyRing.addPrivateKey(newKeyManager.getPrivateKey(1), _newNetwork);
   }
 
   public void recoverWallet(byte[] seed) {
-    URL url = Utils.getBccapiUrl(_network);
-    ECKeyManager keyManager = new AndroidKeyManager(_applicationContext, _network, seed);
-    BitcoinClientApiImpl api = new BitcoinClientApiImpl(url, _network);
-    _account = new AndroidAccount(keyManager, api, _applicationContext);
+    URL url = Utils.getBccapiUrl(_newNetwork);
+    com.bccapi.ng.impl.BitcoinClientApiImpl newApi = new com.bccapi.ng.impl.BitcoinClientApiImpl(url, _newNetwork);
+    NewAndroidKeyManager newKeyManager = new NewAndroidKeyManager(_applicationContext, _newNetwork);
+    _publicKeyRing = new PublicKeyRing();
+    _publicKeyRing.addPublicKey(newKeyManager.getPublicKey(1), _newNetwork);
+    _asyncApi = new AndroidAsyncApi(_publicKeyRing, newApi, _applicationContext);
+    _privateKeyRing = new PrivateKeyRing();
+    _privateKeyRing.addPrivateKey(newKeyManager.getPrivateKey(1), _newNetwork);
   }
 
-  public Network getNetwork() {
-    return _network;
+  public NetworkParameters getNewNetwork() {
+    return _newNetwork;
   }
 
   public boolean isPinProtected() {
@@ -134,8 +144,16 @@ public class SpinnerContext {
     return _applicationContext;
   }
 
-  public AsynchronousAccount getAccount() {
-    return _account;
+  public AsynchronousApi getAsyncApi() {
+    return _asyncApi;
+  }
+
+  public PublicKeyRing getPublicKeyRing() {
+    return _publicKeyRing;
+  }
+
+  public PrivateKeyRing getPrivateKeyRing() {
+    return _privateKeyRing;
   }
 
   public int getDisplayWidth() {

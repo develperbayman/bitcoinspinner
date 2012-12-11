@@ -28,8 +28,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bccapi.api.Network;
+import com.bccapi.bitlib.model.Address;
+import com.bccapi.bitlib.model.NetworkParameters;
 import com.bccapi.core.HashUtils;
 import com.bccapi.core.Asynchronous.AsynchronousAccount;
+import com.bccapi.ng.async.AsynchronousApi;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.EncodeHintType;
 import com.google.zxing.WriterException;
@@ -101,6 +104,16 @@ public class Utils {
     return _lastQrAddressBitmapSmall;
   }
 
+  public static synchronized Bitmap getPrimaryAddressAsSmallQrCode(AsynchronousApi api) {
+    Address address = api.getPrimaryBitcoinAddress();
+    if (address.equals(_lastQrAddressStringSmall)) {
+      return _lastQrAddressBitmapSmall;
+    }
+    _lastQrAddressStringSmall = address.toString();
+    _lastQrAddressBitmapSmall = getSmallQRCodeBitmap("bitcoin:" + address.toString());
+    return _lastQrAddressBitmapSmall;
+  }
+
   private static String _lastQrAddressStringLarge;
   private static Bitmap _lastQrAddressBitmapLarge;
 
@@ -147,8 +160,7 @@ public class Utils {
   public static URL getBccapiUrl(Network network) {
     try {
       if (network.equals(Network.testNetwork)) {
-        return Consts.USE_CLOSED_TESTNET ? new URL("https://testnet.bccapi.com:445") : new URL(
-            "https://testnet.bccapi.com:444");
+        return new URL("https://testnet.bccapi.com:444");
       }
       return new URL("https://prodnet.bccapi.com:443");
     } catch (Exception e) {
@@ -157,14 +169,49 @@ public class Utils {
     }
   }
 
+  public static URL getBccapiUrl(NetworkParameters network) {
+    try {
+      if (network.isTestnet()) {
+        return new URL("https://testnet.bccapi.com:444");
+      }
+      // return new URL("https://prodnet.bccapi.com:443");
+      return new URL("http://192.168.1.139:8080");
+    } catch (Exception e) {
+      // never happens
+      return null;
+    }
+  }
+
   private static String getSeedFileName(Network network) {
     if (network.equals(Network.testNetwork)) {
-      return Consts.USE_CLOSED_TESTNET ? Consts.CLOSED_TESTNET_FILE : Consts.TESTNET_FILE;
+      return Consts.TESTNET_FILE;
+    }
+    return Consts.PRODNET_FILE;
+  }
+
+  private static String getSeedFileName(NetworkParameters network) {
+    if (network.isTestnet()) {
+      return Consts.TESTNET_FILE;
     }
     return Consts.PRODNET_FILE;
   }
 
   public static byte[] readSeed(Context context, Network network) {
+    String seedFile = getSeedFileName(network);
+    byte[] seed = new byte[Consts.SEED_SIZE];
+    FileInputStream fis;
+    try {
+      fis = context.openFileInput(seedFile);
+      fis.read(seed);
+      fis.close();
+      return seed;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public static byte[] readSeed(Context context, NetworkParameters network) {
     String seedFile = getSeedFileName(network);
     byte[] seed = new byte[Consts.SEED_SIZE];
     FileInputStream fis;
@@ -193,7 +240,35 @@ public class Utils {
     return false;
   }
 
+  public static boolean writeSeed(Context context, NetworkParameters network, byte[] seed) {
+    String seedFile = getSeedFileName(network);
+    FileOutputStream fos = null;
+    try {
+      fos = context.openFileOutput(seedFile, Context.MODE_PRIVATE);
+      fos.write(seed);
+      fos.close();
+      return true;
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
   public static byte[] createAndWriteSeed(Context context, Network network) {
+    try {
+      SecureRandom random = new SecureRandom();
+      byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
+      byte[] seed = HashUtils.sha256(genseed);
+      if (writeSeed(context, network, seed)) {
+        return seed;
+      }
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  public static byte[] createAndWriteSeed(Context context, NetworkParameters network) {
     try {
       SecureRandom random = new SecureRandom();
       byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
@@ -232,7 +307,6 @@ public class Utils {
   }
 
   public static AlertDialog showPrimaryAddressQrCode(final Context context, AsynchronousAccount account) {
-
     String address = account.getPrimaryBitcoinAddress();
     Bitmap qrCode = _lastQrAddressBitmapLarge;
     if (!address.equals(_lastQrAddressStringLarge)) {
@@ -241,7 +315,17 @@ public class Utils {
       qrCode = _lastQrAddressBitmapLarge;
     }
     return showQrCode(context, R.string.bitcoin_address, qrCode, address);
+  }
 
+  public static AlertDialog showPrimaryAddressQrCode(final Context context, AsynchronousApi api) {
+    Address address = api.getPrimaryBitcoinAddress();
+    Bitmap qrCode = _lastQrAddressBitmapLarge;
+    if (!address.equals(_lastQrAddressStringLarge)) {
+      _lastQrAddressStringLarge = address.toString();
+      _lastQrAddressBitmapLarge = getLargeQRCodeBitmap("bitcoin:" + address);
+      qrCode = _lastQrAddressBitmapLarge;
+    }
+    return showQrCode(context, R.string.bitcoin_address, qrCode, address.toString());
   }
 
   public static AlertDialog showQrCode(final Context context, int titleMessageId, Bitmap qrCode, final String value) {

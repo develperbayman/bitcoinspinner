@@ -24,7 +24,6 @@ public final class Consts {
   /**
    * Set this to true if you want to use closed test net when on test network
    */
-  public static final boolean USE_CLOSED_TESTNET = false;
   public static final String EXTRA_NETWORK = "Extra network";
   public static final String BTC_ADDRESS_KEY = "BTC address key";
   public static final String BTC_AMOUNT_KEY = "BTC amount key";
@@ -33,7 +32,6 @@ public final class Consts {
 
   public static final String PRODNET_FILE = "seed.bin";
   public static final String TESTNET_FILE = "test-seed.bin";
-  public static final String CLOSED_TESTNET_FILE = "closed-test-seed.bin";
 
   public static final int SEED_SIZE = 32;
   public static final int SEED_GEN_SIZE = 64;

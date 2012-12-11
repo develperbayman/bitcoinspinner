@@ -1,7 +1,7 @@
 package com.miracleas.bitcoin_spinner;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 
@@ -34,30 +34,37 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bccapi.api.Network;
-import com.bccapi.api.SendCoinForm;
-import com.bccapi.api.Tx;
-import com.bccapi.core.AddressUtil;
-import com.bccapi.core.CoinUtils;
-import com.bccapi.core.SendCoinFormValidator;
-import com.bccapi.core.Asynchronous.AccountTask;
-import com.bccapi.core.Asynchronous.AsynchronousAccount;
-import com.bccapi.core.Asynchronous.GetSendCoinFormCallbackHandler;
-import com.bccapi.core.Asynchronous.TransactionSubmissionCallbackHandler;
+import com.bccapi.bitlib.StandardTransactionBuilder;
+import com.bccapi.bitlib.StandardTransactionBuilder.InsufficientFundsException;
+import com.bccapi.bitlib.StandardTransactionBuilder.UnsignedTransaction;
+import com.bccapi.bitlib.crypto.PrivateKeyRing;
+import com.bccapi.bitlib.crypto.PublicKeyRing;
+import com.bccapi.bitlib.model.Address;
+import com.bccapi.bitlib.model.NetworkParameters;
+import com.bccapi.bitlib.model.Transaction;
+import com.bccapi.bitlib.model.UnspentTransactionOutput;
+import com.bccapi.bitlib.util.CoinUtil;
+import com.bccapi.ng.api.ApiError;
+import com.bccapi.ng.api.Balance;
+import com.bccapi.ng.api.BroadcastTransactionResponse;
+import com.bccapi.ng.api.QueryUnspentOutputsResponse;
+import com.bccapi.ng.async.AbstractCallbackHandler;
+import com.bccapi.ng.async.AsyncTask;
 import com.miracleas.bitcoin_spinner.SimpleGestureFilter.SimpleGestureListener;
 
-public class SendBitcoinsActivity extends Activity implements SimpleGestureListener, GetSendCoinFormCallbackHandler,
-    TransactionSubmissionCallbackHandler {
+public class SendBitcoinsActivity extends Activity implements SimpleGestureListener,
+    AbstractCallbackHandler<QueryUnspentOutputsResponse> {
 
-  private final int STANDARD_FEE = 50000;
+  private static final int REQUEST_CODE_SCAN = 0;
+  private static final int REQUEST_CODE_ADDRESS_BOOK = 1;
+  private static final int STANDARD_FEE = 50000;
   private Context mContext;
 
   private TextView tvValidAdress, tvAvailSpend, tvFeeInfo, tvValidAmount;
   private EditText etAddress, etSpend;
   private Button btnQRScan, btnAddressBook, btnSpend, btnCancel;
 
-  private static final int REQUEST_CODE_SCAN = 0;
-  private static final int REQUEST_CODE_ADDRESS_BOOK = 1;
+  private Address mReceivingAddress;
 
   private ProgressDialog mCalcFeeProgressDialog;
   private ProgressDialog mSendCoinsProgressDialog;
@@ -66,15 +73,14 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 
   private static final int ABOUT_DIALOG = 1001;
 
-  private boolean mValidAdress = false;
   private boolean mValidAmount = false;
 
   private InputMethodManager imm;
 
   private SharedPreferences preferences;
-  private AccountTask mGetFormTask;
-  private AccountTask mSubmitTask;
-  private SendCoinForm mFormToSend;
+  private AsyncTask mGetUnspentTask;
+  private AsyncTask mSubmitTask;
+  private UnsignedTransaction mUnsignedTransaction;
 
   /**
    * @see android.app.Activity#onCreate(Bundle)
@@ -152,15 +158,15 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
       }
       long amount = getIntent().getExtras().getLong(Consts.BTC_AMOUNT_KEY);
       if (amount != 0) {
-        etSpend.setText(CoinUtils.valueString(amount));
+        etSpend.setText(CoinUtil.valueString(amount));
       }
     }
 
-    long balance = SpinnerContext.getInstance().getAccount().getCachedBalance();
-    if (balance == -1) {
+    Balance balance = SpinnerContext.getInstance().getAsyncApi().getCachedBalance();
+    if (balance == null) {
       tvAvailSpend.setText(R.string.unknown);
     } else {
-      tvAvailSpend.setText(CoinUtils.valueString(balance) + " BTC");
+      tvAvailSpend.setText(CoinUtil.valueString(balance.unspent + balance.pendingChange) + " BTC");
     }
   }
 
@@ -171,8 +177,8 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
 
   @Override
   protected void onDestroy() {
-    if (mGetFormTask != null) {
-      mGetFormTask.cancel();
+    if (mGetUnspentTask != null) {
+      mGetUnspentTask.cancel();
     }
     if (mSubmitTask != null) {
       mSubmitTask.cancel();
@@ -227,25 +233,30 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
     @Override
     public void afterTextChanged(Editable e) {
       String tempString = e.toString().trim();
-      Network network = SpinnerContext.getInstance().getNetwork();
+      NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
       if (tempString.matches("")) {
         tvValidAdress.setText("");
         tvValidAdress.setError(null);
-        mValidAdress = false;
-      } else if (!AddressUtil.validateAddress(tempString, network)) {
-        if (network.equals(Network.testNetwork)) {
-          tvValidAdress.setText(R.string.invalid_address_for_testnet);
-        } else if (network.equals(Network.productionNetwork)) {
-          tvValidAdress.setText(R.string.invalid_address_for_prodnet);
-        }
-        mValidAdress = false;
-        tvValidAdress.setError("");
+        mReceivingAddress = null;
       } else {
-        tvValidAdress.setText("");
-        tvValidAdress.setError(null);
-        mValidAdress = true;
-        etSpend.requestFocus();
+        Address address = Address.fromString(tempString, network);
+        if (address == null) {
+          if (network.isTestnet()) {
+            tvValidAdress.setText(R.string.invalid_address_for_testnet);
+          } else if (network.isProdnet()) {
+            tvValidAdress.setText(R.string.invalid_address_for_prodnet);
+          }
+          tvValidAdress.setError("");
+          mReceivingAddress = null;
+        } else {
+          tvValidAdress.setText("");
+          tvValidAdress.setError(null);
+          etSpend.requestFocus();
+          mReceivingAddress = address;
+        }
+
       }
+
       enableSendButton();
     }
 
@@ -274,7 +285,8 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
       }
 
       long spend = getSatoshisToSend();
-      long available = SpinnerContext.getInstance().getAccount().getCachedBalance();
+      Balance balance = SpinnerContext.getInstance().getAsyncApi().getCachedBalance();
+      long available = balance.unspent + balance.pendingChange;
       if (spend <= 0) {
         mValidAmount = false;
         tvValidAmount.setText(R.string.invalid_amount);
@@ -345,7 +357,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
       Utils.runPinProtectedFunction(mContext, new Runnable() {
         @Override
         public void run() {
-          requestSendCoinForm();
+          requestUnspentOutputs();
         }
       });
     }
@@ -360,7 +372,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
   };
 
   private void enableSendButton() {
-    btnSpend.setEnabled(mValidAdress && mValidAmount);
+    btnSpend.setEnabled(mReceivingAddress != null && mValidAmount);
   }
 
   private void showMarketPage(final String packageName) {
@@ -388,7 +400,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
         }
         etAddress.setText(b.getAddress().trim());
         if (b.getAmount() > 0) {
-          etSpend.setText(CoinUtils.valueString(b.getAmount()));
+          etSpend.setText(CoinUtil.valueString(b.getAmount()));
         } else {
           etSpend.setText("");
         }
@@ -401,43 +413,73 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
     }
   }
 
-  private void requestSendCoinForm() {
+  private void requestUnspentOutputs() {
     mCalcFeeProgressDialog = ProgressDialog.show(mContext, getString(R.string.calculating_fee),
         getString(R.string.calculating_fee_wait), true);
-
-    String address = getReceivingAddress();
-    Long satoshisToSend = getSatoshisToSend();
-    mGetFormTask = SpinnerContext.getInstance().getAccount().requestSendCoinForm(address, satoshisToSend, -1, this);
+    mGetUnspentTask = SpinnerContext.getInstance().getAsyncApi().queryUnspentOutputs(this);
   }
 
   @Override
-  public void handleGetSendCoinFormCallback(SendCoinForm form, String errorMessage) {
-    mFormToSend = form;
-    mGetFormTask = null;
+  public void handleCallback(QueryUnspentOutputsResponse response, ApiError error) {
+    mGetUnspentTask = null;
     mCalcFeeProgressDialog.dismiss();
-    if (form == null) {
+    if (error != null) {
       Utils.showConnectionAlert(this);
-      return;
     }
 
-    long fee = SendCoinFormValidator.calculateFee(mFormToSend);
+    // Get change address
+    Address changeAddress = SpinnerContext.getInstance().getAsyncApi().getPrimaryBitcoinAddress();
 
-    String address = getReceivingAddress();
-    Long satoshisToSend = getSatoshisToSend();
-
-    // Validate that the server is not cheating us
-    List<String> addresses = new ArrayList<String>();
-    addresses.add(SpinnerContext.getInstance().getAccount().getPrimaryBitcoinAddress());
-    if (!SendCoinFormValidator.validate(mFormToSend, addresses, SpinnerContext.getInstance().getNetwork(),
-        satoshisToSend, fee, address)) {
+    // Get receiving address
+    Address receivingAddress = getReceivingAddress();
+    if (receivingAddress == null) {
       Utils.showAlert(this, R.string.unexpected_error);
       return;
     }
 
+    // Get amount to send
+    long satoshisToSend = getSatoshisToSend();
+    if (satoshisToSend <= 0) {
+      Utils.showAlert(this, R.string.unexpected_error);
+      return;
+    }
+
+    // Create transaction builder
+    NetworkParameters network = SpinnerContext.getInstance().getNewNetwork();
+    StandardTransactionBuilder txBuilder = new StandardTransactionBuilder(network);
+    txBuilder.addOutput(receivingAddress, satoshisToSend);
+
+    // Build list of unspent transaction outputs
+    List<UnspentTransactionOutput> unspent = new LinkedList<UnspentTransactionOutput>();
+    unspent.addAll(response.unspent);
+    unspent.addAll(response.change);
+
+    // Create an unsigned transaction with automatic fee calculation
+    PublicKeyRing keyRing = SpinnerContext.getInstance().getPublicKeyRing();
+    try {
+      mUnsignedTransaction = txBuilder.createUnsignedTransaction(unspent, changeAddress, keyRing, network);
+    } catch (InsufficientFundsException e) {
+      if (e.fee > STANDARD_FEE) {
+        // This trsnasaction has a high fee which we cannot afford
+        String msg = String.format(getString(R.string.insufficient_funds_for_fee), CoinUtil.valueString(e.fee));
+        Utils.showAlert(mContext, msg);
+        return;
+      } else {
+        // This transaction has a standard fee, but we cannot afford it
+        String msg = String.format(getString(R.string.insufficient_funds), CoinUtil.valueString(e.fee));
+        Utils.showAlert(mContext, msg);
+        return;
+      }
+    }
+
+    // We can afford the transaction. Verify that the user is OK with the fee if
+    // it is larger than normal
+    long fee = mUnsignedTransaction.calculateFee();
+
     if (fee > STANDARD_FEE) {
       // If the fee is larger than 0.0005 we ask the user for confirmation
       AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
-      builder.setMessage(String.format(getString(R.string.calculating_fee_done), CoinUtils.valueString(fee)))
+      builder.setMessage(String.format(getString(R.string.calculating_fee_done), CoinUtil.valueString(fee)))
           .setCancelable(false).setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
               sendCoins();
@@ -451,29 +493,42 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
     } else {
       sendCoins();
     }
+
   }
 
   private void sendCoins() {
     mSendCoinsProgressDialog = ProgressDialog.show(mContext, getString(R.string.sending_bitcoins),
         getString(R.string.sending_bitcoins_wait), true);
-    AsynchronousAccount account = SpinnerContext.getInstance().getAccount();
-    Tx tx = AsynchronousAccount.signSendCoinForm(mFormToSend, account);
-    mSubmitTask = account.requestTransactionSubmission(tx, this);
+
+    // Sign all inputs
+    PrivateKeyRing keyRing = SpinnerContext.getInstance().getPrivateKeyRing();
+    List<byte[]> signatures = StandardTransactionBuilder.generateSignatures(mUnsignedTransaction.getSignatureInfo(),
+        keyRing);
+
+    // Apply signatures to unsigned transaction, and create final transaction
+    Transaction transaction = StandardTransactionBuilder.finalizeTransaction(mUnsignedTransaction, signatures);
+
+    mSubmitTask = SpinnerContext.getInstance().getAsyncApi()
+        .broadcastTransaction(transaction, new BroadcastCompletionHandler());
   }
 
-  @Override
-  public void handleTransactionSubmission(Tx transaction, String errorMessage) {
-    mSendCoinsProgressDialog.dismiss();
-    mSubmitTask = null;
-    if (transaction == null) {
-      Utils.showConnectionAlert(this);
-    } else {
-      finish();
+  private class BroadcastCompletionHandler implements AbstractCallbackHandler<BroadcastTransactionResponse> {
+
+    @Override
+    public void handleCallback(BroadcastTransactionResponse response, ApiError error) {
+      mSendCoinsProgressDialog.dismiss();
+      mSubmitTask = null;
+      if (response == null) {
+        Utils.showConnectionAlert(SendBitcoinsActivity.this);
+      } else {
+        finish();
+      }
     }
+
   }
 
-  private String getReceivingAddress() {
-    return etAddress.getText().toString();
+  private Address getReceivingAddress() {
+    return mReceivingAddress;
   }
 
   private long getSatoshisToSend() {
@@ -509,4 +564,5 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
   @Override
   public void onDoubleTap() {
   }
+
 }

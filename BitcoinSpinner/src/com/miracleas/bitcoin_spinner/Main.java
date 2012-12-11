@@ -5,7 +5,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 
-import com.bccapi.api.Network;
+import com.bccapi.bitlib.model.NetworkParameters;
 
 public class Main extends Activity {
   @Override
@@ -30,7 +30,7 @@ public class Main extends Activity {
     }
 
     Intent i = new Intent(this, StartUpActivity.class);
-    i.putExtra(Consts.EXTRA_NETWORK, Network.productionNetwork);
+    i.putExtra(Consts.EXTRA_NETWORK, NetworkParameters.productionNetwork);
     startActivity(i);
     finish();
   }
