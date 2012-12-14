@@ -5,12 +5,19 @@ import com.bccapi.bitlib.util.ByteReader.InsufficientBytesException;
 
 public class ScriptInputStandard extends ScriptInput {
 
-   public ScriptInputStandard(byte[] signature, byte[] pubkeyBytes) {
-      super(new byte[][] { signature, pubkeyBytes });
+   private byte[] _signature;
+   private byte[] _publicKeyBytes;
+
+   public ScriptInputStandard(byte[] signature, byte[] publicKeyBytes) {
+      super(scriptEncodeChunks(new byte[][] { signature, publicKeyBytes }));
+      _signature = signature;
+      _publicKeyBytes = publicKeyBytes;
    }
 
-   protected ScriptInputStandard(byte[][] chunks) {
-      super(chunks);
+   protected ScriptInputStandard(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
+      _signature = chunks[0];
+      _publicKeyBytes = chunks[1];
    }
 
    protected static boolean isScriptInputStandard(byte[][] chunks) throws ScriptParsingException {
@@ -71,7 +78,7 @@ public class ScriptInputStandard extends ScriptInput {
     * Get the signature of this input.
     */
    public byte[] getSignature() {
-      return _chunks[0];
+      return _signature;
    }
 
    /**
@@ -81,7 +88,8 @@ public class ScriptInputStandard extends ScriptInput {
     * in the reference client
     */
    public int getHashType() {
-      return ((int) (_chunks[0][_chunks[0].length - 1])) & 0xFF;
+      // hash type is the last byte of the signature
+      return ((int) (_signature[_signature.length - 1])) & 0xFF;
    }
 
    /**
@@ -90,7 +98,7 @@ public class ScriptInputStandard extends ScriptInput {
     * @return The public key bytes of this input.
     */
    public byte[] getPublicKeyBytes() {
-      return _chunks[1];
+      return _publicKeyBytes;
    }
 
 }

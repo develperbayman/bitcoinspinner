@@ -6,8 +6,13 @@ import com.bccapi.bitlib.util.HashUtils;
 
 public class ScriptOutputMsg extends ScriptOutput {
 
-   protected ScriptOutputMsg(byte[][] chunks) {
-      super(chunks);
+   private byte[] _messageBytes;
+   private byte[] _publicKeyBytes;
+
+   protected ScriptOutputMsg(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
+      _messageBytes = chunks[0];
+      _publicKeyBytes = chunks[2];
    }
 
    protected static boolean isScriptOutputMsg(byte[][] chunks) {
@@ -29,7 +34,7 @@ public class ScriptOutputMsg extends ScriptOutput {
     * @return The message bytes of this output.
     */
    public byte[] getMessageBytes() {
-      return _chunks[0];
+      return _messageBytes;
    }
 
    public String getMessage() {
@@ -46,7 +51,7 @@ public class ScriptOutputMsg extends ScriptOutput {
     * @return The public key bytes that this output is for.
     */
    public byte[] getPublicKeyBytes() {
-      return _chunks[2];
+      return _publicKeyBytes;
    }
 
    @Override

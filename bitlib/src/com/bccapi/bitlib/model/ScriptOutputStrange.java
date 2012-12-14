@@ -5,8 +5,8 @@ package com.bccapi.bitlib.model;
  */
 public class ScriptOutputStrange extends ScriptOutput {
 
-   protected ScriptOutputStrange(byte[][] chunks) {
-      super(chunks);
+   protected ScriptOutputStrange(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
    }
 
    @Override

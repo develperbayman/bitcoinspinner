@@ -5,8 +5,11 @@ import com.bccapi.bitlib.util.ByteReader.InsufficientBytesException;
 
 public class ScriptInputPubKey extends ScriptInput {
 
-   protected ScriptInputPubKey(byte[][] chunks) {
-      super(chunks);
+   private byte[] _signature;
+
+   protected ScriptInputPubKey(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
+      _signature = chunks[0];
    }
 
    protected static boolean isScriptInputPubKey(byte[][] chunks) throws ScriptParsingException {
@@ -72,7 +75,7 @@ public class ScriptInputPubKey extends ScriptInput {
     * Get the signature of this input.
     */
    public byte[] getSignature() {
-      return _chunks[0];
+      return _signature;
    }
 
 }

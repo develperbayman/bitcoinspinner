@@ -79,19 +79,21 @@ public abstract class Script {
       OP_CODE_MAP.put(OP_NOP1, "OP_NOP1");
       OP_CODE_MAP.put(OP_NOP2, "OP_NOP2");
    }
-   protected byte[][] _chunks;
+   // protected byte[][] _chunks;
+   protected byte[] _scriptBytes;
    private boolean _isCoinbase;
 
-   protected Script(byte[][] chunks) {
-      _chunks = chunks;
-      _isCoinbase = false;
-   }
+   // protected Script(byte[][] chunks) {
+   // _chunks = chunks;
+   // _isCoinbase = false;
+   // }
 
-   protected Script(byte[] script) {
+   protected Script(byte[] scriptBytes, boolean isCoinBase) {
       // We handle coinbase scripts in a special way, as anything can be
       // stored in them, also stuff that does not parse
-      _chunks = new byte[][] { script };
-      _isCoinbase = true;
+      // _chunks = new byte[][] { scriptBytes };
+      _scriptBytes = scriptBytes;
+      _isCoinbase = isCoinBase;
    }
 
    public boolean isCoinBase() {
@@ -102,7 +104,7 @@ public abstract class Script {
       return chunk.length == 1 && (((int) chunk[0]) & 0xFF) == op;
    }
 
-   protected static byte[][] chunksFromScriptBytes(byte[] script) throws ScriptParsingException {
+   protected static final byte[][] chunksFromScriptBytes(byte[] script) throws ScriptParsingException {
       try {
          ByteReader reader = new ByteReader(script);
          int numChunks = countChuks(reader);
@@ -172,23 +174,23 @@ public abstract class Script {
       return chunks;
    }
 
-   private int calculateByteSize() {
-      int size = 0;
-      for (byte[] chunk : _chunks) {
-         if (chunk.length == 1) {
-            size++;
-         } else if (chunk.length < OP_PUSHDATA1) {
-            size += 1 + chunk.length;
-         } else if (chunk.length < 256) {
-            size += 1 + 1 + chunk.length;
-         } else if (chunk.length < 65536) {
-            size += 1 + 1 + 1 + chunk.length;
-         } else {
-            throw new RuntimeException("Chunks larger than 65536 not implemented");
-         }
-      }
-      return size;
-   }
+   // private int calculateByteSize() {
+   // int size = 0;
+   // for (byte[] chunk : _chunks) {
+   // if (chunk.length == 1) {
+   // size++;
+   // } else if (chunk.length < OP_PUSHDATA1) {
+   // size += 1 + chunk.length;
+   // } else if (chunk.length < 256) {
+   // size += 1 + 1 + chunk.length;
+   // } else if (chunk.length < 65536) {
+   // size += 1 + 1 + 1 + chunk.length;
+   // } else {
+   // throw new RuntimeException("Chunks larger than 65536 not implemented");
+   // }
+   // }
+   // return size;
+   // }
 
    public String dump(int maxLen) {
       String s = dump();
@@ -205,10 +207,17 @@ public abstract class Script {
 
    public String dump() {
       if (_isCoinbase) {
-         return HexUtils.toHex(_chunks[0]);
+         // coinbase scripts often cannot be parsed, hex dump them instead
+         return HexUtils.toHex(_scriptBytes);
       }
       StringBuilder sb = new StringBuilder();
-      for (byte[] chunk : _chunks) {
+      byte[][] chunks;
+      try {
+         chunks = chunksFromScriptBytes(_scriptBytes);
+      } catch (ScriptParsingException e) {
+         return "Invalid script";
+      }
+      for (byte[] chunk : chunks) {
          if (chunk.length == 1) {
             int opCode = ((int) chunk[0]) & 0xFF;
             String opCodeString = OP_CODE_MAP.get(opCode);
@@ -231,12 +240,41 @@ public abstract class Script {
     * @return The script as an array of bytes
     */
    public byte[] getScriptBytes() {
-      if (_isCoinbase) {
-         return _chunks[0];
-      }
-      byte[] buf = new byte[calculateByteSize()];
+      return _scriptBytes;
+      // if (_isCoinbase) {
+      // return _scriptBytes;
+      // }
+      // byte[] buf = new byte[calculateByteSize()];
+      // int index = 0;
+      // for (byte[] chunk : _chunks) {
+      // if (chunk.length == 1) {
+      // buf[index++] = chunk[0];
+      // } else if (chunk.length < OP_PUSHDATA1) {
+      // buf[index++] = (byte) (0xFF & chunk.length);
+      // System.arraycopy(chunk, 0, buf, index, chunk.length);
+      // index += chunk.length;
+      // } else if (chunk.length < 256) {
+      // buf[index++] = (byte) (0xFF & OP_PUSHDATA1);
+      // buf[index++] = (byte) (0xFF & chunk.length);
+      // System.arraycopy(chunk, 0, buf, index, chunk.length);
+      // index += chunk.length;
+      // } else if (chunk.length < 65536) {
+      // buf[index++] = (byte) (0xFF & OP_PUSHDATA2);
+      // buf[index++] = (byte) (0xFF & chunk.length);
+      // buf[index++] = (byte) (0xFF & (chunk.length >> 8));
+      // System.arraycopy(chunk, 0, buf, index, chunk.length);
+      // index += chunk.length;
+      // } else {
+      // throw new RuntimeException("Chunks larger than 65536 not implemented");
+      // }
+      // }
+      // return buf;
+   }
+
+   protected static final byte[] scriptEncodeChunks(byte[][] chunks) {
+      byte[] buf = new byte[calculateByteSize(chunks)];
       int index = 0;
-      for (byte[] chunk : _chunks) {
+      for (byte[] chunk : chunks) {
          if (chunk.length == 1) {
             buf[index++] = chunk[0];
          } else if (chunk.length < OP_PUSHDATA1) {
@@ -259,6 +297,24 @@ public abstract class Script {
          }
       }
       return buf;
+   }
+
+   private static final int calculateByteSize(byte[][] chunks) {
+      int size = 0;
+      for (byte[] chunk : chunks) {
+         if (chunk.length == 1) {
+            size++;
+         } else if (chunk.length < OP_PUSHDATA1) {
+            size += 1 + chunk.length;
+         } else if (chunk.length < 256) {
+            size += 1 + 1 + chunk.length;
+         } else if (chunk.length < 65536) {
+            size += 1 + 1 + 1 + chunk.length;
+         } else {
+            throw new RuntimeException("Chunks larger than 65536 not implemented");
+         }
+      }
+      return size;
    }
 
 }

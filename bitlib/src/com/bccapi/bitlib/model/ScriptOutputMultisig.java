@@ -2,9 +2,12 @@ package com.bccapi.bitlib.model;
 
 public class ScriptOutputMultisig extends ScriptOutput {
 
-   protected ScriptOutputMultisig(byte[][] chunks) {
-      super(chunks);
+   protected ScriptOutputMultisig(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
+      _multisigAddressBytes = chunks[1];
    }
+
+   private byte[] _multisigAddressBytes;
 
    protected static boolean isScriptOutputMultisig(byte[][] chunks) {
       if (chunks.length != 3) {
@@ -23,7 +26,8 @@ public class ScriptOutputMultisig extends ScriptOutput {
    }
 
    public ScriptOutputMultisig(byte[] addressBytes) {
-      super(new byte[][] { { (byte) OP_HASH160 }, addressBytes, { (byte) OP_EQUAL } });
+      super(scriptEncodeChunks(new byte[][] { { (byte) OP_HASH160 }, addressBytes, { (byte) OP_EQUAL } }));
+      _multisigAddressBytes = addressBytes;
    }
 
    /**
@@ -32,7 +36,7 @@ public class ScriptOutputMultisig extends ScriptOutput {
     * @return The raw multisig address that this output is for.
     */
    public byte[] getMultisigAddressBytes() {
-      return _chunks[1];
+      return _multisigAddressBytes;
    }
 
    @Override

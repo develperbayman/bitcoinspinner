@@ -4,8 +4,11 @@ import com.bccapi.bitlib.util.HashUtils;
 
 public class ScriptOutputPubkey extends ScriptOutput {
 
-   protected ScriptOutputPubkey(byte[][] chunks) {
-      super(chunks);
+   private byte[] _publicKeyBytes;
+
+   protected ScriptOutputPubkey(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
+      _publicKeyBytes = chunks[0];
    }
 
    protected static boolean isScriptOutputPubkey(byte[][] chunks) {
@@ -24,7 +27,7 @@ public class ScriptOutputPubkey extends ScriptOutput {
     * @return The public key bytes that this output is for.
     */
    public byte[] getPublicKeyBytes() {
-      return _chunks[0];
+      return _publicKeyBytes;
    }
 
    @Override

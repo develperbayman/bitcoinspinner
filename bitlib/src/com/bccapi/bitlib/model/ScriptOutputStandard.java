@@ -2,8 +2,11 @@ package com.bccapi.bitlib.model;
 
 public class ScriptOutputStandard extends ScriptOutput {
 
-   protected ScriptOutputStandard(byte[][] chunks) {
-      super(chunks);
+   private byte[] _addressBytes;
+
+   protected ScriptOutputStandard(byte[][] chunks, byte[] scriptBytes) {
+      super(scriptBytes);
+      _addressBytes = chunks[2];
    }
 
    protected static boolean isScriptOutputStandard(byte[][] chunks) {
@@ -33,8 +36,8 @@ public class ScriptOutputStandard extends ScriptOutput {
    }
 
    public ScriptOutputStandard(byte[] addressBytes) {
-      super(new byte[][] { { (byte) OP_DUP }, { (byte) OP_HASH160 }, addressBytes, { (byte) OP_EQUALVERIFY },
-            { (byte) OP_CHECKSIG } });
+      super(scriptEncodeChunks(new byte[][] { { (byte) OP_DUP }, { (byte) OP_HASH160 }, addressBytes,
+            { (byte) OP_EQUALVERIFY }, { (byte) OP_CHECKSIG } }));
    }
 
    /**
@@ -43,7 +46,7 @@ public class ScriptOutputStandard extends ScriptOutput {
     * @return The address that this output is for.
     */
    public byte[] getAddressBytes() {
-      return _chunks[2];
+      return _addressBytes;
    }
 
    @Override
