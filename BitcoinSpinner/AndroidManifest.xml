@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.miracleas.bitcoin_spinner"
-    android:versionCode="35"
-    android:versionName="0.8.0b" >
+    android:versionCode="36"
+    android:versionName="0.8.1b" >
 
     <uses-sdk android:minSdkVersion="7" android:targetSdkVersion="7"/>
 

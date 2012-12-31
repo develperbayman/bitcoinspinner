@@ -172,6 +172,12 @@ public class StandardTransactionBuilder {
    }
 
    public void addOutput(Address sendTo, long value) {
+      _outputs.add(createOutput(sendTo, value));
+   }
+
+   // XXX Should we support pubkey outputs?
+
+   private TransactionOutput createOutput(Address sendTo, long value) {
       ScriptOutput script;
       if (sendTo.isMultisig(_network)) {
          script = new ScriptOutputMultisig(sendTo.getTypeSpecificBytes());
@@ -179,10 +185,8 @@ public class StandardTransactionBuilder {
          script = new ScriptOutputStandard(sendTo.getTypeSpecificBytes());
       }
       TransactionOutput output = new TransactionOutput(value, script);
-      _outputs.add(output);
+      return output;
    }
-
-   // XXX Should we support pubkey outputs?
 
    public static List<byte[]> generateSignatures(SigningRequest[] requests, PrivateKeyRing keyRing) {
       List<byte[]> signatures = new LinkedList<byte[]>();
@@ -278,12 +282,16 @@ public class StandardTransactionBuilder {
       }
       // We have our funding, calculate change
       long change = found - toSend;
+
+      // Get a copy of all outputs
+      List<TransactionOutput> outputs = new LinkedList<TransactionOutput>(_outputs);
+
       if (change > 0) {
-         // We have more than needed, add an output to our change address
-         addOutput(changeAddress, change);
+         // We have more funds than needed, add an output to our change address
+         outputs.add(createOutput(changeAddress, change));
       }
 
-      return new UnsignedTransaction(_outputs, funding, keyRing, network);
+      return new UnsignedTransaction(outputs, funding, keyRing, network);
    }
 
    public static Transaction finalizeTransaction(UnsignedTransaction unsigned, List<byte[]> signatures) {

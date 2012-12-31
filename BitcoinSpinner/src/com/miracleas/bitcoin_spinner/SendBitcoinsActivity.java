@@ -460,7 +460,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
       mUnsignedTransaction = txBuilder.createUnsignedTransaction(unspent, changeAddress, keyRing, network);
     } catch (InsufficientFundsException e) {
       if (e.fee > STANDARD_FEE) {
-        // This trsnasaction has a high fee which we cannot afford
+        // This transaction has a high fee which we cannot afford
         String msg = String.format(getString(R.string.insufficient_funds_for_fee), CoinUtil.valueString(e.fee));
         Utils.showAlert(mContext, msg);
         return;
