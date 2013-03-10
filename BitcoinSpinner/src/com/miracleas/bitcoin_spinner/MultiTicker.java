@@ -42,7 +42,7 @@ public class MultiTicker {
     HOST_NAME_VERIFIER = new HostnameVerifier() {
       @Override
       public boolean verify(String hostname, SSLSession session) {
-        return hostname.equals("mtgox.com");
+        return hostname.equals("data.mtgox.com");
       }
     };
 
@@ -128,7 +128,7 @@ public class MultiTicker {
 
     private static Double getLastMtGoxTrade(String currency) {
       try {
-        URL url = new URL("https://mtgox.com/api/1/BTC" + currency + "/public/ticker");
+        URL url = new URL("https://data.mtgox.com/api/1/BTC" + currency + "/public/ticker");
         HttpsURLConnection connection;
         connection = (HttpsURLConnection) url.openConnection();
         connection.setHostnameVerifier(HOST_NAME_VERIFIER);
