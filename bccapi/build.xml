@@ -15,9 +15,6 @@
 	<target name="bccapi-jar" depends="bccapi">
 		<mkdir dir="${jar.dir}" />
 		<jar destfile="${jar.dir}/bccapi.jar" basedir="${classes.dir}">
-			<fileset dir="${classes.dir}">
-				<include name="**/*.class" />
-			</fileset>
 			<fileset dir="${src.dir}" includes="**/*.java" />
 			<zipfileset excludes="META-INF/**/*" src="${bitlib-jar.dir}/bitlib.jar" />
             <manifest>

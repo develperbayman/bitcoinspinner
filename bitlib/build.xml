@@ -13,9 +13,6 @@
 	<target name="bitlib-jar" depends="bitlib">
 		<mkdir dir="${jar.dir}" />
 		<jar destfile="${jar.dir}/bitlib.jar" basedir="${classes.dir}">
-			<fileset dir="${classes.dir}">
-				<include name="**/*.class" />
-			</fileset>
 			<fileset dir="${src.dir}" includes="**/*.java" />
 		</jar>
 	</target>
