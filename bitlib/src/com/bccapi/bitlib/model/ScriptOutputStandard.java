@@ -38,6 +38,7 @@ public class ScriptOutputStandard extends ScriptOutput {
    public ScriptOutputStandard(byte[] addressBytes) {
       super(scriptEncodeChunks(new byte[][] { { (byte) OP_DUP }, { (byte) OP_HASH160 }, addressBytes,
             { (byte) OP_EQUALVERIFY }, { (byte) OP_CHECKSIG } }));
+      _addressBytes = addressBytes;
    }
 
    /**
