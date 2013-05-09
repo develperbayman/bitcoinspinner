@@ -5,12 +5,15 @@
  */
 package com.bccapi.bitlib.crypto.ec;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * An elliptic curve
  */
-public class Curve {
+public class Curve implements Serializable {
+
+   private static final long serialVersionUID = 1L;
 
    private FieldElement _a;
    private FieldElement _b;

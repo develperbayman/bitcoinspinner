@@ -1,5 +1,6 @@
 package com.bccapi.bitlib.model;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -9,7 +10,10 @@ import com.bccapi.bitlib.util.Base58;
 import com.bccapi.bitlib.util.BitUtils;
 import com.bccapi.bitlib.util.HashUtils;
 
-public class Address {
+public class Address implements Serializable {
+
+   private static final long serialVersionUID = 1L;
+
    private byte[] _bytes;
    private String _address;
 
@@ -103,6 +107,24 @@ public class Address {
    public Address(byte[] bytes) {
       _bytes = bytes;
       _address = null;
+   }
+
+   /**
+    * Construct a Bitcoin address from an array of bytes and the string
+    * representation of the address. The byte array contains both the address
+    * version and address bytes, but without the checksum (1 + 20 = 21 bytes).
+    * 
+    * Note: No attempt is made to verify that the byte array and string
+    * representation match.
+    * 
+    * @param bytes
+    *           containing the full address representation 1 + 20 bytes.
+    * @param stringAddress
+    *           the string representation of a Bitcoin address
+    */
+   public Address(byte[] bytes, String stringAddress) {
+      _bytes = bytes;
+      _address = stringAddress;
    }
 
    /**

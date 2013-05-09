@@ -4,6 +4,7 @@
  */
 package com.bccapi.bitlib.crypto;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.SecureRandom;
 
@@ -17,7 +18,10 @@ import com.bccapi.bitlib.util.HashUtils;
 /**
  * A Bitcoin private key that is kept in memory.
  */
-public class InMemoryPrivateKey extends PrivateKey implements KeyExporter {
+public class InMemoryPrivateKey extends PrivateKey implements KeyExporter, Serializable {
+
+   private static final long serialVersionUID = 1L;
+   
    private final BigInteger _privateKey;
    private final PublicKey _publicKey;
 

@@ -1,10 +1,13 @@
 package com.bccapi.bitlib.crypto;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 import com.bccapi.bitlib.util.ByteWriter;
 
-public abstract class PrivateKey implements BitcoinSigner {
+public abstract class PrivateKey implements BitcoinSigner , Serializable {
+
+   private static final long serialVersionUID = 1L;
 
    public abstract PublicKey getPublicKey();
 

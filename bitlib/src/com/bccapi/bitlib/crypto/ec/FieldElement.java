@@ -5,13 +5,16 @@
  */
 package com.bccapi.bitlib.crypto.ec;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Random;
 
 /**
  * This class represents an elliptic field element.
  */
-public class FieldElement {
+public class FieldElement implements Serializable {
+
+   private static final long serialVersionUID = 1L;
 
    private static final BigInteger TWO = BigInteger.valueOf(2);
 

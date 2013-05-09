@@ -5,13 +5,16 @@
  */
 package com.bccapi.bitlib.crypto.ec;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * This class represents an elliptic curve point.
  */
-public class Point {
+public class Point implements Serializable {
 
+   private static final long serialVersionUID = 1L;
+   
    private Curve _curve;
    private FieldElement _x;
    private FieldElement _y;

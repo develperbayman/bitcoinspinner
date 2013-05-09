@@ -1,5 +1,6 @@
 package com.bccapi.bitlib.crypto;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Arrays;
 
@@ -11,7 +12,9 @@ import com.bccapi.bitlib.util.ByteReader.InsufficientBytesException;
 import com.bccapi.bitlib.util.HashUtils;
 import com.bccapi.bitlib.util.HexUtils;
 
-public class PublicKey {
+public class PublicKey implements Serializable {
+
+   private static final long serialVersionUID = 1L;
 
    private final byte[] _pubKeyBytes;
    private byte[] _pubKeyHash;
