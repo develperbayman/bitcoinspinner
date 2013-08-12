@@ -503,7 +503,7 @@ public class SendBitcoinsActivity extends Activity implements SimpleGestureListe
     // Sign all inputs
     PrivateKeyRing keyRing = SpinnerContext.getInstance().getPrivateKeyRing();
     List<byte[]> signatures = StandardTransactionBuilder.generateSignatures(mUnsignedTransaction.getSignatureInfo(),
-        keyRing);
+        keyRing, new AndroidRandomSource());
 
     // Apply signatures to unsigned transaction, and create final transaction
     Transaction transaction = StandardTransactionBuilder.finalizeTransaction(mUnsignedTransaction, signatures);

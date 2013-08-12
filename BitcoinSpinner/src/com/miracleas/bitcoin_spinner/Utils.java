@@ -3,7 +3,6 @@ package com.miracleas.bitcoin_spinner;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.net.URL;
-import java.security.SecureRandom;
 import java.util.Hashtable;
 
 import android.app.Activity;
@@ -195,8 +194,9 @@ public class Utils {
 
   public static byte[] createAndWriteSeed(Context context, NetworkParameters network) {
     try {
-      SecureRandom random = new SecureRandom();
-      byte genseed[] = random.generateSeed(Consts.SEED_GEN_SIZE);
+       byte[] genseed = new byte[Consts.SEED_GEN_SIZE];
+      AndroidRandomSource randomSource = new AndroidRandomSource();
+      randomSource.nextBytes(genseed);
       byte[] seed = HashUtils.sha256(genseed);
       if (writeSeed(context, network, seed)) {
         return seed;

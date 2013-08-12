@@ -17,20 +17,18 @@
 package com.bccapi.legacy;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 
 import com.bccapi.bitlib.crypto.Hmac;
+import com.bccapi.bitlib.crypto.RandomSource;
 import com.bccapi.bitlib.util.BitUtils;
 
 /**
  * A Pseudo Random Number Generator based on HMAC SHA-256 which is wrapping
- * {@link SecureRandom}. This way we are certain that we use the same random
+ * {@link RandomSource}. This way we are certain that we use the same random
  * generator on all platforms, and can generate the same sequence of random
  * bytes from the same seed.
  */
-public class HmacPRNG extends SecureRandom {
-
-   private static final long serialVersionUID = 5678497558585271430L;
+public class HmacPRNG extends RandomSource {
 
    private int _nonce;
    private byte[] _key;
@@ -61,21 +59,6 @@ public class HmacPRNG extends SecureRandom {
    }
 
    @Override
-   public String getAlgorithm() {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public synchronized void setSeed(byte[] seed) {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public void setSeed(long seed) {
-      // ignore
-   }
-
-   @Override
    public synchronized void nextBytes(byte[] bytes) {
       for (int i = 0; i < bytes.length; i++) {
          bytes[i] = nextByte();
@@ -87,46 +70,6 @@ public class HmacPRNG extends SecureRandom {
          hmacIteration();
       }
       return _randomBuffer[_index++];
-   }
-
-   @Override
-   public byte[] generateSeed(int numBytes) {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public int nextInt() {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public int nextInt(int n) {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public long nextLong() {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public boolean nextBoolean() {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public float nextFloat() {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public double nextDouble() {
-      throw new RuntimeException("Not supported");
-   }
-
-   @Override
-   public synchronized double nextGaussian() {
-      throw new RuntimeException("Not supported");
    }
 
 }

@@ -17,7 +17,6 @@
 package com.bccapi.legacy;
 
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +26,7 @@ import com.bccapi.bitlib.crypto.BitcoinSigner;
 import com.bccapi.bitlib.crypto.InMemoryPrivateKey;
 import com.bccapi.bitlib.crypto.PrivateKey;
 import com.bccapi.bitlib.crypto.PublicKey;
+import com.bccapi.bitlib.crypto.RandomSource;
 
 /**
  * An {@link ECKeyManager} that generates deterministic key-pairs using a seed
@@ -34,7 +34,7 @@ import com.bccapi.bitlib.crypto.PublicKey;
  */
 public class DeterministicECKeyManager implements ECKeyManager {
 
-   private SecureRandom _prng;
+   private RandomSource _prng;
    protected List<InMemoryPrivateKey> _privateKeys;
    protected Map<PublicKey, Integer> _publicKeyMap;
 

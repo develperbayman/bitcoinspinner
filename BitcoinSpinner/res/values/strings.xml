@@ -126,4 +126,11 @@
     <string name="insufficient_funds_for_fee">This transaction has a lot of small inputs and will require at least %s BTC in miner fees, which you cannot afford.</string>
     <string name="insufficient_funds">Including miner fee of %1$s BTC this transaction will cost %2$s BTC, which you cannot afford.</string>
     <string name="coins_you_are_sending">Coins you are sending:</string>
+    <string name="key_vulnerability_title">Critical Security Vulnerability</string>
+    <string name="key_vulnerability_message1">A critical security vulnerability has been identified on Android, which makes private keys created or used by Android wallets vulnerable.\n\nYou are urged to take immediate action.</string>
+    <string name="key_vulnerability_link1"> \nMore details here.\n </string>
+    <string name="key_vulnerability_message2">You should either:</string>
+    <string name="key_vulnerability_link2"> \nMigrate to the Mycelium Bitcoin Wallet\n </string>
+    <string name="key_vulnerability_message3">Install Mycelium Bitcoin Wallet and move your funds to one of its addresses. Mycelium Bitcoin Wallet is the successor of BitcoinSpinner, and will eventually replace it entirely.\n\nOR\n\nContinue using BitcoinSpinner:\n  1. Move your funds to another wallet and wait for 6 confirmations\n  2. Uninstall BitcoinSpinner\n  3. Re-install BitcoinSpinner, this creates new strong keys\n  4. Move funds back</string>
+    <string name="key_vulnerability_i_got_it">I got it, don\'t show this message again</string>
 </resources>

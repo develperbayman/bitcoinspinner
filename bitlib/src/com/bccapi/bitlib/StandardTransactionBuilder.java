@@ -7,6 +7,7 @@ import com.bccapi.bitlib.crypto.BitcoinSigner;
 import com.bccapi.bitlib.crypto.PrivateKeyRing;
 import com.bccapi.bitlib.crypto.PublicKey;
 import com.bccapi.bitlib.crypto.PublicKeyRing;
+import com.bccapi.bitlib.crypto.RandomSource;
 import com.bccapi.bitlib.model.Address;
 import com.bccapi.bitlib.model.NetworkParameters;
 import com.bccapi.bitlib.model.ScriptInput;
@@ -188,7 +189,8 @@ public class StandardTransactionBuilder {
       return output;
    }
 
-   public static List<byte[]> generateSignatures(SigningRequest[] requests, PrivateKeyRing keyRing) {
+   public static List<byte[]> generateSignatures(SigningRequest[] requests, PrivateKeyRing keyRing,
+         RandomSource randomSource) {
       List<byte[]> signatures = new LinkedList<byte[]>();
       for (SigningRequest request : requests) {
          BitcoinSigner signer = keyRing.findSignerByPublicKey(request.publicKey);
@@ -197,7 +199,7 @@ public class StandardTransactionBuilder {
             // keys for
             throw new RuntimeException("Private key not found");
          }
-         byte[] signature = signer.makeStandardBitcoinSignature(request.toSign);
+         byte[] signature = signer.makeStandardBitcoinSignature(request.toSign, randomSource);
          signatures.add(signature);
       }
       return signatures;

@@ -6,7 +6,6 @@ package com.bccapi.bitlib.crypto;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.security.SecureRandom;
 
 import com.bccapi.bitlib.crypto.ec.EcTools;
 import com.bccapi.bitlib.crypto.ec.Parameters;
@@ -28,7 +27,7 @@ public class InMemoryPrivateKey extends PrivateKey implements KeyExporter, Seria
    /**
     * Construct a random private key using a secure random source.
     */
-   public InMemoryPrivateKey(SecureRandom random) {
+   public InMemoryPrivateKey(RandomSource randomSource) {
       int nBitLength = Parameters.n.bitLength();
       BigInteger d;
       do {
@@ -37,7 +36,7 @@ public class InMemoryPrivateKey extends PrivateKey implements KeyExporter, Seria
          // same seed. Using BigInteger(nBitLength, random)
          // produces different results on Android compared to 'classic' java.
          byte[] bytes = new byte[nBitLength / 8];
-         random.nextBytes(bytes);
+         randomSource.nextBytes(bytes);
          bytes[0] = (byte) (bytes[0] & 0x7F); // ensure positive number
          d = new BigInteger(bytes);
       } while (d.equals(BigInteger.ZERO) || (d.compareTo(Parameters.n) >= 0));
@@ -107,12 +106,11 @@ public class InMemoryPrivateKey extends PrivateKey implements KeyExporter, Seria
    }
 
    @Override
-   protected BigInteger[] generateSignature(byte[] message) {
+   protected BigInteger[] generateSignature(byte[] message, RandomSource randomSource) {
       BigInteger n = Parameters.n;
       BigInteger e = calculateE(n, message);
       BigInteger r = null;
       BigInteger s = null;
-      SecureRandom random = new SecureRandom();
       // 5.3.2
       do // generate s
       {
@@ -125,7 +123,7 @@ public class InMemoryPrivateKey extends PrivateKey implements KeyExporter, Seria
                // make a BigInteger from bytes to ensure that Andriod and
                // 'classic' java make the same BigIntegers
                byte[] bytes = new byte[nBitLength / 8];
-               random.nextBytes(bytes);
+               randomSource.nextBytes(bytes);
                bytes[0] = (byte) (bytes[0] & 0x7F); // ensure positive number
                k = new BigInteger(bytes);
             } while (k.equals(BigInteger.ZERO));

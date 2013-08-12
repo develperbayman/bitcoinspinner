@@ -18,6 +18,7 @@ public class SpinnerContext {
   private static final String PIN = "pin";
   private static final String PUBLIC_KEY_REGISTERED = "pub key registered";
   private static final String BACKUP_WARNING_DISABLED = "backup warning disabled";
+  private static final String VULNERABILITY_WARNING_DISABLED = "vulnerability warning disabled";
 
   private static SpinnerContext _spinnerContext;
 
@@ -128,6 +129,20 @@ public class SpinnerContext {
     }
   }
 
+  public boolean isVulnerabilityWarningDisabled() {
+     SharedPreferences preferences = getApplicationContext().getSharedPreferences(Consts.PREFS_NAME,
+         Context.MODE_PRIVATE);
+     return preferences.getBoolean(VULNERABILITY_WARNING_DISABLED, false);
+   }
+
+   public void markVulnerabilityWarningDisabled() {
+     SharedPreferences preferences = getApplicationContext().getSharedPreferences(Consts.PREFS_NAME,
+         Context.MODE_PRIVATE);
+     if (!preferences.getBoolean(VULNERABILITY_WARNING_DISABLED, false)) {
+       preferences.edit().putBoolean(VULNERABILITY_WARNING_DISABLED, true).commit();
+     }
+   }
+  
   public String getPin() {
     SharedPreferences preferences = getApplicationContext().getSharedPreferences(Consts.PREFS_NAME,
         Context.MODE_PRIVATE);

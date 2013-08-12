@@ -11,6 +11,7 @@ import java.io.OutputStream;
 import java.math.BigDecimal;
 import java.net.URL;
 import java.security.GeneralSecurityException;
+import java.security.SecureRandom;
 import java.text.DateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,6 +30,7 @@ import com.bccapi.bitlib.crypto.PrivateKey;
 import com.bccapi.bitlib.crypto.PrivateKeyRing;
 import com.bccapi.bitlib.crypto.PublicKey;
 import com.bccapi.bitlib.crypto.PublicKeyRing;
+import com.bccapi.bitlib.crypto.RandomSource;
 import com.bccapi.bitlib.model.Address;
 import com.bccapi.bitlib.model.NetworkParameters;
 import com.bccapi.bitlib.model.Transaction;
@@ -242,8 +244,16 @@ public class SimpleClient {
       printnln("Hit enter to sign and send transaction.");
       readLine();
 
+      RandomSource randomSource = new RandomSource() {
+
+         @Override
+         public void nextBytes(byte[] bytes) {
+            new SecureRandom().nextBytes(bytes);
+         }
+      };
+      
       // Sign all inputs
-      List<byte[]> signatures = StandardTransactionBuilder.generateSignatures(unsigned.getSignatureInfo(), keyRing);
+      List<byte[]> signatures = StandardTransactionBuilder.generateSignatures(unsigned.getSignatureInfo(), keyRing, randomSource);
 
       // Apply signatures to unsigned transaction, and create final transaction
       Transaction transaction = StandardTransactionBuilder.finalizeTransaction(unsigned, signatures);
