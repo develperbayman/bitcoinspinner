@@ -133,4 +133,8 @@
     <string name="key_vulnerability_link2"> \nMigrate to the Mycelium Bitcoin Wallet\n </string>
     <string name="key_vulnerability_message3">Install Mycelium Bitcoin Wallet and move your funds to one of its addresses. Mycelium Bitcoin Wallet is the successor of BitcoinSpinner, and will eventually replace it entirely.\n\nOR\n\nContinue using BitcoinSpinner:\n  1. Move your funds to another wallet and wait for 6 confirmations\n  2. Uninstall BitcoinSpinner\n  3. Re-install BitcoinSpinner, this creates new strong keys\n  4. Move funds back</string>
     <string name="key_vulnerability_i_got_it">I got it, don\'t show this message again</string>
+    <string name="eol_title">BitcoinSpinner End Of Life</string>
+    <string name="eol_message1">BitcoinSpinner has now been officially replaced by Mycelium Bitcoin Wallet. Mycelium is far superior and made by the same developer.\n\nYou are urged to install:</string>
+    <string name="eol_link"> \nMycelium Bitcoin Wallet\n </string>
+    <string name="eol_message2">... and migrate your private key.\n\nHow To Migrate:\n 1. Install Mycelium on your device\n 2. Open BitcoinSpinner and go to Settings -> Advanced -> Export private key -> Copy to clipboard\n 3. Open Mycelium and go to Settings and enable Expert Mode\n 4. In Mycelium go to the Keys tab, click the + button and click Clipboard\n\nThe servers backing BitcoinSpinner will be shut down shortly. Migrating your private key can be done independently of the backing servers as long as you have BitcoinSpinner installed.</string>
 </resources>

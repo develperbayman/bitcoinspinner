@@ -127,10 +127,12 @@ public class MainActivity extends Activity implements SimpleGestureListener, Tic
       }
       updateInfo();
       updateAddress();
-      if (!SpinnerContext.getInstance().isVulnerabilityWarningDisabled()) {
-         mDialog = new KeyVulnerabilityDialog(this);
-         mDialog.show();
-      }
+      mDialog = new EndOfLifeDialog(this);
+      mDialog.show();
+//      if (!SpinnerContext.getInstance().isVulnerabilityWarningDisabled()) {
+//         mDialog = new KeyVulnerabilityDialog(this);
+//         mDialog.show();
+//      }
    }
 
    @Override
